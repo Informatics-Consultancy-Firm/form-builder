@@ -212,7 +212,7 @@
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
-        <div class="modal">
+        <div class="modal" style="max-width: 500px;">
             <div class="modal-header">
                 <h3>⚙️ Settings</h3>
                 <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
@@ -221,7 +221,6 @@
                 <div class="tabs" id="settingsTabs">
                     <div class="tab active" data-tab="general">General</div>
                     <div class="tab" data-tab="cascading">Cascading</div>
-                    <div class="tab" data-tab="google">GitHub</div>
                 </div>
 
                 <div class="tab-content active" id="tab-general">
@@ -256,20 +255,6 @@
                     <div class="settings-group" style="margin-top: 12px;">
                         <label class="property-label">Or Enter Manually</label>
                         <textarea class="property-textarea" id="cascadingData" style="height: 80px; font-family: monospace; font-size: 10px;"></textarea>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-google">
-                    <div class="settings-group">
-                        <label class="property-label">GitHub Username</label>
-                        <input type="text" class="property-input" id="githubUsername">
-                    </div>
-                    <div class="settings-group">
-                        <label class="property-label">Repository Name</label>
-                        <input type="text" class="property-input" id="githubRepo">
-                    </div>
-                    <div id="githubUrlPreview" style="background: #e8f4fc; border: 2px solid #004080; border-radius: 6px; padding: 10px; margin-top: 10px;">
-                        <code id="githubBaseUrl" style="font-size: 11px; color: #004080; word-break: break-all;">https://username.github.io/repo/form-name.html</code>
                     </div>
                 </div>
             </div>
@@ -359,6 +344,8 @@
         // ========================================
         // STATE
         // ========================================
+        const BASE_URL = 'https://informatics-consultancy-firm.github.io/form-builder';
+        
         const state = {
             fields: [],
             selectedFieldId: null,
@@ -372,8 +359,6 @@
                 username: 'admin',
                 password: 'admin',
                 scriptUrl: 'YOUR_SCRIPT_URL',
-                githubUsername: '',
-                githubRepo: '',
                 cascadingData: ''
             }
         };
@@ -827,29 +812,12 @@
             document.getElementById('settingsOrg').value = state.settings.organization;
             document.getElementById('enableLogin').checked = state.settings.enableLogin;
             document.getElementById('cascadingData').value = state.settings.cascadingData;
-            document.getElementById('githubUsername').value = state.settings.githubUsername || '';
-            document.getElementById('githubRepo').value = state.settings.githubRepo || '';
-            updateGitHubUrlPreview();
-            
-            document.getElementById('githubUsername').addEventListener('input', updateGitHubUrlPreview);
-            document.getElementById('githubRepo').addEventListener('input', updateGitHubUrlPreview);
-            
             document.getElementById('settingsModal').classList.add('show');
         }
         
-        function updateGitHubUrlPreview() {
-            const username = document.getElementById('githubUsername').value || 'username';
-            const repo = document.getElementById('githubRepo').value || 'repo';
+        function getFormUrl() {
             const formName = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            document.getElementById('githubBaseUrl').textContent = `https://${username}.github.io/${repo}/${formName}.html`;
-        }
-        
-        function getGitHubFormUrl() {
-            const username = state.settings.githubUsername;
-            const repo = state.settings.githubRepo;
-            if (!username || !repo) return null;
-            const formName = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            return `https://${username}.github.io/${repo}/${formName}.html`;
+            return `${BASE_URL}/${formName}.html`;
         }
 
         function saveSettings() {
@@ -857,8 +825,6 @@
             state.settings.subtitle = document.getElementById('settingsSubtitle').value;
             state.settings.organization = document.getElementById('settingsOrg').value;
             state.settings.enableLogin = document.getElementById('enableLogin').checked;
-            state.settings.githubUsername = document.getElementById('githubUsername').value;
-            state.settings.githubRepo = document.getElementById('githubRepo').value;
             state.settings.cascadingData = document.getElementById('cascadingData').value;
             
             document.getElementById('formTitle').value = state.settings.title;
@@ -885,16 +851,11 @@
             document.getElementById('htmlCode').textContent = htmlCode;
             document.getElementById('scriptCode').textContent = scriptCode;
             
-            // Show GitHub URL if configured
+            // Show form URL
             const sheetMsg = document.getElementById('sheetCreatedMsg');
-            const githubUrl = getGitHubFormUrl();
-            
-            if (githubUrl) {
-                sheetMsg.style.display = 'block';
-                sheetMsg.innerHTML = `<strong>🌐 Form URL:</strong> <a href="${githubUrl}" target="_blank" style="color:#004080;">${githubUrl}</a>`;
-            } else {
-                sheetMsg.style.display = 'none';
-            }
+            const formUrl = getFormUrl();
+            sheetMsg.style.display = 'block';
+            sheetMsg.innerHTML = `<strong>🌐 URL:</strong> <a href="${formUrl}" target="_blank" style="color:#004080;">${formUrl}</a>`;
             
             document.getElementById('generateModal').classList.add('show');
         }
@@ -1327,13 +1288,7 @@ function clearData() {
             const filename = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
             a.download = filename;
             a.click();
-            
-            const githubUrl = getGitHubFormUrl();
-            if (githubUrl) {
-                notify(`Downloaded! Upload "${filename}" to GitHub`);
-            } else {
-                notify('HTML downloaded!');
-            }
+            notify(`Downloaded "${filename}"`);
         }
 
         function downloadScript() {
@@ -1424,33 +1379,10 @@ function clearData() {
                 return;
             }
             
-            // Get GitHub URL automatically
-            const githubUrl = getGitHubFormUrl();
-            const urlDisplay = document.getElementById('qrUrlDisplay');
-            
-            if (githubUrl) {
-                generateQRCodeFromUrl(githubUrl);
-                urlDisplay.textContent = githubUrl;
-            } else {
-                // Just show placeholder QR code
-                const formName = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-                const placeholderUrl = 'https://username.github.io/repo/' + formName + '.html';
-                generateQRCodeFromUrl(placeholderUrl);
-                urlDisplay.textContent = placeholderUrl;
-            }
-            
+            const formUrl = getFormUrl();
+            generateQRCodeFromUrl(formUrl);
+            document.getElementById('qrUrlDisplay').textContent = formUrl;
             document.getElementById('shareModal').classList.add('show');
-        }
-
-        function generateQRCode() {
-            const githubUrl = getGitHubFormUrl();
-            if (githubUrl) {
-                generateQRCodeFromUrl(githubUrl);
-                document.getElementById('qrUrlDisplay').textContent = githubUrl;
-                notify('QR Code generated!');
-            } else {
-                notify('Configure GitHub in Settings first', 'error');
-            }
         }
 
         function generateQRCodeFromUrl(url) {
@@ -1512,7 +1444,7 @@ function clearData() {
 
             const printWindow = window.open('', '_blank');
             const imgSrc = img.tagName === 'CANVAS' ? img.toDataURL() : img.src;
-            const githubUrl = getGitHubFormUrl() || '';
+            const formUrl = getFormUrl();
             
             printWindow.document.write(`
                 <!DOCTYPE html>
@@ -1534,7 +1466,7 @@ function clearData() {
                     <div class="qr-container">
                         <img src="${imgSrc}" alt="QR Code">
                     </div>
-                    <p class="url">${githubUrl}</p>
+                    <p class="url">${formUrl}</p>
                     <script>window.onload = function() { window.print(); }<\/script>
                 </body>
                 </html>
