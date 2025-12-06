@@ -273,10 +273,7 @@
                 <button class="modal-close" onclick="closeModal('generateModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div id="sheetCreatedMsg" style="display: none; background: #d4edda; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
-                    <strong>✅ Google Sheet Created!</strong>
-                    <p style="font-size: 11px; margin-top: 5px;">Sheet: <a href="#" id="sheetLink" target="_blank" style="color: #004080;"></a></p>
-                </div>
+                <div id="sheetCreatedMsg" style="display: none; background: #d4edda; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 2px solid #28a745;"></div>
                 
                 <div class="tabs" id="generateTabs">
                     <div class="tab active" data-tab="html-code">HTML Form</div>
@@ -328,9 +325,12 @@
             </div>
             <div class="modal-body" style="text-align: center; padding: 25px;">
                 <div id="qrcodeContainer" style="display: inline-block; padding: 15px; background: white; border: 3px solid #004080; border-radius: 12px;"></div>
-                <p style="margin-top: 12px; font-size: 10px; color: #004080; word-break: break-all;" id="qrUrlDisplay"></p>
+                <p style="margin-top: 12px; font-size: 10px; color: #004080; word-break: break-all; cursor: pointer;" id="qrUrlDisplay" title="Click to copy"></p>
                 <div style="margin-top: 15px;">
-                    <button class="modal-btn primary" onclick="downloadQRCode()">⬇️ Download</button>
+                    <button class="modal-btn primary" onclick="copyFormUrl()">📋 Copy URL</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="modal-btn secondary" onclick="downloadQRCode()">⬇️ Download</button>
                     <button class="modal-btn secondary" onclick="printQRCode()" style="margin-left: 8px;">🖨️ Print</button>
                 </div>
             </div>
@@ -816,8 +816,29 @@
         }
         
         function getFormUrl() {
-            const formName = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            return `${BASE_URL}/${formName}/`;
+            const formData = {
+                s: {
+                    t: state.settings.title,
+                    st: state.settings.subtitle,
+                    o: state.settings.organization,
+                    l: state.settings.logo,
+                    el: state.settings.enableLogin,
+                    u: state.settings.username,
+                    p: state.settings.password,
+                    su: state.settings.scriptUrl
+                },
+                f: state.fields.map(f => ({
+                    i: f.id,
+                    t: f.type,
+                    n: f.name,
+                    l: f.label,
+                    r: f.required,
+                    o: f.options,
+                    sk: f.skipLogic
+                }))
+            };
+            const encoded = btoa(encodeURIComponent(JSON.stringify(formData)));
+            return `${BASE_URL}/?d=${encoded}`;
         }
 
         function saveSettings() {
@@ -852,10 +873,13 @@
             document.getElementById('scriptCode').textContent = scriptCode;
             
             // Show form URL
-            const sheetMsg = document.getElementById('sheetCreatedMsg');
             const formUrl = getFormUrl();
-            sheetMsg.style.display = 'block';
-            sheetMsg.innerHTML = `<strong>🌐 URL:</strong> <a href="${formUrl}" target="_blank" style="color:#004080;">${formUrl}</a>`;
+            document.getElementById('sheetCreatedMsg').style.display = 'block';
+            document.getElementById('sheetCreatedMsg').innerHTML = `
+                <strong>🌐 Share URL:</strong><br>
+                <a href="${formUrl}" target="_blank" style="color:#004080;word-break:break-all;font-size:11px;">${formUrl.length > 100 ? formUrl.substring(0, 100) + '...' : formUrl}</a>
+                <br><small style="color:#666;">URL contains form data - just share it!</small>
+            `;
             
             document.getElementById('generateModal').classList.add('show');
         }
@@ -1285,10 +1309,10 @@ function clearData() {
             const blob = new Blob([code], { type: 'text/html' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            const filename = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
-            a.download = filename;
+            a.download = 'index.html';
             a.click();
-            notify(`Downloaded "${filename}"`);
+            const folderName = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            notify(`Downloaded! Create folder "${folderName}" and upload index.html`);
         }
 
         function downloadScript() {
@@ -1381,8 +1405,29 @@ function clearData() {
             
             const formUrl = getFormUrl();
             generateQRCodeFromUrl(formUrl);
-            document.getElementById('qrUrlDisplay').textContent = formUrl;
+            
+            // Show truncated URL for display
+            const displayUrl = formUrl.length > 60 ? formUrl.substring(0, 60) + '...' : formUrl;
+            document.getElementById('qrUrlDisplay').textContent = displayUrl;
+            document.getElementById('qrUrlDisplay').title = formUrl; // Full URL on hover
+            
             document.getElementById('shareModal').classList.add('show');
+        }
+        
+        function copyFormUrl() {
+            const formUrl = getFormUrl();
+            navigator.clipboard.writeText(formUrl).then(() => {
+                notify('URL copied to clipboard!');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = formUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                notify('URL copied!');
+            });
         }
 
         function generateQRCodeFromUrl(url) {
@@ -1476,6 +1521,143 @@ function clearData() {
 
         // Initialize
         init();
+        
+        // Check if viewing a form (data encoded in URL)
+        (function checkFormView() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('d');
+            if (encodedData) {
+                try {
+                    const formData = JSON.parse(decodeURIComponent(atob(encodedData)));
+                    renderFormForViewing(formData);
+                } catch (err) {
+                    document.body.innerHTML = `
+                        <div style="text-align:center;padding:50px;font-family:Oswald,sans-serif;">
+                            <h1 style="color:#dc3545;">Invalid Form Link</h1>
+                            <p>This form link is invalid or corrupted.</p>
+                            <a href="./" style="color:#004080;">Go to Form Builder</a>
+                        </div>`;
+                }
+            }
+        })();
+        
+        function renderFormForViewing(data) {
+            const s = data.s;
+            const fields = data.f;
+            
+            // Build login screen if enabled
+            let loginHTML = '';
+            if (s.el) {
+                loginHTML = `
+                    <div id="loginScreen" style="max-width:400px;margin:50px auto;font-family:Oswald,sans-serif;">
+                        <div style="border:4px double #004080;border-radius:12px;overflow:hidden;">
+                            <div style="background:#004080;color:#fff;padding:20px;text-align:center;">
+                                <img src="${s.l}" style="width:70px;border-radius:8px;margin-bottom:8px;">
+                                <h1 style="font-size:17px;margin:0;">${s.t}</h1>
+                            </div>
+                            <div style="padding:20px;">
+                                <div style="margin-bottom:12px;">
+                                    <label style="display:block;font-size:11px;font-weight:700;margin-bottom:5px;">USERNAME</label>
+                                    <input type="text" id="loginUser" style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;">
+                                </div>
+                                <div style="margin-bottom:12px;">
+                                    <label style="display:block;font-size:11px;font-weight:700;margin-bottom:5px;">PASSWORD</label>
+                                    <input type="password" id="loginPass" style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;">
+                                </div>
+                                <button onclick="doLogin('${s.u}','${s.p}')" style="width:100%;padding:12px;background:#004080;color:#fff;border:none;border-radius:6px;font-family:Oswald;font-weight:700;cursor:pointer;">LOGIN</button>
+                                <p id="loginError" style="color:red;font-size:11px;margin-top:8px;display:none;">Invalid credentials</p>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            
+            let fieldsHTML = fields.map(f => {
+                if (f.t === 'section') {
+                    return `<div style="background:#004080;color:#fff;padding:10px 14px;margin:18px -20px;font-size:13px;font-weight:700;">${f.l.toUpperCase()}</div>`;
+                }
+                const req = f.r ? '<span style="color:red;">*</span>' : '';
+                const reqAttr = f.r ? 'required' : '';
+                let inner = '';
+                switch (f.t) {
+                    case 'text': case 'number': case 'date':
+                        inner = `<input type="${f.t}" name="${f.n}" ${reqAttr} style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;">`;
+                        break;
+                    case 'textarea':
+                        inner = `<textarea name="${f.n}" rows="3" ${reqAttr} style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;"></textarea>`;
+                        break;
+                    case 'select':
+                        inner = `<select name="${f.n}" ${reqAttr} style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;"><option value="">-- Select --</option>${(f.o||[]).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
+                        break;
+                    case 'radio': case 'yesno': case 'yesnona':
+                        const opts = f.t === 'yesno' ? ['Yes','No'] : f.t === 'yesnona' ? ['Yes','No','N/A'] : (f.o||[]);
+                        inner = `<div style="display:flex;flex-wrap:wrap;gap:10px;">${opts.map(o=>`<label style="display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;"><input type="radio" name="${f.n}" value="${o}" ${reqAttr}><span>${o}</span></label>`).join('')}</div>`;
+                        break;
+                    case 'checkbox':
+                        inner = `<div style="display:flex;flex-wrap:wrap;gap:10px;">${(f.o||[]).map(o=>`<label style="display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;"><input type="checkbox" name="${f.n}" value="${o}"><span>${o}</span></label>`).join('')}</div>`;
+                        break;
+                    default:
+                        inner = `<input type="text" name="${f.n}" style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;">`;
+                }
+                return `<div style="margin-bottom:16px;"><label style="display:block;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;">${f.l} ${req}</label>${inner}</div>`;
+            }).join('');
+            
+            const formHTML = `
+                <div id="formScreen" style="max-width:650px;margin:20px auto;font-family:Oswald,sans-serif;${s.el ? 'display:none;' : ''}">
+                    <div style="border:4px double #004080;border-radius:12px;overflow:hidden;">
+                        <div style="background:#004080;color:#fff;padding:20px;text-align:center;">
+                            <img src="${s.l}" style="width:70px;border-radius:8px;margin-bottom:8px;">
+                            <h1 style="font-size:17px;margin:0 0 3px 0;">${s.t}</h1>
+                            <p style="font-size:10px;margin:0;opacity:0.9;">${s.st}</p>
+                        </div>
+                        <div style="padding:20px;">
+                            <form id="dataForm">${fieldsHTML}
+                                <button type="submit" style="width:100%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:Oswald;font-size:14px;font-weight:700;cursor:pointer;">SUBMIT</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:12px;font-size:10px;color:#666;">© 2025 ${s.o}</div>
+                </div>`;
+            
+            document.body.innerHTML = loginHTML + formHTML;
+            
+            // Add login function
+            window.doLogin = function(u, p) {
+                const user = document.getElementById('loginUser').value;
+                const pass = document.getElementById('loginPass').value;
+                if (user === u && pass === p) {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('formScreen').style.display = 'block';
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            };
+            
+            // Add form submit
+            document.getElementById('dataForm').onsubmit = function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = new FormData(form);
+                const obj = {};
+                data.forEach((v,k) => obj[k] = v);
+                
+                // Send to Google Sheets if configured
+                if (s.su && s.su !== 'YOUR_SCRIPT_URL') {
+                    fetch(s.su, {
+                        method: 'POST',
+                        body: JSON.stringify(obj)
+                    }).then(() => {
+                        alert('✅ Form submitted successfully!');
+                        form.reset();
+                    }).catch(() => {
+                        alert('❌ Submission failed. Please try again.');
+                    });
+                } else {
+                    alert('✅ Form submitted! (Configure Apps Script URL for Google Sheets)');
+                    console.log('Form data:', obj);
+                    form.reset();
+                }
+            };
+        }
     </script>
 </body>
 </html>
