@@ -1,4 +1,4 @@
-<!DOCTYPE html>      
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,6 @@
         .auth-container { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #004080 0%, #001a33 100%); padding: 20px; }
         .auth-box { background: white; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .auth-header { background: #004080; color: white; padding: 25px; text-align: center; }
-        .auth-header img { width: 70px; border-radius: 10px; margin-bottom: 12px; }
         .auth-header h1 { font-size: 22px; margin-bottom: 5px; }
         .auth-header p { font-size: 12px; opacity: 0.9; }
         .auth-body { padding: 25px; }
@@ -37,7 +36,6 @@
         .dashboard-container { display: none; }
         .header { background: #004080; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-logo { width: 40px; height: 40px; border-radius: 6px; }
         .header h1 { font-size: 18px; }
         .header-user { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .header-username { font-size: 12px; background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; }
@@ -167,7 +165,6 @@
         .viewer-form { max-width: 600px; margin: 15px auto; padding: 0 15px; }
         .viewer-form-box { border: 4px double #004080; border-radius: 12px; overflow: hidden; background: white; }
         .viewer-header { background: #004080; color: white; padding: 18px; text-align: center; }
-        .viewer-header img { width: 60px; border-radius: 8px; margin-bottom: 8px; }
         .viewer-header h1 { font-size: 16px; margin-bottom: 4px; }
         .viewer-header p { font-size: 10px; opacity: 0.9; }
         .viewer-body { padding: 18px; }
@@ -209,7 +206,7 @@
     <div class="auth-container" id="authContainer">
         <div class="auth-box">
             <div class="auth-header">
-                <img src="https://i.ibb.co/S7fsH2f/ICF-SL-LOGO.png" alt="ICF-SL">
+                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" style="width:70px;border-radius:10px;margin-bottom:12px;">
                 <h1>Form Builder</h1>
                 <p>Create & Manage Data Collection Forms</p>
             </div>
@@ -265,7 +262,7 @@
     <div class="dashboard-container" id="dashboardContainer">
         <div class="header">
             <div class="header-brand">
-                <img src="https://i.ibb.co/S7fsH2f/ICF-SL-LOGO.png" alt="ICF-SL" class="header-logo">
+                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" style="width:40px;height:40px;border-radius:6px;">
                 <h1>Form Builder</h1>
             </div>
             <div class="header-user">
@@ -445,7 +442,8 @@
         // CONFIGURATION & STATE
         // ========================================
         const CONFIG = {
-            LOGO: 'https://i.ibb.co/S7fsH2f/ICF-SL-LOGO.png',
+            LOGO: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
+            ORG_NAME: 'ICF-SL',
             DEFAULT_ORG: 'ICF-SL',
             BASE_URL: window.location.origin + window.location.pathname
         };
@@ -1110,7 +1108,7 @@
                 </div>
                 <div id="viewerFormTab" class="viewer-form">
                     <div class="viewer-form-box">
-                        <div class="viewer-header"><img src="${CONFIG.LOGO}"><h1>${form.title}</h1><p>${form.subtitle || 'Data Collection'}</p></div>
+                        <div class="viewer-header"><img src="${CONFIG.LOGO}" style="width:60px;border-radius:8px;margin-bottom:8px;"><h1>${form.title}</h1><p>${form.subtitle || 'Data Collection'}</p></div>
                         <div class="viewer-body">
                             <form id="viewerForm">${fieldsHtml}
                                 <button type="button" class="viewer-draft-btn" onclick="saveDraft('${form.id}')">💾 Save Draft</button>
@@ -1221,7 +1219,7 @@
             const container = document.getElementById('reportContainer');
             let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
             
-            let html = `<div id="printableReport"><div style="text-align:center;margin-bottom:15px;"><img src="${CONFIG.LOGO}" style="width:50px;"><h2 style="color:#004080;margin:8px 0;">${form.title}</h2><p style="font-size:10px;color:#666;">Generated: ${new Date().toLocaleString()}</p></div>
+            let html = `<div id="printableReport"><div style="text-align:center;margin-bottom:15px;"><img src="${CONFIG.LOGO}" style="width:50px;border-radius:6px;"><h2 style="color:#004080;margin:8px 0;">${form.title}</h2><p style="font-size:10px;color:#666;">Generated: ${new Date().toLocaleString()}</p></div>
             <div style="background:#e8f4fc;padding:10px;border-radius:6px;margin-bottom:15px;"><strong>Total:</strong> ${data.length} submissions</div>`;
             
             if (data.length > 0) {
