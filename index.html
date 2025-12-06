@@ -221,6 +221,7 @@
                 <div class="tabs" id="settingsTabs">
                     <div class="tab active" data-tab="general">General</div>
                     <div class="tab" data-tab="cascading">Cascading</div>
+                    <div class="tab" data-tab="google">Google Sheets</div>
                 </div>
 
                 <div class="tab-content active" id="tab-general">
@@ -255,6 +256,17 @@
                     <div class="settings-group" style="margin-top: 12px;">
                         <label class="property-label">Or Enter Manually</label>
                         <textarea class="property-textarea" id="cascadingData" style="height: 80px; font-family: monospace; font-size: 10px;"></textarea>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-google">
+                    <div class="settings-group">
+                        <label class="property-label">Apps Script Web URL</label>
+                        <input type="text" class="property-input" id="settingsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+                    </div>
+                    <div style="background:#e8f4fc;padding:12px;border-radius:6px;margin-top:10px;font-size:11px;">
+                        <strong>📋 One Script for ALL Forms!</strong><br>
+                        Each form auto-creates its own sheet/tab based on form title.
                     </div>
                 </div>
             </div>
@@ -937,41 +949,9 @@
             document.getElementById('settingsOrg').value = state.settings.organization;
             document.getElementById('enableLogin').checked = state.settings.enableLogin;
             document.getElementById('cascadingData').value = state.settings.cascadingData;
+            document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl || '';
             document.getElementById('settingsModal').classList.add('show');
         }
-        
-        // LZ-String compression (minimal implementation)
-        const LZString = {
-            compress: function(str) {
-                if (!str) return '';
-                let i, value, dict = {}, data = (str + '').split(''), out = [], currChar, phrase = data[0], code = 256;
-                for (i = 1; i < data.length; i++) {
-                    currChar = data[i];
-                    if (dict[phrase + currChar] != null) {
-                        phrase += currChar;
-                    } else {
-                        out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-                        dict[phrase + currChar] = code++;
-                        phrase = currChar;
-                    }
-                }
-                out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-                return out.map(c => String.fromCharCode(c)).join('');
-            },
-            decompress: function(str) {
-                if (!str) return '';
-                let i, dict = {}, currChar = str.charAt(0), oldPhrase = currChar, out = [currChar], code = 256, phrase;
-                for (i = 1; i < str.length; i++) {
-                    let currCode = str.charCodeAt(i);
-                    phrase = currCode < 256 ? String.fromCharCode(currCode) : (dict[currCode] ? dict[currCode] : (oldPhrase + currChar));
-                    out.push(phrase);
-                    currChar = phrase.charAt(0);
-                    dict[code++] = oldPhrase + currChar;
-                    oldPhrase = phrase;
-                }
-                return out.join('');
-            }
-        };
         
         function getFormUrl() {
             const formData = {
@@ -995,8 +975,7 @@
                 }))
             };
             const json = JSON.stringify(formData);
-            const compressed = LZString.compress(json);
-            const encoded = btoa(unescape(encodeURIComponent(compressed)));
+            const encoded = btoa(unescape(encodeURIComponent(json)));
             return `${BASE_URL}/?d=${encoded}`;
         }
 
@@ -1006,6 +985,7 @@
             state.settings.organization = document.getElementById('settingsOrg').value;
             state.settings.enableLogin = document.getElementById('enableLogin').checked;
             state.settings.cascadingData = document.getElementById('cascadingData').value;
+            state.settings.scriptUrl = document.getElementById('settingsScriptUrl').value;
             
             document.getElementById('formTitle').value = state.settings.title;
             document.getElementById('previewTitle').textContent = state.settings.title;
@@ -1788,9 +1768,8 @@ function clearCurrentSheet() {
             const encodedData = urlParams.get('d');
             if (encodedData) {
                 try {
-                    const decoded = decodeURIComponent(escape(atob(encodedData)));
-                    const decompressed = LZString.decompress(decoded);
-                    const formData = JSON.parse(decompressed);
+                    const json = decodeURIComponent(escape(atob(encodedData)));
+                    const formData = JSON.parse(json);
                     renderFormForViewing(formData);
                 } catch (err) {
                     console.error('Error loading form:', err);
@@ -1807,6 +1786,7 @@ function clearCurrentSheet() {
         function renderFormForViewing(data) {
             const s = data.s;
             const fields = data.f;
+            const formKey = 'form_' + s.t.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             
             // Build login screen if enabled
             let loginHTML = '';
@@ -1876,7 +1856,7 @@ function clearCurrentSheet() {
                         break;
                     case 'signature':
                         inner = `<div class="sig-container" data-name="${f.n}">
-                            <canvas class="sig-canvas" width="300" height="150" style="border:2px solid #004080;border-radius:6px;touch-action:none;"></canvas>
+                            <canvas class="sig-canvas" width="300" height="150" style="border:2px solid #004080;border-radius:6px;touch-action:none;background:#fff;"></canvas>
                             <input type="hidden" name="${f.n}" class="sig-data">
                             <div style="margin-top:8px;">
                                 <button type="button" onclick="clearSignature(this)" style="padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;">Clear</button>
@@ -1894,8 +1874,37 @@ function clearCurrentSheet() {
             }).join('');
             
             const formHTML = `
+                <style>
+                    .nav-btn{padding:8px 12px;margin:3px;border:none;border-radius:6px;cursor:pointer;font-family:Oswald;font-size:11px;font-weight:700;}
+                    .nav-btn:hover{opacity:0.9;}
+                    .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;overflow:auto;}
+                    .modal-overlay.show{display:flex;align-items:flex-start;justify-content:center;padding:20px;}
+                    .modal-box{background:#fff;border-radius:12px;max-width:95%;width:900px;margin:20px auto;max-height:90vh;overflow:auto;}
+                    .modal-header{background:#004080;color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;}
+                    .modal-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;}
+                    .data-table{width:100%;border-collapse:collapse;font-size:11px;}
+                    .data-table th,.data-table td{border:1px solid #ddd;padding:8px;text-align:left;}
+                    .data-table th{background:#004080;color:#fff;}
+                    .data-table tr:nth-child(even){background:#f9f9f9;}
+                    .stat-card{background:#f8f9fa;border:2px solid #004080;border-radius:8px;padding:15px;text-align:center;margin:10px;}
+                    .stat-value{font-size:28px;font-weight:700;color:#004080;}
+                    .stat-label{font-size:11px;color:#666;margin-top:5px;}
+                    .chart-bar{height:20px;background:#004080;border-radius:4px;margin:5px 0;}
+                    .draft-item{background:#fff8e6;border:2px solid #ffc107;border-radius:8px;padding:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;}
+                </style>
+                
                 <div id="formScreen" style="max-width:650px;margin:20px auto;font-family:Oswald,sans-serif;${s.el ? 'display:none;' : ''}">
-                    <div style="border:4px double #004080;border-radius:12px;overflow:hidden;">
+                    <!-- Navigation Bar -->
+                    <div style="background:#f8f9fa;border-radius:8px;padding:10px;margin-bottom:15px;text-align:center;">
+                        <button class="nav-btn" style="background:#004080;color:#fff;" onclick="showView('form')">📝 Form</button>
+                        <button class="nav-btn" style="background:#28a745;color:#fff;" onclick="showView('data')">📊 View Data</button>
+                        <button class="nav-btn" style="background:#17a2b8;color:#fff;" onclick="showView('dashboard')">📈 Dashboard</button>
+                        <button class="nav-btn" style="background:#6c757d;color:#fff;" onclick="showView('report')">📄 Report</button>
+                        <button class="nav-btn" style="background:#ffc107;color:#000;" onclick="showView('drafts')">💾 Drafts</button>
+                    </div>
+                    
+                    <!-- Form View -->
+                    <div id="formView" style="border:4px double #004080;border-radius:12px;overflow:hidden;">
                         <div style="background:#004080;color:#fff;padding:20px;text-align:center;">
                             <img src="${s.l}" style="width:70px;border-radius:8px;margin-bottom:8px;">
                             <h1 style="font-size:17px;margin:0 0 3px 0;">${s.t}</h1>
@@ -1903,16 +1912,341 @@ function clearCurrentSheet() {
                         </div>
                         <div style="padding:20px;">
                             <form id="dataForm">${fieldsHTML}
-                                <button type="submit" style="width:100%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:Oswald;font-size:14px;font-weight:700;cursor:pointer;">SUBMIT</button>
+                                <div style="display:flex;gap:10px;margin-top:15px;">
+                                    <button type="button" onclick="saveDraft()" style="flex:1;padding:12px;background:#ffc107;color:#000;border:none;border-radius:6px;font-family:Oswald;font-size:13px;font-weight:700;cursor:pointer;">💾 SAVE DRAFT</button>
+                                    <button type="submit" style="flex:2;padding:12px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:Oswald;font-size:14px;font-weight:700;cursor:pointer;">✅ SUBMIT</button>
+                                </div>
                             </form>
                         </div>
                     </div>
+                    
+                    <!-- Data View -->
+                    <div id="dataView" style="display:none;border:4px double #004080;border-radius:12px;overflow:hidden;">
+                        <div style="background:#28a745;color:#fff;padding:15px 20px;">
+                            <h2 style="margin:0;font-size:16px;">📊 Submitted Data</h2>
+                        </div>
+                        <div style="padding:15px;overflow-x:auto;" id="dataTableContainer">
+                            <p style="text-align:center;color:#666;">Loading data...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard View -->
+                    <div id="dashboardView" style="display:none;border:4px double #004080;border-radius:12px;overflow:hidden;">
+                        <div style="background:#17a2b8;color:#fff;padding:15px 20px;">
+                            <h2 style="margin:0;font-size:16px;">📈 Dashboard</h2>
+                        </div>
+                        <div style="padding:15px;" id="dashboardContainer">
+                            <p style="text-align:center;color:#666;">Loading dashboard...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Report View -->
+                    <div id="reportView" style="display:none;border:4px double #004080;border-radius:12px;overflow:hidden;">
+                        <div style="background:#6c757d;color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;">
+                            <h2 style="margin:0;font-size:16px;">📄 Report</h2>
+                            <button onclick="printReport()" style="padding:8px 15px;background:#fff;color:#6c757d;border:none;border-radius:6px;cursor:pointer;font-family:Oswald;font-weight:700;">🖨️ Print</button>
+                        </div>
+                        <div style="padding:15px;" id="reportContainer">
+                            <p style="text-align:center;color:#666;">Loading report...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Drafts View -->
+                    <div id="draftsView" style="display:none;border:4px double #004080;border-radius:12px;overflow:hidden;">
+                        <div style="background:#ffc107;color:#000;padding:15px 20px;">
+                            <h2 style="margin:0;font-size:16px;">💾 Saved Drafts</h2>
+                        </div>
+                        <div style="padding:15px;" id="draftsContainer">
+                            <p style="text-align:center;color:#666;">No drafts saved</p>
+                        </div>
+                    </div>
+                    
                     <div style="text-align:center;padding:12px;font-size:10px;color:#666;">© 2025 ${s.o}</div>
                 </div>`;
             
             document.body.innerHTML = loginHTML + formHTML;
             
-            // Add login function
+            // Store form config globally
+            window.formConfig = { s, fields, formKey };
+            
+            // View switching
+            window.showView = function(view) {
+                ['formView', 'dataView', 'dashboardView', 'reportView', 'draftsView'].forEach(v => {
+                    document.getElementById(v).style.display = 'none';
+                });
+                document.getElementById(view + 'View').style.display = 'block';
+                
+                if (view === 'data') loadDataView();
+                if (view === 'dashboard') loadDashboard();
+                if (view === 'report') loadReport();
+                if (view === 'drafts') loadDrafts();
+            };
+            
+            // Load Data View
+            window.loadDataView = function() {
+                const container = document.getElementById('dataTableContainer');
+                if (!s.su || s.su === 'YOUR_SCRIPT_URL') {
+                    container.innerHTML = '<p style="text-align:center;color:#dc3545;">⚠️ Configure Apps Script URL to view data</p>';
+                    return;
+                }
+                
+                container.innerHTML = '<p style="text-align:center;">⏳ Loading...</p>';
+                
+                fetch(s.su + '?action=getData&form=' + encodeURIComponent(s.t))
+                    .then(r => r.json())
+                    .then(result => {
+                        if (!result.data || result.data.length === 0) {
+                            container.innerHTML = '<p style="text-align:center;color:#666;">No submissions yet</p>';
+                            return;
+                        }
+                        
+                        const headers = Object.keys(result.data[0]);
+                        let html = '<table class="data-table"><thead><tr>';
+                        headers.forEach(h => html += '<th>' + h + '</th>');
+                        html += '</tr></thead><tbody>';
+                        
+                        result.data.forEach(row => {
+                            html += '<tr>';
+                            headers.forEach(h => html += '<td>' + (row[h] || '') + '</td>');
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table>';
+                        html += '<p style="margin-top:10px;font-size:11px;color:#666;">Total: ' + result.data.length + ' submissions</p>';
+                        container.innerHTML = html;
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<p style="text-align:center;color:#dc3545;">❌ Failed to load data</p>';
+                    });
+            };
+            
+            // Load Dashboard
+            window.loadDashboard = function() {
+                const container = document.getElementById('dashboardContainer');
+                if (!s.su || s.su === 'YOUR_SCRIPT_URL') {
+                    container.innerHTML = '<p style="text-align:center;color:#dc3545;">⚠️ Configure Apps Script URL</p>';
+                    return;
+                }
+                
+                container.innerHTML = '<p style="text-align:center;">⏳ Loading...</p>';
+                
+                fetch(s.su + '?action=getData&form=' + encodeURIComponent(s.t))
+                    .then(r => r.json())
+                    .then(result => {
+                        if (!result.data || result.data.length === 0) {
+                            container.innerHTML = '<p style="text-align:center;">No data for dashboard</p>';
+                            return;
+                        }
+                        
+                        const data = result.data;
+                        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">';
+                        
+                        // Total submissions
+                        html += '<div class="stat-card"><div class="stat-value">' + data.length + '</div><div class="stat-label">Total Submissions</div></div>';
+                        
+                        // Today's submissions
+                        const today = new Date().toDateString();
+                        const todayCount = data.filter(r => new Date(r.Timestamp).toDateString() === today).length;
+                        html += '<div class="stat-card"><div class="stat-value">' + todayCount + '</div><div class="stat-label">Today</div></div>';
+                        
+                        html += '</div>';
+                        
+                        // Charts for radio/select fields
+                        fields.filter(f => ['radio', 'yesno', 'yesnona', 'select', 'quality'].includes(f.t)).forEach(field => {
+                            const counts = {};
+                            data.forEach(row => {
+                                const val = row[field.l] || 'Empty';
+                                counts[val] = (counts[val] || 0) + 1;
+                            });
+                            
+                            html += '<div style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:8px;">';
+                            html += '<h4 style="margin:0 0 10px 0;font-size:13px;">' + field.l + '</h4>';
+                            
+                            const max = Math.max(...Object.values(counts));
+                            Object.entries(counts).forEach(([key, val]) => {
+                                const pct = (val / max * 100).toFixed(0);
+                                html += '<div style="margin:8px 0;"><div style="display:flex;justify-content:space-between;font-size:11px;"><span>' + key + '</span><span>' + val + '</span></div>';
+                                html += '<div class="chart-bar" style="width:' + pct + '%;"></div></div>';
+                            });
+                            
+                            html += '</div>';
+                        });
+                        
+                        container.innerHTML = html;
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<p style="text-align:center;color:#dc3545;">❌ Failed to load dashboard</p>';
+                    });
+            };
+            
+            // Load Report
+            window.loadReport = function() {
+                const container = document.getElementById('reportContainer');
+                if (!s.su || s.su === 'YOUR_SCRIPT_URL') {
+                    container.innerHTML = '<p style="text-align:center;color:#dc3545;">⚠️ Configure Apps Script URL</p>';
+                    return;
+                }
+                
+                container.innerHTML = '<p style="text-align:center;">⏳ Loading...</p>';
+                
+                fetch(s.su + '?action=getData&form=' + encodeURIComponent(s.t))
+                    .then(r => r.json())
+                    .then(result => {
+                        if (!result.data || result.data.length === 0) {
+                            container.innerHTML = '<p style="text-align:center;">No data for report</p>';
+                            return;
+                        }
+                        
+                        const data = result.data;
+                        const now = new Date().toLocaleString();
+                        
+                        let html = '<div id="printableReport">';
+                        html += '<div style="text-align:center;margin-bottom:20px;">';
+                        html += '<img src="' + s.l + '" style="width:60px;margin-bottom:10px;">';
+                        html += '<h2 style="margin:0;color:#004080;">' + s.t + '</h2>';
+                        html += '<p style="font-size:11px;color:#666;">Generated: ' + now + '</p>';
+                        html += '</div>';
+                        
+                        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">';
+                        html += '<div style="background:#e8f4fc;padding:12px;border-radius:8px;"><strong>Total Submissions:</strong> ' + data.length + '</div>';
+                        
+                        const today = new Date().toDateString();
+                        const todayCount = data.filter(r => new Date(r.Timestamp).toDateString() === today).length;
+                        html += '<div style="background:#e8f4fc;padding:12px;border-radius:8px;"><strong>Today:</strong> ' + todayCount + '</div>';
+                        html += '</div>';
+                        
+                        // Summary for each field
+                        html += '<h3 style="color:#004080;border-bottom:2px solid #004080;padding-bottom:5px;">Summary by Field</h3>';
+                        
+                        fields.filter(f => f.t !== 'section').forEach(field => {
+                            html += '<div style="margin:15px 0;padding:12px;background:#f8f9fa;border-radius:8px;">';
+                            html += '<h4 style="margin:0 0 8px 0;font-size:12px;color:#004080;">' + field.l + '</h4>';
+                            
+                            if (['radio', 'yesno', 'yesnona', 'select', 'quality'].includes(field.t)) {
+                                const counts = {};
+                                data.forEach(row => {
+                                    const val = row[field.l] || 'Empty';
+                                    counts[val] = (counts[val] || 0) + 1;
+                                });
+                                
+                                html += '<table style="width:100%;font-size:11px;"><tbody>';
+                                Object.entries(counts).forEach(([key, val]) => {
+                                    const pct = (val / data.length * 100).toFixed(1);
+                                    html += '<tr><td>' + key + '</td><td style="text-align:right;">' + val + ' (' + pct + '%)</td></tr>';
+                                });
+                                html += '</tbody></table>';
+                            } else if (field.t === 'number') {
+                                const nums = data.map(r => parseFloat(r[field.l])).filter(n => !isNaN(n));
+                                if (nums.length > 0) {
+                                    const avg = (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2);
+                                    const min = Math.min(...nums);
+                                    const max = Math.max(...nums);
+                                    html += '<p style="font-size:11px;margin:0;">Avg: ' + avg + ' | Min: ' + min + ' | Max: ' + max + '</p>';
+                                }
+                            } else {
+                                const filled = data.filter(r => r[field.l]).length;
+                                html += '<p style="font-size:11px;margin:0;">Responses: ' + filled + ' / ' + data.length + '</p>';
+                            }
+                            
+                            html += '</div>';
+                        });
+                        
+                        html += '</div>';
+                        container.innerHTML = html;
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<p style="text-align:center;color:#dc3545;">❌ Failed to load report</p>';
+                    });
+            };
+            
+            // Print Report
+            window.printReport = function() {
+                const content = document.getElementById('printableReport');
+                if (!content) return;
+                
+                const win = window.open('', '_blank');
+                win.document.write('<html><head><title>Report - ' + s.t + '</title>');
+                win.document.write('<style>body{font-family:Arial,sans-serif;padding:20px;}</style></head><body>');
+                win.document.write(content.innerHTML);
+                win.document.write('</body></html>');
+                win.document.close();
+                win.print();
+            };
+            
+            // Save Draft
+            window.saveDraft = function() {
+                const form = document.getElementById('dataForm');
+                const formData = new FormData(form);
+                const draft = { timestamp: new Date().toISOString(), data: {} };
+                formData.forEach((v, k) => draft.data[k] = v);
+                
+                const drafts = JSON.parse(localStorage.getItem(formKey + '_drafts') || '[]');
+                drafts.unshift(draft);
+                if (drafts.length > 10) drafts.pop(); // Keep max 10 drafts
+                localStorage.setItem(formKey + '_drafts', JSON.stringify(drafts));
+                
+                alert('✅ Draft saved!');
+            };
+            
+            // Load Drafts
+            window.loadDrafts = function() {
+                const container = document.getElementById('draftsContainer');
+                const drafts = JSON.parse(localStorage.getItem(formKey + '_drafts') || '[]');
+                
+                if (drafts.length === 0) {
+                    container.innerHTML = '<p style="text-align:center;color:#666;">No drafts saved</p>';
+                    return;
+                }
+                
+                let html = '';
+                drafts.forEach((draft, i) => {
+                    const date = new Date(draft.timestamp).toLocaleString();
+                    html += '<div class="draft-item">';
+                    html += '<div><strong>Draft ' + (i + 1) + '</strong><br><small>' + date + '</small></div>';
+                    html += '<div>';
+                    html += '<button onclick="loadDraft(' + i + ')" style="padding:6px 12px;background:#004080;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-right:5px;">Load</button>';
+                    html += '<button onclick="deleteDraft(' + i + ')" style="padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;">Delete</button>';
+                    html += '</div></div>';
+                });
+                
+                container.innerHTML = html;
+            };
+            
+            // Load Draft into form
+            window.loadDraft = function(index) {
+                const drafts = JSON.parse(localStorage.getItem(formKey + '_drafts') || '[]');
+                if (!drafts[index]) return;
+                
+                const draft = drafts[index];
+                const form = document.getElementById('dataForm');
+                
+                Object.entries(draft.data).forEach(([name, value]) => {
+                    const el = form.querySelector('[name="' + name + '"]');
+                    if (el) {
+                        if (el.type === 'checkbox' || el.type === 'radio') {
+                            const inputs = form.querySelectorAll('[name="' + name + '"]');
+                            inputs.forEach(inp => inp.checked = inp.value === value);
+                        } else {
+                            el.value = value;
+                        }
+                    }
+                });
+                
+                showView('form');
+                alert('✅ Draft loaded!');
+            };
+            
+            // Delete Draft
+            window.deleteDraft = function(index) {
+                if (!confirm('Delete this draft?')) return;
+                
+                const drafts = JSON.parse(localStorage.getItem(formKey + '_drafts') || '[]');
+                drafts.splice(index, 1);
+                localStorage.setItem(formKey + '_drafts', JSON.stringify(drafts));
+                loadDrafts();
+            };
+            
+            // Login function
             window.doLogin = function(u, p) {
                 const user = document.getElementById('loginUser').value;
                 const pass = document.getElementById('loginPass').value;
@@ -1951,10 +2285,11 @@ function clearCurrentSheet() {
                         btn.textContent = '📍 Update GPS';
                     },
                     function(error) {
-                        let msg = 'Error getting location';
-                        if (error.code === 1) msg = '❌ Location permission denied';
-                        else if (error.code === 2) msg = '❌ Location unavailable';
-                        else if (error.code === 3) msg = '❌ Location timeout';
+                        let msg = '❌ ';
+                        if (error.code === 1) msg += 'Permission denied';
+                        else if (error.code === 2) msg += 'Location unavailable';
+                        else if (error.code === 3) msg += 'Timeout';
+                        else msg += 'Error getting location';
                         status.textContent = msg;
                         status.style.color = '#dc3545';
                     },
@@ -1984,26 +2319,9 @@ function clearCurrentSheet() {
                     return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
                 }
                 
-                function start(e) {
-                    e.preventDefault();
-                    drawing = true;
-                    const pos = getPos(e);
-                    ctx.beginPath();
-                    ctx.moveTo(pos.x, pos.y);
-                }
-                
-                function draw(e) {
-                    if (!drawing) return;
-                    e.preventDefault();
-                    const pos = getPos(e);
-                    ctx.lineTo(pos.x, pos.y);
-                    ctx.stroke();
-                }
-                
-                function stop() {
-                    drawing = false;
-                    dataInput.value = canvas.toDataURL();
-                }
+                function start(e) { e.preventDefault(); drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
+                function draw(e) { if (!drawing) return; e.preventDefault(); const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+                function stop() { drawing = false; dataInput.value = canvas.toDataURL(); }
                 
                 canvas.addEventListener('mousedown', start);
                 canvas.addEventListener('mousemove', draw);
@@ -2018,16 +2336,15 @@ function clearCurrentSheet() {
                 ctx.lineCap = 'round';
             });
             
-            // Add form submit with form title for sheet name
+            // Form submit
             const formTitle = s.t;
             document.getElementById('dataForm').onsubmit = function(e) {
                 e.preventDefault();
                 const form = e.target;
                 const data = new FormData(form);
                 const obj = { _formTitle: formTitle };
-                data.forEach((v,k) => obj[k] = v);
+                data.forEach((v, k) => obj[k] = v);
                 
-                // Send to Google Sheets if configured
                 if (s.su && s.su !== 'YOUR_SCRIPT_URL') {
                     const btn = form.querySelector('button[type="submit"]');
                     btn.disabled = true;
@@ -2047,16 +2364,15 @@ function clearCurrentSheet() {
                             canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
                         });
                         btn.disabled = false;
-                        btn.textContent = 'SUBMIT';
+                        btn.textContent = '✅ SUBMIT';
                     }).catch(() => {
-                        alert('❌ Submission failed. Please try again.');
+                        alert('❌ Submission failed. Try again.');
                         btn.disabled = false;
-                        btn.textContent = 'SUBMIT';
+                        btn.textContent = '✅ SUBMIT';
                     });
                 } else {
-                    alert('✅ Form submitted! (Configure Apps Script URL for Google Sheets)');
+                    alert('✅ Form captured! (Configure Apps Script URL for Google Sheets)');
                     console.log('Form data:', obj);
-                    form.reset();
                 }
             };
         }
