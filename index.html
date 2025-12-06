@@ -480,7 +480,18 @@
                 required: true,
                 options: def.options ? [...def.options] : [],
                 levels: def.levels ? [...def.levels] : [],
-                skipLogic: { enabled: false, action: 'show', sourceField: '', condition: 'equals', sourceValue: '' }
+                skipLogic: { enabled: false, action: 'show', sourceField: '', condition: 'equals', sourceValue: '' },
+                validation: { 
+                    enabled: false, 
+                    type: 'none',  // none, minmax, minlength, maxlength, pattern, email, phone, custom
+                    min: '',
+                    max: '',
+                    minLength: '',
+                    maxLength: '',
+                    pattern: '',
+                    customRegex: '',
+                    errorMessage: ''
+                }
             };
 
             state.fields.push(field);
@@ -687,6 +698,63 @@
                         </div>
                     </div>
                 </div>`;
+                
+                // Validation Rules
+                if (['text', 'number', 'textarea'].includes(field.type)) {
+                    const v = field.validation || {};
+                    html += `<div class="skip-logic-box" style="background:#fff8e6;border-color:#ffc107;">
+                        <div class="skip-logic-title" style="color:#856404;">✓ Validation</div>
+                        <div class="property-group">
+                            <label class="property-checkbox">
+                                <input type="checkbox" id="validEnabled" ${v.enabled ? 'checked' : ''}>
+                                <span>Enable Validation</span>
+                            </label>
+                        </div>
+                        <div id="validOptions" style="display:${v.enabled ? 'block' : 'none'};">
+                            <div class="property-group">
+                                <label class="property-label">Validation Type</label>
+                                <select id="validType" class="property-input">
+                                    <option value="none" ${v.type === 'none' ? 'selected' : ''}>None</option>
+                                    ${field.type === 'number' ? `
+                                        <option value="minmax" ${v.type === 'minmax' ? 'selected' : ''}>Min/Max Value</option>
+                                    ` : `
+                                        <option value="minlength" ${v.type === 'minlength' ? 'selected' : ''}>Min Length</option>
+                                        <option value="maxlength" ${v.type === 'maxlength' ? 'selected' : ''}>Max Length</option>
+                                        <option value="email" ${v.type === 'email' ? 'selected' : ''}>Email</option>
+                                        <option value="phone" ${v.type === 'phone' ? 'selected' : ''}>Phone Number</option>
+                                        <option value="custom" ${v.type === 'custom' ? 'selected' : ''}>Custom Pattern</option>
+                                    `}
+                                </select>
+                            </div>
+                            <div id="validMinMax" style="display:${v.type === 'minmax' ? 'flex' : 'none'};gap:8px;">
+                                <div class="property-group" style="flex:1;">
+                                    <label class="property-label">Min</label>
+                                    <input type="number" class="property-input" id="validMin" value="${v.min || ''}">
+                                </div>
+                                <div class="property-group" style="flex:1;">
+                                    <label class="property-label">Max</label>
+                                    <input type="number" class="property-input" id="validMax" value="${v.max || ''}">
+                                </div>
+                            </div>
+                            <div id="validLength" style="display:${['minlength', 'maxlength'].includes(v.type) ? 'block' : 'none'};">
+                                <div class="property-group">
+                                    <label class="property-label">${v.type === 'minlength' ? 'Minimum' : 'Maximum'} Characters</label>
+                                    <input type="number" class="property-input" id="validLengthVal" value="${v.minLength || v.maxLength || ''}">
+                                </div>
+                            </div>
+                            <div id="validCustom" style="display:${v.type === 'custom' ? 'block' : 'none'};">
+                                <div class="property-group">
+                                    <label class="property-label">Regex Pattern</label>
+                                    <input type="text" class="property-input" id="validPattern" value="${v.customRegex || ''}" placeholder="e.g., ^[A-Z]{2}[0-9]{4}$">
+                                </div>
+                            </div>
+                            <div class="property-group">
+                                <label class="property-label">Error Message</label>
+                                <input type="text" class="property-input" id="validError" value="${v.errorMessage || ''}" placeholder="Custom error message">
+                            </div>
+                        </div>
+                    </div>`;
+                }
             }
             
             container.innerHTML = html;
@@ -723,6 +791,54 @@
             
             const skipVal = document.getElementById('skipValue');
             if (skipVal) skipVal.addEventListener('change', e => updateSkipLogic('sourceValue', e.target.value));
+            
+            // Validation event listeners
+            const validEn = document.getElementById('validEnabled');
+            if (validEn) {
+                validEn.addEventListener('change', e => {
+                    updateValidation('enabled', e.target.checked);
+                    document.getElementById('validOptions').style.display = e.target.checked ? 'block' : 'none';
+                });
+            }
+            
+            const validType = document.getElementById('validType');
+            if (validType) {
+                validType.addEventListener('change', e => {
+                    updateValidation('type', e.target.value);
+                    const minmax = document.getElementById('validMinMax');
+                    const length = document.getElementById('validLength');
+                    const custom = document.getElementById('validCustom');
+                    if (minmax) minmax.style.display = e.target.value === 'minmax' ? 'flex' : 'none';
+                    if (length) length.style.display = ['minlength', 'maxlength'].includes(e.target.value) ? 'block' : 'none';
+                    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
+                });
+            }
+            
+            const validMin = document.getElementById('validMin');
+            if (validMin) validMin.addEventListener('change', e => updateValidation('min', e.target.value));
+            
+            const validMax = document.getElementById('validMax');
+            if (validMax) validMax.addEventListener('change', e => updateValidation('max', e.target.value));
+            
+            const validLengthVal = document.getElementById('validLengthVal');
+            if (validLengthVal) {
+                validLengthVal.addEventListener('change', e => {
+                    const field = state.fields.find(f => f.id === state.selectedFieldId);
+                    if (field && field.validation) {
+                        if (field.validation.type === 'minlength') {
+                            updateValidation('minLength', e.target.value);
+                        } else {
+                            updateValidation('maxLength', e.target.value);
+                        }
+                    }
+                });
+            }
+            
+            const validPattern = document.getElementById('validPattern');
+            if (validPattern) validPattern.addEventListener('change', e => updateValidation('customRegex', e.target.value));
+            
+            const validError = document.getElementById('validError');
+            if (validError) validError.addEventListener('change', e => updateValidation('errorMessage', e.target.value));
         }
 
         function updateField(prop, value) {
@@ -740,6 +856,15 @@
                 if (!field.skipLogic) field.skipLogic = { enabled: false, action: 'show', sourceField: '', condition: 'equals', sourceValue: '' };
                 field.skipLogic[prop] = value;
                 renderFields();
+                saveToStorage();
+            }
+        }
+        
+        function updateValidation(prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field) {
+                if (!field.validation) field.validation = { enabled: false, type: 'none', min: '', max: '', minLength: '', maxLength: '', pattern: '', customRegex: '', errorMessage: '' };
+                field.validation[prop] = value;
                 saveToStorage();
             }
         }
@@ -815,6 +940,39 @@
             document.getElementById('settingsModal').classList.add('show');
         }
         
+        // LZ-String compression (minimal implementation)
+        const LZString = {
+            compress: function(str) {
+                if (!str) return '';
+                let i, value, dict = {}, data = (str + '').split(''), out = [], currChar, phrase = data[0], code = 256;
+                for (i = 1; i < data.length; i++) {
+                    currChar = data[i];
+                    if (dict[phrase + currChar] != null) {
+                        phrase += currChar;
+                    } else {
+                        out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+                        dict[phrase + currChar] = code++;
+                        phrase = currChar;
+                    }
+                }
+                out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+                return out.map(c => String.fromCharCode(c)).join('');
+            },
+            decompress: function(str) {
+                if (!str) return '';
+                let i, dict = {}, currChar = str.charAt(0), oldPhrase = currChar, out = [currChar], code = 256, phrase;
+                for (i = 1; i < str.length; i++) {
+                    let currCode = str.charCodeAt(i);
+                    phrase = currCode < 256 ? String.fromCharCode(currCode) : (dict[currCode] ? dict[currCode] : (oldPhrase + currChar));
+                    out.push(phrase);
+                    currChar = phrase.charAt(0);
+                    dict[code++] = oldPhrase + currChar;
+                    oldPhrase = phrase;
+                }
+                return out.join('');
+            }
+        };
+        
         function getFormUrl() {
             const formData = {
                 s: {
@@ -822,22 +980,23 @@
                     st: state.settings.subtitle,
                     o: state.settings.organization,
                     l: state.settings.logo,
-                    el: state.settings.enableLogin,
+                    el: state.settings.enableLogin ? 1 : 0,
                     u: state.settings.username,
                     p: state.settings.password,
                     su: state.settings.scriptUrl
                 },
                 f: state.fields.map(f => ({
-                    i: f.id,
                     t: f.type,
                     n: f.name,
                     l: f.label,
-                    r: f.required,
-                    o: f.options,
-                    sk: f.skipLogic
+                    r: f.required ? 1 : 0,
+                    o: f.options?.length ? f.options : undefined,
+                    v: f.validation?.enabled ? f.validation : undefined
                 }))
             };
-            const encoded = btoa(encodeURIComponent(JSON.stringify(formData)));
+            const json = JSON.stringify(formData);
+            const compressed = LZString.compress(json);
+            const encoded = btoa(unescape(encodeURIComponent(compressed)));
             return `${BASE_URL}/?d=${encoded}`;
         }
 
@@ -1228,30 +1387,63 @@ ${skipLogicJS}
 // Form: ${s.title}
 // Generated: ${new Date().toLocaleString()}
 // ============================================
-
-const SHEET_NAME = 'Submissions';
-const HEADERS = ${JSON.stringify(headers, null, 2)};
+// 
+// SETUP INSTRUCTIONS:
+// 1. Create a new Google Sheet
+// 2. Go to Extensions > Apps Script
+// 3. Paste this entire code
+// 4. Click Deploy > New deployment
+// 5. Select "Web app", set "Anyone" access
+// 6. Copy the URL and paste in Form Builder settings
+//
+// Each form creates its own tab/sheet automatically!
+// ============================================
 
 function doPost(e) {
     try {
-        const sheet = getOrCreateSheet();
         const data = JSON.parse(e.postData.contents);
+        
+        // Get form title from submission (each form has its own sheet)
+        const formTitle = data._formTitle || '${s.title}';
+        const sheetName = formTitle.substring(0, 100); // Sheet names max 100 chars
+        
+        const sheet = getOrCreateSheet(sheetName, ${JSON.stringify(headers)});
+        
+        // Build row data
         const row = [
-            data.timestamp || new Date().toISOString(),
-${fields.map(f => `            data.${f.name} || ''`).join(',\n')}
+            new Date().toISOString(),
+${fields.map(f => `            data['${f.name}'] || ''`).join(',\n')}
         ];
+        
         sheet.appendRow(row);
-        return ContentService.createTextOutput(JSON.stringify({ success: true }))
-            .setMimeType(ContentService.MimeType.JSON);
+        
+        return ContentService.createTextOutput(JSON.stringify({ 
+            success: true, 
+            sheet: sheetName,
+            row: sheet.getLastRow() 
+        })).setMimeType(ContentService.MimeType.JSON);
+        
     } catch (err) {
-        return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
-            .setMimeType(ContentService.MimeType.JSON);
+        Logger.log('Error: ' + err.toString());
+        return ContentService.createTextOutput(JSON.stringify({ 
+            success: false, 
+            error: err.toString() 
+        })).setMimeType(ContentService.MimeType.JSON);
     }
 }
 
 function doGet(e) {
-    if (e.parameter.action === 'getData') {
-        const sheet = getOrCreateSheet();
+    const action = e.parameter.action;
+    const formTitle = e.parameter.form || '${s.title}';
+    
+    if (action === 'getData') {
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(formTitle);
+        if (!sheet) {
+            return ContentService.createTextOutput(JSON.stringify({ 
+                error: 'Form not found: ' + formTitle 
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
         const data = sheet.getDataRange().getValues();
         const headers = data[0];
         const result = data.slice(1).map(row => {
@@ -1259,46 +1451,114 @@ function doGet(e) {
             headers.forEach((h, i) => obj[h] = row[i]);
             return obj;
         });
-        return ContentService.createTextOutput(JSON.stringify({ data: result }))
+        
+        return ContentService.createTextOutput(JSON.stringify({ 
+            form: formTitle,
+            count: result.length,
+            data: result 
+        })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (action === 'listForms') {
+        const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+        const forms = sheets.map(s => ({
+            name: s.getName(),
+            rows: s.getLastRow() - 1
+        }));
+        return ContentService.createTextOutput(JSON.stringify({ forms }))
             .setMimeType(ContentService.MimeType.JSON);
     }
-    return ContentService.createTextOutput(JSON.stringify({ status: 'OK' }))
-        .setMimeType(ContentService.MimeType.JSON);
+    
+    return ContentService.createTextOutput(JSON.stringify({ 
+        status: 'OK',
+        message: 'Form Data Collection API',
+        endpoints: {
+            'GET ?action=listForms': 'List all form sheets',
+            'GET ?action=getData&form=FormName': 'Get submissions for a form',
+            'POST': 'Submit form data'
+        }
+    })).setMimeType(ContentService.MimeType.JSON);
 }
 
-function getOrCreateSheet() {
+function getOrCreateSheet(sheetName, headers) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName(SHEET_NAME);
+    let sheet = ss.getSheetByName(sheetName);
+    
     if (!sheet) {
-        sheet = ss.insertSheet(SHEET_NAME);
-        sheet.appendRow(HEADERS);
-        sheet.getRange(1, 1, 1, HEADERS.length)
-            .setFontWeight('bold')
+        // Create new sheet for this form
+        sheet = ss.insertSheet(sheetName);
+        sheet.appendRow(headers);
+        
+        // Style header row
+        const headerRange = sheet.getRange(1, 1, 1, headers.length);
+        headerRange.setFontWeight('bold')
             .setBackground('#004080')
-            .setFontColor('#ffffff');
+            .setFontColor('#ffffff')
+            .setHorizontalAlignment('center');
+        
+        // Freeze header row
         sheet.setFrozenRows(1);
+        
+        // Auto-resize columns
+        for (let i = 1; i <= headers.length; i++) {
+            sheet.autoResizeColumn(i);
+        }
+        
+        Logger.log('Created new sheet: ' + sheetName);
     }
+    
     return sheet;
 }
 
 function onOpen() {
     SpreadsheetApp.getUi()
-        .createMenu('📋 ${s.title}')
-        .addItem('📊 View Stats', 'viewStats')
-        .addItem('🗑️ Clear Data', 'clearData')
+        .createMenu('📋 Form Manager')
+        .addItem('📊 View All Stats', 'viewAllStats')
+        .addItem('📈 Export Summary', 'exportSummary')
+        .addSeparator()
+        .addItem('🗑️ Clear Current Sheet', 'clearCurrentSheet')
         .addToUi();
 }
 
-function viewStats() {
-    const count = getOrCreateSheet().getLastRow() - 1;
-    SpreadsheetApp.getUi().alert('Total Submissions: ' + count);
+function viewAllStats() {
+    const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    let msg = 'Form Submissions Summary:\\n\\n';
+    
+    sheets.forEach(sheet => {
+        const rows = sheet.getLastRow() - 1;
+        if (rows >= 0) {
+            msg += '📋 ' + sheet.getName() + ': ' + rows + ' submissions\\n';
+        }
+    });
+    
+    SpreadsheetApp.getUi().alert(msg);
 }
 
-function clearData() {
+function exportSummary() {
+    const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    const summary = sheets.map(s => [s.getName(), s.getLastRow() - 1, new Date()]);
+    
+    let summarySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('_Summary');
+    if (!summarySheet) {
+        summarySheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('_Summary');
+        summarySheet.appendRow(['Form Name', 'Submissions', 'Last Updated']);
+    } else {
+        summarySheet.clear();
+        summarySheet.appendRow(['Form Name', 'Submissions', 'Last Updated']);
+    }
+    
+    summary.forEach(row => summarySheet.appendRow(row));
+    SpreadsheetApp.getUi().alert('Summary exported to _Summary sheet');
+}
+
+function clearCurrentSheet() {
     const ui = SpreadsheetApp.getUi();
-    if (ui.alert('Clear all data?', ui.ButtonSet.YES_NO) === ui.Button.YES) {
-        const sheet = getOrCreateSheet();
-        if (sheet.getLastRow() > 1) sheet.deleteRows(2, sheet.getLastRow() - 1);
+    const sheet = SpreadsheetApp.getActiveSheet();
+    
+    if (ui.alert('Clear all data from "' + sheet.getName() + '"?', ui.ButtonSet.YES_NO) === ui.Button.YES) {
+        if (sheet.getLastRow() > 1) {
+            sheet.deleteRows(2, sheet.getLastRow() - 1);
+        }
         ui.alert('Data cleared!');
     }
 }`;
@@ -1309,10 +1569,10 @@ function clearData() {
             const blob = new Blob([code], { type: 'text/html' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'index.html';
+            const filename = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
+            a.download = filename;
             a.click();
-            const folderName = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            notify(`Downloaded! Create folder "${folderName}" and upload index.html`);
+            notify(`Downloaded "${filename}"`);
         }
 
         function downloadScript() {
@@ -1528,9 +1788,12 @@ function clearData() {
             const encodedData = urlParams.get('d');
             if (encodedData) {
                 try {
-                    const formData = JSON.parse(decodeURIComponent(atob(encodedData)));
+                    const decoded = decodeURIComponent(escape(atob(encodedData)));
+                    const decompressed = LZString.decompress(decoded);
+                    const formData = JSON.parse(decompressed);
                     renderFormForViewing(formData);
                 } catch (err) {
+                    console.error('Error loading form:', err);
                     document.body.innerHTML = `
                         <div style="text-align:center;padding:50px;font-family:Oswald,sans-serif;">
                             <h1 style="color:#dc3545;">Invalid Form Link</h1>
@@ -1579,8 +1842,16 @@ function clearData() {
                 const reqAttr = f.r ? 'required' : '';
                 let inner = '';
                 switch (f.t) {
-                    case 'text': case 'number': case 'date':
+                    case 'text': case 'date':
                         inner = `<input type="${f.t}" name="${f.n}" ${reqAttr} style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;">`;
+                        break;
+                    case 'number':
+                        let numAttrs = reqAttr;
+                        if (f.v && f.v.enabled && f.v.type === 'minmax') {
+                            if (f.v.min) numAttrs += ` min="${f.v.min}"`;
+                            if (f.v.max) numAttrs += ` max="${f.v.max}"`;
+                        }
+                        inner = `<input type="number" name="${f.n}" ${numAttrs} style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;">`;
                         break;
                     case 'textarea':
                         inner = `<textarea name="${f.n}" rows="3" ${reqAttr} style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:Oswald;"></textarea>`;
@@ -1594,6 +1865,27 @@ function clearData() {
                         break;
                     case 'checkbox':
                         inner = `<div style="display:flex;flex-wrap:wrap;gap:10px;">${(f.o||[]).map(o=>`<label style="display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;"><input type="checkbox" name="${f.n}" value="${o}"><span>${o}</span></label>`).join('')}</div>`;
+                        break;
+                    case 'gps':
+                        inner = `<div class="gps-container" data-name="${f.n}">
+                            <input type="hidden" name="${f.n}_lat" class="gps-lat">
+                            <input type="hidden" name="${f.n}_lng" class="gps-lng">
+                            <button type="button" onclick="captureGPS(this)" style="padding:10px 14px;background:#004080;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:Oswald;font-weight:700;">📍 Capture GPS</button>
+                            <div class="gps-status" style="margin-top:8px;font-size:11px;color:#666;"></div>
+                        </div>`;
+                        break;
+                    case 'signature':
+                        inner = `<div class="sig-container" data-name="${f.n}">
+                            <canvas class="sig-canvas" width="300" height="150" style="border:2px solid #004080;border-radius:6px;touch-action:none;"></canvas>
+                            <input type="hidden" name="${f.n}" class="sig-data">
+                            <div style="margin-top:8px;">
+                                <button type="button" onclick="clearSignature(this)" style="padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;">Clear</button>
+                            </div>
+                        </div>`;
+                        break;
+                    case 'quality':
+                        const qopts = f.o || ['Excellent', 'Acceptable', 'Needs Improvement'];
+                        inner = `<div style="display:flex;flex-wrap:wrap;gap:10px;">${qopts.map(o=>`<label style="display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;"><input type="radio" name="${f.n}" value="${o}" ${reqAttr}><span>${o}</span></label>`).join('')}</div>`;
                         break;
                     default:
                         inner = `<input type="text" name="${f.n}" style="width:100%;padding:10px;border:2px solid #004080;border-radius:6px;">`;
@@ -1632,24 +1924,134 @@ function clearData() {
                 }
             };
             
-            // Add form submit
+            // GPS capture function
+            window.captureGPS = function(btn) {
+                const container = btn.closest('.gps-container');
+                const status = container.querySelector('.gps-status');
+                const latInput = container.querySelector('.gps-lat');
+                const lngInput = container.querySelector('.gps-lng');
+                
+                status.textContent = '📡 Getting location...';
+                status.style.color = '#004080';
+                
+                if (!navigator.geolocation) {
+                    status.textContent = '❌ Geolocation not supported';
+                    status.style.color = '#dc3545';
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        latInput.value = lat;
+                        lngInput.value = lng;
+                        status.innerHTML = '✅ <strong>' + lat + ', ' + lng + '</strong>';
+                        status.style.color = '#28a745';
+                        btn.textContent = '📍 Update GPS';
+                    },
+                    function(error) {
+                        let msg = 'Error getting location';
+                        if (error.code === 1) msg = '❌ Location permission denied';
+                        else if (error.code === 2) msg = '❌ Location unavailable';
+                        else if (error.code === 3) msg = '❌ Location timeout';
+                        status.textContent = msg;
+                        status.style.color = '#dc3545';
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            };
+            
+            // Signature functions
+            window.clearSignature = function(btn) {
+                const container = btn.closest('.sig-container');
+                const canvas = container.querySelector('.sig-canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                container.querySelector('.sig-data').value = '';
+            };
+            
+            // Initialize signatures
+            document.querySelectorAll('.sig-container').forEach(container => {
+                const canvas = container.querySelector('.sig-canvas');
+                const ctx = canvas.getContext('2d');
+                const dataInput = container.querySelector('.sig-data');
+                let drawing = false;
+                
+                function getPos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    const touch = e.touches ? e.touches[0] : e;
+                    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+                }
+                
+                function start(e) {
+                    e.preventDefault();
+                    drawing = true;
+                    const pos = getPos(e);
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                }
+                
+                function draw(e) {
+                    if (!drawing) return;
+                    e.preventDefault();
+                    const pos = getPos(e);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                }
+                
+                function stop() {
+                    drawing = false;
+                    dataInput.value = canvas.toDataURL();
+                }
+                
+                canvas.addEventListener('mousedown', start);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stop);
+                canvas.addEventListener('mouseleave', stop);
+                canvas.addEventListener('touchstart', start);
+                canvas.addEventListener('touchmove', draw);
+                canvas.addEventListener('touchend', stop);
+                
+                ctx.strokeStyle = '#004080';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+            });
+            
+            // Add form submit with form title for sheet name
+            const formTitle = s.t;
             document.getElementById('dataForm').onsubmit = function(e) {
                 e.preventDefault();
                 const form = e.target;
                 const data = new FormData(form);
-                const obj = {};
+                const obj = { _formTitle: formTitle };
                 data.forEach((v,k) => obj[k] = v);
                 
                 // Send to Google Sheets if configured
                 if (s.su && s.su !== 'YOUR_SCRIPT_URL') {
+                    const btn = form.querySelector('button[type="submit"]');
+                    btn.disabled = true;
+                    btn.textContent = '⏳ Submitting...';
+                    
                     fetch(s.su, {
                         method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(obj)
                     }).then(() => {
                         alert('✅ Form submitted successfully!');
                         form.reset();
+                        document.querySelectorAll('.gps-status').forEach(s => s.textContent = '');
+                        document.querySelectorAll('.sig-container').forEach(c => {
+                            const canvas = c.querySelector('.sig-canvas');
+                            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                        });
+                        btn.disabled = false;
+                        btn.textContent = 'SUBMIT';
                     }).catch(() => {
                         alert('❌ Submission failed. Please try again.');
+                        btn.disabled = false;
+                        btn.textContent = 'SUBMIT';
                     });
                 } else {
                     alert('✅ Form submitted! (Configure Apps Script URL for Google Sheets)');
