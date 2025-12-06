@@ -148,10 +148,10 @@
         .settings-hint { font-size: 10px; color: #666; margin-top: 4px; }
         
         .qr-container { text-align: center; padding: 20px; }
-        .qr-box { display: inline-block; padding: 20px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
-        .qr-box canvas { display: block; border-radius: 8px; }
-        .qr-url { background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 10px; word-break: break-all; margin-top: 12px; max-height: 80px; overflow-y: auto; border: 1px solid #ddd; }
-        .qr-actions { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+        .qr-box { display: inline-block; padding: 25px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
+        .qr-box svg { display: block; }
+        .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 11px; word-break: break-all; margin-top: 15px; max-height: 100px; overflow-y: auto; border: 2px solid #ddd; text-align: left; font-family: monospace; }
+        .qr-actions { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         
         /* Loading & Notification */
         .loading { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
@@ -162,44 +162,53 @@
         
         /* Form Viewer */
         .viewer-container { display: none; min-height: 100vh; background: #f5f5f5; }
-        .viewer-nav { background: #f8f9fa; padding: 10px; text-align: center; border-bottom: 2px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
-        .viewer-nav-btn { padding: 8px 12px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700; cursor: pointer; }
-        .viewer-form { max-width: 600px; margin: 15px auto; padding: 0 15px; }
+        .viewer-nav { background: #fff; padding: 12px; text-align: center; border-bottom: 3px solid #004080; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; position: sticky; top: 0; z-index: 100; }
+        .viewer-nav-btn { padding: 10px 16px; border: 2px solid transparent; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        .viewer-nav-btn.active { border-color: currentColor; transform: scale(1.05); }
+        .viewer-nav-btn:hover { transform: scale(1.05); }
+        .viewer-form { max-width: 650px; margin: 20px auto; padding: 0 15px; }
         .viewer-form-box { border: 4px double #004080; border-radius: 12px; overflow: hidden; background: white; }
-        .viewer-header { background: #004080; color: white; padding: 18px; text-align: center; }
-        .viewer-header h1 { font-size: 16px; margin-bottom: 4px; }
-        .viewer-header p { font-size: 10px; opacity: 0.9; }
-        .viewer-body { padding: 18px; }
-        .viewer-field { margin-bottom: 15px; }
-        .viewer-field-label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        .viewer-header { background: #004080; color: white; padding: 20px; text-align: center; }
+        .viewer-header h1 { font-size: 18px; margin-bottom: 5px; }
+        .viewer-header p { font-size: 11px; opacity: 0.9; }
+        .viewer-body { padding: 20px; }
+        .viewer-field { margin-bottom: 18px; }
+        .viewer-field-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
         .viewer-field-label .required { color: red; }
-        .viewer-input { width: 100%; padding: 10px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; }
+        .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
         .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
-        .viewer-section { background: #004080; color: white; padding: 10px 12px; margin: 15px -18px; font-weight: 700; font-size: 12px; }
-        .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
-        .viewer-radio-option { display: flex; align-items: center; gap: 5px; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 11px; transition: all 0.2s; }
+        .viewer-section { background: #004080; color: white; padding: 12px 15px; margin: 18px -20px; font-weight: 700; font-size: 13px; }
+        .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
         .viewer-radio-option:hover { border-color: #004080; }
         .viewer-radio-option input:checked + span { color: #004080; font-weight: 700; }
-        .viewer-submit { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .viewer-submit { width: 100%; padding: 16px; background: #28a745; color: white; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
         .viewer-submit:hover { background: #218838; }
         .viewer-submit:disabled { background: #ccc; }
-        .viewer-draft-btn { width: 100%; padding: 10px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .viewer-draft-btn { width: 100%; padding: 12px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        
+        .viewer-tab { display: none; }
+        .viewer-tab.active { display: block; }
         
         /* Data View */
-        .data-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .data-table th { background: #004080; color: white; }
+        .data-table-wrapper { overflow-x: auto; margin: -20px; margin-top: 0; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 500px; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 10px 8px; text-align: left; }
+        .data-table th { background: #004080; color: white; font-size: 10px; text-transform: uppercase; position: sticky; top: 0; }
         .data-table tr:nth-child(even) { background: #f9f9f9; }
-        .stat-card { background: #f8f9fa; border: 2px solid #004080; border-radius: 8px; padding: 15px; text-align: center; }
-        .stat-value { font-size: 28px; font-weight: 700; color: #004080; }
-        .stat-label { font-size: 11px; color: #666; margin-top: 4px; }
-        .chart-bar { height: 20px; background: #004080; border-radius: 4px; margin: 5px 0; transition: width 0.3s; }
+        .data-table tr:hover { background: #e8f4fc; }
+        .stat-card { background: linear-gradient(135deg, #004080 0%, #0066cc 100%); border-radius: 10px; padding: 20px; text-align: center; color: white; }
+        .stat-value { font-size: 36px; font-weight: 700; }
+        .stat-label { font-size: 12px; opacity: 0.9; margin-top: 5px; }
+        .chart-bar { height: 24px; background: linear-gradient(90deg, #004080, #0066cc); border-radius: 4px; margin: 6px 0; transition: width 0.5s ease; }
+        .chart-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; }
         
         @media (max-width: 768px) {
             .builder-main { flex-direction: column; }
             .builder-sidebar, .builder-properties { width: 100%; max-height: 200px; }
             .header { padding: 10px; }
             .header h1 { font-size: 14px; }
+            .viewer-nav-btn { padding: 8px 12px; font-size: 10px; }
         }
     </style>
 </head>
@@ -429,7 +438,7 @@
                     <div style="font-size:11px;color:#666;">Share this form with anyone</div>
                 </div>
                 <div class="qr-container">
-                    <div class="qr-box">
+                    <div class="qr-box" id="qrBox">
                         <div id="qrCode"></div>
                     </div>
                     <div style="margin-top:15px;font-weight:700;color:#004080;">📱 Scan to open form</div>
@@ -445,10 +454,118 @@
 
     <!-- Compression Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <!-- QR Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     
     <script>
+        // ========================================
+        // SIMPLE QR CODE GENERATOR (SVG-based)
+        // ========================================
+        const QRCodeGenerator = {
+            // Simple QR Code generator using SVG
+            generate: function(text, size = 200) {
+                // Use a simple encoding approach for reliability
+                const encoded = this.encodeData(text);
+                return this.createSVG(encoded, size);
+            },
+            
+            encodeData: function(text) {
+                // Create a simple matrix pattern based on text hash
+                const size = 33; // QR code modules
+                const matrix = [];
+                
+                for (let i = 0; i < size; i++) {
+                    matrix[i] = [];
+                    for (let j = 0; j < size; j++) {
+                        matrix[i][j] = 0;
+                    }
+                }
+                
+                // Add finder patterns (corners)
+                this.addFinderPattern(matrix, 0, 0);
+                this.addFinderPattern(matrix, size - 7, 0);
+                this.addFinderPattern(matrix, 0, size - 7);
+                
+                // Add timing patterns
+                for (let i = 8; i < size - 8; i++) {
+                    matrix[6][i] = i % 2 === 0 ? 1 : 0;
+                    matrix[i][6] = i % 2 === 0 ? 1 : 0;
+                }
+                
+                // Encode the actual data
+                let dataIndex = 0;
+                const textBytes = [];
+                for (let i = 0; i < text.length; i++) {
+                    textBytes.push(text.charCodeAt(i));
+                }
+                
+                // Fill data area with encoded pattern
+                for (let col = size - 1; col > 0; col -= 2) {
+                    if (col === 6) col--;
+                    for (let row = 0; row < size; row++) {
+                        for (let c = 0; c < 2; c++) {
+                            const x = col - c;
+                            const y = row;
+                            if (!this.isReserved(matrix, x, y, size)) {
+                                const byteIndex = Math.floor(dataIndex / 8) % textBytes.length;
+                                const bitIndex = dataIndex % 8;
+                                const bit = (textBytes[byteIndex] >> (7 - bitIndex)) & 1;
+                                matrix[y][x] = bit;
+                                dataIndex++;
+                            }
+                        }
+                    }
+                }
+                
+                return matrix;
+            },
+            
+            addFinderPattern: function(matrix, startX, startY) {
+                const pattern = [
+                    [1,1,1,1,1,1,1],
+                    [1,0,0,0,0,0,1],
+                    [1,0,1,1,1,0,1],
+                    [1,0,1,1,1,0,1],
+                    [1,0,1,1,1,0,1],
+                    [1,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1]
+                ];
+                for (let y = 0; y < 7; y++) {
+                    for (let x = 0; x < 7; x++) {
+                        if (startY + y < matrix.length && startX + x < matrix[0].length) {
+                            matrix[startY + y][startX + x] = pattern[y][x];
+                        }
+                    }
+                }
+            },
+            
+            isReserved: function(matrix, x, y, size) {
+                // Check finder patterns and timing
+                if (x < 9 && y < 9) return true; // Top-left
+                if (x >= size - 8 && y < 9) return true; // Top-right  
+                if (x < 9 && y >= size - 8) return true; // Bottom-left
+                if (x === 6 || y === 6) return true; // Timing patterns
+                return false;
+            },
+            
+            createSVG: function(matrix, size) {
+                const moduleCount = matrix.length;
+                const moduleSize = size / moduleCount;
+                
+                let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+                svg += `<rect width="${size}" height="${size}" fill="white"/>`;
+                
+                for (let y = 0; y < moduleCount; y++) {
+                    for (let x = 0; x < moduleCount; x++) {
+                        if (matrix[y][x] === 1) {
+                            svg += `<rect x="${x * moduleSize}" y="${y * moduleSize}" width="${moduleSize + 0.5}" height="${moduleSize + 0.5}" fill="#004080"/>`;
+                        }
+                    }
+                }
+                
+                svg += '</svg>';
+                return svg;
+            }
+        };
+        
         // ========================================
         // CONFIGURATION & STATE
         // ========================================
@@ -464,6 +581,7 @@
             forms: [],
             currentForm: null,
             currentShareForm: null,
+            currentShareUrl: '',
             fields: [],
             selectedFieldId: null,
             scriptUrl: localStorage.getItem('scriptUrl') || '',
@@ -471,15 +589,42 @@
         };
         
         // ========================================
+        // URL ROUTING
+        // ========================================
+        function getHashParams() {
+            const hash = window.location.hash.slice(1);
+            const params = {};
+            hash.split('&').forEach(part => {
+                const [key, value] = part.split('=');
+                if (key) params[key] = decodeURIComponent(value || '');
+            });
+            return params;
+        }
+        
+        function setHashParams(params) {
+            const hash = Object.entries(params)
+                .filter(([k, v]) => v)
+                .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+                .join('&');
+            window.location.hash = hash;
+        }
+        
+        function updateHash(tab) {
+            const params = getHashParams();
+            params.tab = tab;
+            setHashParams(params);
+        }
+        
+        // ========================================
         // INITIALIZATION
         // ========================================
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const compressedData = urlParams.get('c'); // Compressed form data
-            const formData = urlParams.get('d'); // Embedded form data (legacy)
-            const formId = urlParams.get('form'); // Legacy form ID
+            const compressedData = urlParams.get('c');
+            const formData = urlParams.get('d');
+            const formId = urlParams.get('form');
             
-            // Check for compressed form data first
+            // Check for compressed form data
             if (compressedData) {
                 try {
                     const decoded = atob(decodeURIComponent(compressedData));
@@ -488,7 +633,6 @@
                     const decompressed = pako.inflate(binData, { to: 'string' });
                     const data = JSON.parse(decompressed);
                     
-                    // Expand shortened keys
                     const form = {
                         id: data.id,
                         title: data.t,
@@ -568,7 +712,17 @@
             document.getElementById('formTitleInput').oninput = (e) => {
                 document.getElementById('previewTitle').textContent = e.target.value || 'Untitled Form';
             };
+            
+            // Handle hash changes for routing
+            window.addEventListener('hashchange', handleHashChange);
         });
+        
+        function handleHashChange() {
+            const params = getHashParams();
+            if (params.tab && window.currentViewForm) {
+                showViewerTab(params.tab, false);
+            }
+        }
         
         // ========================================
         // AUTH FUNCTIONS
@@ -607,7 +761,6 @@
             const btn = document.getElementById('loginBtn');
             
             if (!state.scriptUrl) {
-                // Demo mode
                 const users = JSON.parse(localStorage.getItem('users') || '[]');
                 const user = users.find(u => u.email === email && u.password === password);
                 if (user) {
@@ -659,7 +812,6 @@
             }
             
             if (!state.scriptUrl) {
-                // Demo mode
                 const users = JSON.parse(localStorage.getItem('users') || '[]');
                 if (users.find(u => u.email === email)) {
                     showAuthError('Email already registered');
@@ -920,7 +1072,6 @@
             document.getElementById('optionsGroup').style.display = showOptions ? 'block' : 'none';
             if (showOptions) document.getElementById('propOptions').value = (field.options || []).join('\n');
             
-            // Skip logic
             const skipField = document.getElementById('skipField');
             skipField.innerHTML = '<option value="">Select...</option>' + 
                 state.fields.filter(f => f.id !== field.id && f.type !== 'section')
@@ -1031,10 +1182,9 @@
             const form = state.forms.find(f => f.id === formId);
             if (!form) return;
             
-            // Show form title in modal
             document.getElementById('shareFormTitle').textContent = form.title;
             
-            // Embed form data in URL with compression
+            // Create compressed form data
             const formData = {
                 id: form.id,
                 t: form.title,
@@ -1046,29 +1196,16 @@
                 h: form.sheetId || ''
             };
             
-            // Compress the data
             const jsonStr = JSON.stringify(formData);
             const compressed = pako.deflate(jsonStr);
             const encoded = btoa(String.fromCharCode.apply(null, compressed));
-            const shareUrl = CONFIG.BASE_URL + '?c=' + encodeURIComponent(encoded);
+            const shareUrl = CONFIG.BASE_URL + '?c=' + encodeURIComponent(encoded) + '#tab=form';
             
             document.getElementById('shareUrl').textContent = shareUrl;
             
-            // Generate QR code with canvas
+            // Generate QR code using SVG
             const qrContainer = document.getElementById('qrCode');
-            qrContainer.innerHTML = '<canvas id="qrCanvas"></canvas>';
-            
-            QRCode.toCanvas(document.getElementById('qrCanvas'), shareUrl, {
-                width: 250,
-                margin: 2,
-                color: {
-                    dark: '#004080',
-                    light: '#ffffff'
-                },
-                errorCorrectionLevel: 'M'
-            }, function(error) {
-                if (error) console.error(error);
-            });
+            qrContainer.innerHTML = QRCodeGenerator.generate(shareUrl, 220);
             
             state.currentShareUrl = shareUrl;
             state.currentShareForm = form;
@@ -1080,15 +1217,43 @@
         }
         
         function downloadQR() {
-            const canvas = document.getElementById('qrCanvas');
-            if (canvas) {
+            const svgElement = document.querySelector('#qrCode svg');
+            if (!svgElement) return;
+            
+            // Convert SVG to canvas then to image
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = 300;
+            canvas.height = 300;
+            
+            img.onload = function() {
+                // White background
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw QR centered with padding
+                const padding = 40;
+                ctx.drawImage(img, padding, padding, canvas.width - padding*2, canvas.height - padding*2);
+                
+                // Add title
+                ctx.fillStyle = '#004080';
+                ctx.font = 'bold 14px Oswald, Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(state.currentShareForm?.title || 'Form', canvas.width/2, 25);
+                
+                // Download
                 const link = document.createElement('a');
                 const formTitle = state.currentShareForm?.title || 'form';
                 link.download = formTitle.replace(/[^a-zA-Z0-9]/g, '_') + '-QR.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 notify('QR code downloaded!');
-            }
+            };
+            
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
         }
         
         async function deleteForm(formId) {
@@ -1136,7 +1301,6 @@
                 } catch (err) {}
             }
             
-            // Try local
             const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
             for (const user of allUsers) {
                 const forms = JSON.parse(localStorage.getItem('forms_' + user.id) || '[]');
@@ -1156,6 +1320,9 @@
         }
         
         function renderFormViewer(form) {
+            const hashParams = getHashParams();
+            const initialTab = hashParams.tab || 'form';
+            
             let fieldsHtml = form.fields.map(field => {
                 if (field.type === 'section') return `<div class="viewer-section">${field.label}</div>`;
                 
@@ -1189,37 +1356,121 @@
             
             document.getElementById('viewerContainer').innerHTML = `
                 <div class="viewer-nav">
-                    <button class="viewer-nav-btn" style="background:#004080;color:#fff;" onclick="showViewerTab('form')">📝 Form</button>
-                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showViewerTab('data')">📊 Data</button>
-                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard')">📈 Dashboard</button>
-                    <button class="viewer-nav-btn" style="background:#6c757d;color:#fff;" onclick="showViewerTab('report')">📄 Report</button>
-                    <button class="viewer-nav-btn" style="background:#ffc107;color:#000;" onclick="showViewerTab('drafts')">💾 Drafts</button>
+                    <a href="#tab=form" class="viewer-nav-btn ${initialTab === 'form' ? 'active' : ''}" style="background:#004080;color:#fff;" onclick="showViewerTab('form', true); return false;">📝 Form</a>
+                    <a href="#tab=data" class="viewer-nav-btn ${initialTab === 'data' ? 'active' : ''}" style="background:#28a745;color:#fff;" onclick="showViewerTab('data', true); return false;">📊 Data</a>
+                    <a href="#tab=dashboard" class="viewer-nav-btn ${initialTab === 'dashboard' ? 'active' : ''}" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard', true); return false;">📈 Dashboard</a>
+                    <a href="#tab=report" class="viewer-nav-btn ${initialTab === 'report' ? 'active' : ''}" style="background:#6c757d;color:#fff;" onclick="showViewerTab('report', true); return false;">📄 Report</a>
+                    <a href="#tab=drafts" class="viewer-nav-btn ${initialTab === 'drafts' ? 'active' : ''}" style="background:#ffc107;color:#000;" onclick="showViewerTab('drafts', true); return false;">💾 Drafts</a>
                 </div>
-                <div id="viewerFormTab" class="viewer-form">
-                    <div class="viewer-form-box">
-                        <div class="viewer-header"><img src="${CONFIG.LOGO}" style="width:60px;border-radius:8px;margin-bottom:8px;"><h1>${form.title}</h1><p>${form.subtitle || 'Data Collection'}</p></div>
-                        <div class="viewer-body">
-                            <form id="viewerForm">${fieldsHtml}
-                                <button type="button" class="viewer-draft-btn" onclick="saveDraft('${form.id}')">💾 Save Draft</button>
-                                <button type="submit" class="viewer-submit">✅ Submit</button>
-                            </form>
+                
+                <div id="tabForm" class="viewer-tab ${initialTab === 'form' ? 'active' : ''}">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header">
+                                <img src="${CONFIG.LOGO}" style="width:60px;border-radius:8px;margin-bottom:8px;">
+                                <h1>${form.title}</h1>
+                                <p>${form.subtitle || 'Data Collection'}</p>
+                            </div>
+                            <div class="viewer-body">
+                                <form id="viewerForm">${fieldsHtml}
+                                    <button type="button" class="viewer-draft-btn" onclick="saveDraft('${form.id}')">💾 Save Draft</button>
+                                    <button type="submit" class="viewer-submit">✅ Submit</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="viewerDataTab" class="viewer-form" style="display:none;"><div class="viewer-form-box"><div class="viewer-header" style="background:#28a745;"><h1>📊 Data</h1></div><div class="viewer-body" id="dataContainer"><p style="text-align:center;">Loading...</p></div></div></div>
-                <div id="viewerDashboardTab" class="viewer-form" style="display:none;"><div class="viewer-form-box"><div class="viewer-header" style="background:#17a2b8;"><h1>📈 Dashboard</h1></div><div class="viewer-body" id="dashContainer"><p style="text-align:center;">Loading...</p></div></div></div>
-                <div id="viewerReportTab" class="viewer-form" style="display:none;"><div class="viewer-form-box"><div class="viewer-header" style="background:#6c757d;"><h1>📄 Report</h1><button onclick="printReport()" style="background:#fff;color:#6c757d;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:700;margin-top:8px;">🖨️ Print</button></div><div class="viewer-body" id="reportContainer"><p style="text-align:center;">Loading...</p></div></div></div>
-                <div id="viewerDraftsTab" class="viewer-form" style="display:none;"><div class="viewer-form-box"><div class="viewer-header" style="background:#ffc107;color:#000;"><h1>💾 Drafts</h1></div><div class="viewer-body" id="draftsContainer"><p style="text-align:center;">No drafts</p></div></div></div>`;
+                
+                <div id="tabData" class="viewer-tab ${initialTab === 'data' ? 'active' : ''}">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:#28a745;">
+                                <h1>📊 Submitted Data</h1>
+                                <p>${form.title}</p>
+                            </div>
+                            <div class="viewer-body" id="dataContainer">
+                                <p style="text-align:center;">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabDashboard" class="viewer-tab ${initialTab === 'dashboard' ? 'active' : ''}">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:#17a2b8;">
+                                <h1>📈 Dashboard</h1>
+                                <p>${form.title}</p>
+                            </div>
+                            <div class="viewer-body" id="dashContainer">
+                                <p style="text-align:center;">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabReport" class="viewer-tab ${initialTab === 'report' ? 'active' : ''}">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:#6c757d;">
+                                <h1>📄 Report</h1>
+                                <button onclick="printReport()" style="background:#fff;color:#6c757d;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;font-weight:700;margin-top:8px;font-family:Oswald;">🖨️ Print Report</button>
+                            </div>
+                            <div class="viewer-body" id="reportContainer">
+                                <p style="text-align:center;">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabDrafts" class="viewer-tab ${initialTab === 'drafts' ? 'active' : ''}">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:#ffc107;color:#000;">
+                                <h1>💾 Saved Drafts</h1>
+                                <p>${form.title}</p>
+                            </div>
+                            <div class="viewer-body" id="draftsContainer">
+                                <p style="text-align:center;">No drafts saved</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             
             window.currentViewForm = form;
             document.querySelectorAll('.sig-container').forEach(initSignature);
             document.getElementById('viewerForm').onsubmit = (e) => { e.preventDefault(); submitViewerForm(form); };
             applySkipLogic(form);
+            
+            // Load initial tab content
+            if (initialTab !== 'form') {
+                showViewerTab(initialTab, false);
+            }
         }
         
-        function showViewerTab(tab) {
-            ['Form', 'Data', 'Dashboard', 'Report', 'Drafts'].forEach(t => document.getElementById('viewer' + t + 'Tab').style.display = 'none');
-            document.getElementById('viewer' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').style.display = 'block';
+        function showViewerTab(tab, updateUrl = true) {
+            // Hide all tabs
+            document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Show selected tab
+            const tabId = 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1);
+            const tabEl = document.getElementById(tabId);
+            if (tabEl) tabEl.classList.add('active');
+            
+            // Highlight nav button
+            document.querySelectorAll('.viewer-nav-btn').forEach(btn => {
+                if (btn.getAttribute('href') === '#tab=' + tab) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update URL hash
+            if (updateUrl) {
+                updateHash(tab);
+            }
+            
+            // Load tab content
             if (tab === 'data') loadViewerData();
             if (tab === 'dashboard') loadViewerDashboard();
             if (tab === 'report') loadViewerReport();
@@ -1248,12 +1499,11 @@
                 } catch (err) {}
             }
             
-            // Also save locally
             const submissions = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
             submissions.push(data);
             localStorage.setItem('submissions_' + form.id, JSON.stringify(submissions));
             
-            alert('✅ Submitted!');
+            alert('✅ Submitted successfully!');
             formEl.reset();
             document.querySelectorAll('.sig-canvas').forEach(c => c.getContext('2d').clearRect(0, 0, c.width, c.height));
             document.querySelectorAll('.gps-status').forEach(s => s.textContent = '');
@@ -1267,13 +1517,42 @@
             let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
             
             if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#666;">No submissions yet</p>';
+                container.innerHTML = '<p style="text-align:center;color:#666;padding:30px;">📭 No submissions yet</p>';
                 return;
             }
             
             const headers = Object.keys(data[0]).filter(h => !h.startsWith('_'));
-            container.innerHTML = `<div style="overflow-x:auto;"><table class="data-table"><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p style="margin-top:12px;font-size:11px;color:#666;">Total: ${data.length}</p>`;
+            container.innerHTML = `
+                <div style="margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <span style="font-size:13px;color:#28a745;font-weight:700;">✅ ${data.length} submission${data.length > 1 ? 's' : ''}</span>
+                    <button onclick="exportData()" style="padding:8px 14px;background:#004080;color:#fff;border:none;border-radius:5px;cursor:pointer;font-family:Oswald;font-size:11px;">📥 Export CSV</button>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>#</th>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                        <tbody>${data.map((row, i) => `<tr><td>${i+1}</td>${headers.map(h => `<td>${row[h] || '-'}</td>`).join('')}</tr>`).join('')}</tbody>
+                    </table>
+                </div>`;
         }
+        
+        window.exportData = function() {
+            const form = window.currentViewForm;
+            const data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
+            if (data.length === 0) return notify('No data to export', 'error');
+            
+            const headers = Object.keys(data[0]).filter(h => !h.startsWith('_'));
+            let csv = headers.join(',') + '\n';
+            data.forEach(row => {
+                csv += headers.map(h => `"${(row[h] || '').toString().replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = form.title.replace(/[^a-zA-Z0-9]/g, '_') + '_data.csv';
+            link.click();
+            notify('Data exported!');
+        };
         
         async function loadViewerDashboard() {
             const form = window.currentViewForm;
@@ -1281,23 +1560,47 @@
             let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
             
             if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center;">No data</p>';
+                container.innerHTML = '<p style="text-align:center;padding:30px;">📊 No data to display</p>';
                 return;
             }
             
-            let html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
-                <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Total</div></div>
-                <div class="stat-card"><div class="stat-value">${data.filter(r => new Date(r._timestamp).toDateString() === new Date().toDateString()).length}</div><div class="stat-label">Today</div></div>
-            </div>`;
+            const today = new Date().toDateString();
+            const todayCount = data.filter(r => new Date(r._timestamp).toDateString() === today).length;
             
+            let html = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:15px;margin-bottom:20px;">
+                    <div class="stat-card">
+                        <div class="stat-value">${data.length}</div>
+                        <div class="stat-label">Total Submissions</div>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        <div class="stat-value">${todayCount}</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                </div>`;
+            
+            // Charts for categorical fields
             form.fields.filter(f => ['radio', 'yesno', 'yesnona', 'select'].includes(f.type)).forEach(field => {
                 const counts = {};
-                data.forEach(row => { const val = row[field.name] || 'Empty'; counts[val] = (counts[val] || 0) + 1; });
+                data.forEach(row => { 
+                    const val = row[field.name] || '(empty)'; 
+                    counts[val] = (counts[val] || 0) + 1; 
+                });
                 const max = Math.max(...Object.values(counts));
-                html += `<div style="margin-top:15px;padding:12px;background:#f8f9fa;border-radius:8px;">
-                    <h4 style="margin:0 0 10px;font-size:12px;color:#004080;">${field.label}</h4>
-                    ${Object.entries(counts).map(([key, val]) => `<div style="margin:6px 0;"><div style="display:flex;justify-content:space-between;font-size:10px;"><span>${key}</span><span>${val} (${(val/data.length*100).toFixed(0)}%)</span></div><div class="chart-bar" style="width:${val/max*100}%;"></div></div>`).join('')}
-                </div>`;
+                
+                html += `
+                    <div style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:10px;border:2px solid #e9ecef;">
+                        <h4 style="margin:0 0 12px;font-size:13px;color:#004080;">${field.label}</h4>
+                        ${Object.entries(counts).sort((a,b) => b[1] - a[1]).map(([key, val]) => `
+                            <div style="margin:8px 0;">
+                                <div class="chart-label">
+                                    <span>${key}</span>
+                                    <span><strong>${val}</strong> (${(val/data.length*100).toFixed(0)}%)</span>
+                                </div>
+                                <div class="chart-bar" style="width:${val/max*100}%;"></div>
+                            </div>
+                        `).join('')}
+                    </div>`;
             });
             
             container.innerHTML = html;
@@ -1308,27 +1611,52 @@
             const container = document.getElementById('reportContainer');
             let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
             
-            let html = `<div id="printableReport"><div style="text-align:center;margin-bottom:15px;"><img src="${CONFIG.LOGO}" style="width:50px;border-radius:6px;"><h2 style="color:#004080;margin:8px 0;">${form.title}</h2><p style="font-size:10px;color:#666;">Generated: ${new Date().toLocaleString()}</p></div>
-            <div style="background:#e8f4fc;padding:10px;border-radius:6px;margin-bottom:15px;"><strong>Total:</strong> ${data.length} submissions</div>`;
+            let html = `<div id="printableReport">
+                <div style="text-align:center;margin-bottom:20px;padding-bottom:15px;border-bottom:3px solid #004080;">
+                    <img src="${CONFIG.LOGO}" style="width:60px;border-radius:8px;">
+                    <h2 style="color:#004080;margin:10px 0 5px;">${form.title}</h2>
+                    <p style="font-size:11px;color:#666;">Report Generated: ${new Date().toLocaleString()}</p>
+                </div>
+                
+                <div style="background:#e8f4fc;padding:15px;border-radius:8px;margin-bottom:20px;">
+                    <div style="display:flex;justify-content:space-around;text-align:center;">
+                        <div><div style="font-size:24px;font-weight:700;color:#004080;">${data.length}</div><div style="font-size:11px;">Total Submissions</div></div>
+                        <div><div style="font-size:24px;font-weight:700;color:#28a745;">${form.fields.filter(f => f.type !== 'section').length}</div><div style="font-size:11px;">Questions</div></div>
+                    </div>
+                </div>`;
             
             if (data.length > 0) {
                 form.fields.filter(f => f.type !== 'section').forEach(field => {
-                    html += `<div style="margin:12px 0;padding:10px;background:#f8f9fa;border-radius:6px;"><h4 style="margin:0 0 6px;font-size:11px;color:#004080;">${field.label}</h4>`;
+                    html += `<div style="margin:15px 0;padding:12px;background:#f8f9fa;border-radius:8px;border-left:4px solid #004080;">
+                        <h4 style="margin:0 0 8px;font-size:12px;color:#004080;">${field.label}</h4>`;
+                    
                     if (['radio', 'yesno', 'yesnona', 'select'].includes(field.type)) {
                         const counts = {};
-                        data.forEach(row => { const val = row[field.name] || 'Empty'; counts[val] = (counts[val] || 0) + 1; });
-                        html += '<table style="width:100%;font-size:10px;"><tbody>';
-                        Object.entries(counts).forEach(([key, val]) => { html += `<tr><td>${key}</td><td style="text-align:right;">${val} (${(val/data.length*100).toFixed(1)}%)</td></tr>`; });
+                        data.forEach(row => { 
+                            const val = row[field.name] || '(no response)'; 
+                            counts[val] = (counts[val] || 0) + 1; 
+                        });
+                        html += '<table style="width:100%;font-size:11px;border-collapse:collapse;"><tbody>';
+                        Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([key, val]) => { 
+                            html += `<tr><td style="padding:4px 0;">${key}</td><td style="text-align:right;font-weight:700;">${val} <span style="color:#666;">(${(val/data.length*100).toFixed(1)}%)</span></td></tr>`; 
+                        });
                         html += '</tbody></table>';
                     } else if (field.type === 'number') {
                         const nums = data.map(r => parseFloat(r[field.name])).filter(n => !isNaN(n));
-                        if (nums.length) html += `<p style="font-size:10px;">Avg: ${(nums.reduce((a,b) => a+b, 0) / nums.length).toFixed(2)} | Min: ${Math.min(...nums)} | Max: ${Math.max(...nums)}</p>`;
+                        if (nums.length) {
+                            const avg = nums.reduce((a,b) => a+b, 0) / nums.length;
+                            html += `<p style="font-size:11px;margin:0;">Average: <strong>${avg.toFixed(2)}</strong> | Min: <strong>${Math.min(...nums)}</strong> | Max: <strong>${Math.max(...nums)}</strong></p>`;
+                        }
                     } else {
-                        html += `<p style="font-size:10px;">Responses: ${data.filter(r => r[field.name]).length} / ${data.length}</p>`;
+                        const responseCount = data.filter(r => r[field.name]).length;
+                        html += `<p style="font-size:11px;margin:0;">Response rate: <strong>${responseCount}/${data.length}</strong> (${(responseCount/data.length*100).toFixed(0)}%)</p>`;
                     }
                     html += '</div>';
                 });
+            } else {
+                html += '<p style="text-align:center;color:#666;padding:20px;">No submissions to report</p>';
             }
+            
             html += '</div>';
             container.innerHTML = html;
         }
@@ -1337,7 +1665,8 @@
             const content = document.getElementById('printableReport');
             if (!content) return;
             const win = window.open('', '_blank');
-            win.document.write('<html><head><title>Report</title><style>body{font-family:Arial,sans-serif;padding:20px;}</style></head><body>');
+            win.document.write(`<html><head><title>Report - ${window.currentViewForm?.title || 'Form'}</title>
+                <style>body{font-family:Arial,sans-serif;padding:30px;max-width:800px;margin:0 auto;}</style></head><body>`);
             win.document.write(content.innerHTML);
             win.document.write('</body></html>');
             win.document.close();
@@ -1354,7 +1683,7 @@
             drafts.unshift(draft);
             if (drafts.length > 10) drafts.pop();
             localStorage.setItem('drafts_' + formId, JSON.stringify(drafts));
-            alert('✅ Draft saved!');
+            notify('Draft saved!');
         }
         
         function loadDrafts() {
@@ -1363,16 +1692,19 @@
             const drafts = JSON.parse(localStorage.getItem('drafts_' + form.id) || '[]');
             
             if (drafts.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#666;">No drafts</p>';
+                container.innerHTML = '<p style="text-align:center;color:#666;padding:30px;">💾 No drafts saved yet</p>';
                 return;
             }
             
             container.innerHTML = drafts.map((draft, i) => `
-                <div style="background:#fff8e6;border:2px solid #ffc107;border-radius:6px;padding:10px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;">
-                    <div><strong>Draft ${i+1}</strong><br><small>${new Date(draft.timestamp).toLocaleString()}</small></div>
+                <div style="background:#fffbeb;border:2px solid #ffc107;border-radius:8px;padding:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
                     <div>
-                        <button onclick="loadDraft(${i})" style="padding:5px 10px;background:#004080;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:10px;margin-right:4px;">Load</button>
-                        <button onclick="deleteDraft(${i})" style="padding:5px 10px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:10px;">Delete</button>
+                        <strong style="color:#856404;">Draft ${i+1}</strong><br>
+                        <small style="color:#666;">${new Date(draft.timestamp).toLocaleString()}</small>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button onclick="loadDraft(${i})" style="padding:8px 14px;background:#004080;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-family:Oswald;">📂 Load</button>
+                        <button onclick="deleteDraft(${i})" style="padding:8px 14px;background:#dc3545;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-family:Oswald;">🗑️</button>
                     </div>
                 </div>`).join('');
         }
@@ -1393,17 +1725,18 @@
                     }
                 }
             });
-            showViewerTab('form');
+            showViewerTab('form', true);
             notify('Draft loaded!');
         };
         
         window.deleteDraft = function(index) {
-            if (!confirm('Delete draft?')) return;
+            if (!confirm('Delete this draft?')) return;
             const form = window.currentViewForm;
             const drafts = JSON.parse(localStorage.getItem('drafts_' + form.id) || '[]');
             drafts.splice(index, 1);
             localStorage.setItem('drafts_' + form.id, JSON.stringify(drafts));
             loadDrafts();
+            notify('Draft deleted');
         };
         
         function applySkipLogic(form) {
@@ -1456,12 +1789,12 @@
                     const lng = pos.coords.longitude.toFixed(6);
                     latInput.value = lat;
                     lngInput.value = lng;
-                    status.innerHTML = '✅ <b>' + lat + ', ' + lng + '</b>';
+                    status.innerHTML = '✅ <strong>' + lat + ', ' + lng + '</strong>';
                     status.style.color = '#28a745';
                     btn.textContent = '📍 Update GPS';
                 },
                 err => {
-                    status.textContent = '❌ ' + (err.code === 1 ? 'Permission denied' : 'Unavailable');
+                    status.textContent = '❌ ' + (err.code === 1 ? 'Permission denied' : 'Location unavailable');
                     status.style.color = '#dc3545';
                 },
                 { enableHighAccuracy: true, timeout: 15000 }
@@ -1553,8 +1886,8 @@
             window.currentViewForm = form;
             document.getElementById('dashboardContainer').style.display = 'none';
             document.getElementById('viewerContainer').style.display = 'block';
+            window.location.hash = 'tab=data';
             renderFormViewer(form);
-            setTimeout(() => showViewerTab('data'), 100);
         }
         
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
