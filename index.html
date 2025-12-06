@@ -58,7 +58,7 @@
         .form-card-body { padding: 15px; }
         .form-card-stat { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
         .form-card-stat:last-of-type { border-bottom: none; }
-        .form-card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
+        .form-card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 12px; }
         .card-btn { padding: 8px; border: none; border-radius: 5px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 10px; cursor: pointer; text-transform: uppercase; }
         .card-btn.edit { background: #004080; color: white; }
         .card-btn.share { background: #17a2b8; color: white; }
@@ -452,6 +452,30 @@
         </div>
     </div>
 
+    <!-- Rename Modal -->
+    <div class="modal-overlay" id="renameModal">
+        <div class="modal" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>✏️ Rename Form</h3>
+                <button class="modal-close" onclick="closeModal('renameModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <label class="settings-label">Form Name</label>
+                    <input type="text" class="settings-input" id="renameInput" placeholder="Enter new form name">
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Subtitle (Optional)</label>
+                    <input type="text" class="settings-input" id="renameSubtitle" placeholder="e.g., Data Collection Form">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal('renameModal')">Cancel</button>
+                <button class="modal-btn primary" onclick="saveRename()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Compression Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     
@@ -584,6 +608,7 @@
             currentShareUrl: '',
             fields: [],
             selectedFieldId: null,
+            renameFormId: null,
             scriptUrl: localStorage.getItem('scriptUrl') || '',
             folderId: localStorage.getItem('folderId') || ''
         };
@@ -912,12 +937,13 @@
                     <div class="form-card-body">
                         <div class="form-card-stat"><span>Fields:</span><span>${form.fields?.length || 0}</span></div>
                         <div class="form-card-stat"><span>Submissions:</span><span>${form.submissions || 0}</span></div>
-                        <div class="form-card-actions">
+                        <div class="form-card-actions" style="grid-template-columns: 1fr 1fr;">
                             <button class="card-btn edit" onclick="editForm('${form.id}')">✏️ Edit</button>
+                            <button class="card-btn" style="background:#6c757d;color:white;" onclick="renameForm('${form.id}')">✎ Rename</button>
                             <button class="card-btn share" onclick="shareForm('${form.id}')">📤 Share</button>
                             <button class="card-btn view" onclick="viewData('${form.id}')">📊 Data</button>
-                            <button class="card-btn delete" onclick="deleteForm('${form.id}')">🗑️</button>
                         </div>
+                        <button class="card-btn delete" style="width:100%;margin-top:6px;" onclick="deleteForm('${form.id}')">🗑️ Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -1277,6 +1303,66 @@
                 notify('Form deleted');
             } catch (err) {
                 notify('Error deleting', 'error');
+            }
+        }
+        
+        // ========================================
+        // RENAME FORM
+        // ========================================
+        function renameForm(formId) {
+            const form = state.forms.find(f => f.id === formId);
+            if (!form) return;
+            
+            state.renameFormId = formId;
+            document.getElementById('renameInput').value = form.title;
+            document.getElementById('renameSubtitle').value = form.subtitle || 'Data Collection Form';
+            document.getElementById('renameModal').classList.add('show');
+            
+            // Focus the input
+            setTimeout(() => document.getElementById('renameInput').focus(), 100);
+        }
+        
+        async function saveRename() {
+            const newTitle = document.getElementById('renameInput').value.trim();
+            const newSubtitle = document.getElementById('renameSubtitle').value.trim();
+            
+            if (!newTitle) {
+                notify('Please enter a form name', 'error');
+                return;
+            }
+            
+            const form = state.forms.find(f => f.id === state.renameFormId);
+            if (!form) return;
+            
+            form.title = newTitle;
+            form.subtitle = newSubtitle || 'Data Collection Form';
+            form.updatedAt = new Date().toISOString();
+            
+            if (!state.scriptUrl) {
+                localStorage.setItem('forms_' + state.user.id, JSON.stringify(state.forms));
+                renderFormsGrid();
+                closeModal('renameModal');
+                notify('Form renamed!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(state.scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveForm', form: form, folderId: state.folderId })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeModal('renameModal');
+                    notify('Form renamed!');
+                    loadUserForms();
+                } else {
+                    notify(result.message || 'Rename failed', 'error');
+                }
+            } catch (err) {
+                notify('Error renaming form', 'error');
             }
         }
         
