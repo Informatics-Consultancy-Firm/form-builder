@@ -148,8 +148,8 @@
         .settings-hint { font-size: 10px; color: #666; margin-top: 4px; }
         
         .qr-container { text-align: center; padding: 20px; }
-        .qr-box { display: inline-block; padding: 15px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
-        .qr-box canvas { display: block; }
+        .qr-box { display: inline-block; padding: 20px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
+        .qr-box canvas { display: block; border-radius: 8px; }
         .qr-url { background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 10px; word-break: break-all; margin-top: 12px; max-height: 80px; overflow-y: auto; border: 1px solid #ddd; }
         .qr-actions { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
         
@@ -443,8 +443,10 @@
         </div>
     </div>
 
+    <!-- Compression Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <!-- QR Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     
     <script>
         // ========================================
@@ -473,10 +475,41 @@
         // ========================================
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const formData = urlParams.get('d'); // Embedded form data
+            const compressedData = urlParams.get('c'); // Compressed form data
+            const formData = urlParams.get('d'); // Embedded form data (legacy)
             const formId = urlParams.get('form'); // Legacy form ID
             
-            // Check for embedded form data first
+            // Check for compressed form data first
+            if (compressedData) {
+                try {
+                    const decoded = atob(decodeURIComponent(compressedData));
+                    const charData = decoded.split('').map(c => c.charCodeAt(0));
+                    const binData = new Uint8Array(charData);
+                    const decompressed = pako.inflate(binData, { to: 'string' });
+                    const data = JSON.parse(decompressed);
+                    
+                    // Expand shortened keys
+                    const form = {
+                        id: data.id,
+                        title: data.t,
+                        subtitle: data.s,
+                        fields: data.f.map(f => ({
+                            id: f.i, type: f.y, label: f.l, name: f.n, required: f.r,
+                            options: f.o, skipLogic: f.k
+                        })),
+                        sheetId: data.h
+                    };
+                    
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.getElementById('viewerContainer').style.display = 'block';
+                    renderFormViewer(form);
+                    return;
+                } catch (err) {
+                    console.error('Error decoding compressed form:', err);
+                }
+            }
+            
+            // Check for embedded form data (legacy)
             if (formData) {
                 try {
                     const json = decodeURIComponent(escape(atob(formData)));
@@ -1001,28 +1034,40 @@
             // Show form title in modal
             document.getElementById('shareFormTitle').textContent = form.title;
             
-            // Embed form data in URL so anyone can access it
+            // Embed form data in URL with compression
             const formData = {
                 id: form.id,
-                title: form.title,
-                subtitle: form.subtitle || 'Data Collection',
-                fields: form.fields,
-                sheetId: form.sheetId || ''
+                t: form.title,
+                s: form.subtitle || 'Data Collection',
+                f: form.fields.map(f => ({
+                    i: f.id, y: f.type, l: f.label, n: f.name, r: f.required,
+                    o: f.options, k: f.skipLogic
+                })),
+                h: form.sheetId || ''
             };
-            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
-            const shareUrl = CONFIG.BASE_URL + '?d=' + encoded;
+            
+            // Compress the data
+            const jsonStr = JSON.stringify(formData);
+            const compressed = pako.deflate(jsonStr);
+            const encoded = btoa(String.fromCharCode.apply(null, compressed));
+            const shareUrl = CONFIG.BASE_URL + '?c=' + encodeURIComponent(encoded);
             
             document.getElementById('shareUrl').textContent = shareUrl;
             
-            // Generate QR code
-            document.getElementById('qrCode').innerHTML = '';
-            new QRCode(document.getElementById('qrCode'), {
-                text: shareUrl,
-                width: 220,
-                height: 220,
-                colorDark: '#004080',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
+            // Generate QR code with canvas
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '<canvas id="qrCanvas"></canvas>';
+            
+            QRCode.toCanvas(document.getElementById('qrCanvas'), shareUrl, {
+                width: 250,
+                margin: 2,
+                color: {
+                    dark: '#004080',
+                    light: '#ffffff'
+                },
+                errorCorrectionLevel: 'M'
+            }, function(error) {
+                if (error) console.error(error);
             });
             
             state.currentShareUrl = shareUrl;
@@ -1035,7 +1080,7 @@
         }
         
         function downloadQR() {
-            const canvas = document.querySelector('.qr-box canvas');
+            const canvas = document.getElementById('qrCanvas');
             if (canvas) {
                 const link = document.createElement('a');
                 const formTitle = state.currentShareForm?.title || 'form';
