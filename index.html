@@ -463,8 +463,24 @@
         // ========================================
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const formId = urlParams.get('form');
+            const formData = urlParams.get('d'); // Embedded form data
+            const formId = urlParams.get('form'); // Legacy form ID
             
+            // Check for embedded form data first
+            if (formData) {
+                try {
+                    const json = decodeURIComponent(escape(atob(formData)));
+                    const form = JSON.parse(json);
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.getElementById('viewerContainer').style.display = 'block';
+                    renderFormViewer(form);
+                    return;
+                } catch (err) {
+                    console.error('Error decoding form:', err);
+                }
+            }
+            
+            // Legacy: check for form ID
             if (formId) {
                 loadFormForViewing(formId);
                 return;
@@ -972,7 +988,17 @@
             const form = state.forms.find(f => f.id === formId);
             if (!form) return;
             
-            const shareUrl = CONFIG.BASE_URL + '?form=' + formId;
+            // Embed form data in URL so anyone can access it
+            const formData = {
+                id: form.id,
+                title: form.title,
+                subtitle: form.subtitle || 'Data Collection',
+                fields: form.fields,
+                sheetId: form.sheetId || ''
+            };
+            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
+            const shareUrl = CONFIG.BASE_URL + '?d=' + encoded;
+            
             document.getElementById('shareUrl').textContent = shareUrl;
             
             document.getElementById('qrCode').innerHTML = '';
@@ -1445,10 +1471,17 @@
         
         function previewForm() {
             if (state.fields.length === 0) { notify('Add fields first', 'error'); return; }
-            window.currentViewForm = { id: state.currentForm.id, title: document.getElementById('formTitleInput').value, subtitle: 'Data Collection', fields: state.fields };
+            const form = { 
+                id: state.currentForm.id, 
+                title: document.getElementById('formTitleInput').value, 
+                subtitle: 'Data Collection', 
+                fields: state.fields,
+                sheetId: state.currentForm.sheetId || ''
+            };
+            window.currentViewForm = form;
             document.getElementById('builderContainer').style.display = 'none';
             document.getElementById('viewerContainer').style.display = 'block';
-            renderFormViewer(window.currentViewForm);
+            renderFormViewer(form);
         }
         
         function viewData(formId) {
