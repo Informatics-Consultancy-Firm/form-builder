@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Builder - ICF-SL</title>
+    <title>Form Builder Pro - ICF-SL</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,122 +31,141 @@
         .auth-btn:disabled { background: #ccc; cursor: not-allowed; }
         .auth-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: none; }
         .auth-success { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: none; }
+        .auth-link { text-align: center; margin-top: 15px; font-size: 12px; }
+        .auth-link a { color: #004080; cursor: pointer; text-decoration: underline; }
         
-        /* Dashboard */
-        .dashboard-container { display: none; }
-        .header { background: #004080; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        /* Header */
+        .header { background: #004080; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
         .header-brand { display: flex; align-items: center; gap: 12px; }
+        .header-logo { width: 40px; height: 40px; border-radius: 6px; }
         .header h1 { font-size: 18px; }
-        .header-user { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .header-username { font-size: 12px; background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; }
-        .header-btn { background: white; color: #004080; border: none; padding: 8px 14px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .header-btn { background: white; color: #004080; border: none; padding: 8px 16px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
         .header-btn:hover { background: #f0f0f0; }
+        .header-btn.primary { background: #ffc107; color: #000; }
+        .header-btn.success { background: #28a745; color: white; }
         .header-btn.danger { background: #dc3545; color: white; }
         
-        .dashboard { padding: 25px; max-width: 1200px; margin: 0 auto; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .dashboard-title { font-size: 22px; color: #004080; }
-        .new-form-btn { background: #28a745; color: white; border: none; padding: 12px 22px; border-radius: 8px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .new-form-btn:hover { background: #218838; }
+        /* Main Layout */
+        .main-container { display: none; margin-top: 60px; height: calc(100vh - 90px); }
+        .main-container.show { display: flex; }
+        .footer { background: #004080; color: white; padding: 8px 20px; text-align: center; font-size: 11px; position: fixed; bottom: 0; left: 0; right: 0; }
         
-        .forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .form-card { background: white; border: 3px solid #ddd; border-radius: 12px; overflow: hidden; transition: all 0.2s; }
-        .form-card:hover { border-color: #004080; box-shadow: 0 5px 20px rgba(0,64,128,0.15); }
-        .form-card-header { background: #004080; color: white; padding: 15px; }
-        .form-card-title { font-size: 15px; margin-bottom: 3px; }
-        .form-card-date { font-size: 10px; opacity: 0.8; }
-        .form-card-body { padding: 15px; }
-        .form-card-stat { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
-        .form-card-stat:last-of-type { border-bottom: none; }
-        .form-card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 12px; }
-        .card-btn { padding: 8px; border: none; border-radius: 5px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 10px; cursor: pointer; text-transform: uppercase; }
-        .card-btn.edit { background: #004080; color: white; }
-        .card-btn.share { background: #17a2b8; color: white; }
-        .card-btn.view { background: #28a745; color: white; }
-        .card-btn.delete { background: #dc3545; color: white; }
+        /* Sidebar */
+        .sidebar { width: 200px; background: white; border-right: 2px solid #004080; overflow-y: auto; padding: 12px; }
+        .sidebar-section { margin-bottom: 12px; }
+        .sidebar-title { font-size: 10px; font-weight: 700; color: #004080; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #004080; text-transform: uppercase; }
+        .field-type { background: #f8f9fa; border: 2px solid #ddd; border-radius: 6px; padding: 8px 10px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; transition: all 0.2s; }
+        .field-type:hover { border-color: #004080; background: #e8f4fc; transform: translateX(2px); }
+        .field-type-icon { font-size: 14px; }
         
-        .empty-state { text-align: center; padding: 60px 20px; grid-column: 1 / -1; }
-        .empty-state-icon { font-size: 50px; margin-bottom: 15px; }
-        .empty-state-text { color: #666; font-size: 15px; margin-bottom: 20px; }
-        
-        /* Form Builder */
-        .builder-container { display: none; height: 100vh; }
-        .builder-header { background: #004080; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .builder-title-input { background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; width: 250px; }
-        .builder-title-input::placeholder { color: rgba(255,255,255,0.6); }
-        .builder-title-input:focus { outline: none; border-color: white; }
-        .builder-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .builder-btn { background: white; color: #004080; border: none; padding: 8px 14px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; }
-        .builder-btn:hover { background: #f0f0f0; }
-        .builder-btn.save { background: #28a745; color: white; }
-        .builder-btn.preview { background: #ffc107; color: #000; }
-        
-        .builder-main { display: flex; height: calc(100vh - 52px); }
-        .builder-sidebar { width: 180px; background: white; border-right: 2px solid #ddd; padding: 12px; overflow-y: auto; }
-        .sidebar-title { font-size: 10px; font-weight: 700; color: #004080; margin-bottom: 10px; text-transform: uppercase; border-bottom: 2px solid #004080; padding-bottom: 5px; }
-        .field-type { background: #f8f9fa; border: 2px solid #ddd; border-radius: 6px; padding: 8px 10px; margin-bottom: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-        .field-type:hover { border-color: #004080; background: #e8f4fc; }
-        
-        .builder-canvas { flex: 1; background: #e9ecef; padding: 15px; overflow-y: auto; }
-        .form-preview { max-width: 550px; margin: 0 auto; background: white; border: 4px double #004080; border-radius: 12px; min-height: 350px; }
-        .form-preview-header { background: #004080; color: white; padding: 18px; text-align: center; }
-        .form-preview-header h2 { font-size: 16px; margin-bottom: 4px; }
+        /* Canvas */
+        .canvas-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .canvas-header { background: white; padding: 10px 20px; border-bottom: 2px solid #ddd; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .form-title-input { font-size: 15px; font-weight: 700; border: 2px solid transparent; padding: 6px 10px; border-radius: 6px; font-family: 'Oswald', sans-serif; width: 280px; }
+        .form-title-input:focus { outline: none; border-color: #004080; background: #f8f9fa; }
+        .canvas { flex: 1; overflow-y: auto; padding: 20px; background: #e9ecef; }
+        .form-preview { max-width: 600px; margin: 0 auto; background: white; border: 4px double #004080; border-radius: 12px; min-height: 300px; }
+        .form-preview-header { background: #004080; color: white; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
+        .form-preview-header h2 { font-size: 16px; margin-bottom: 3px; }
         .form-preview-header p { font-size: 10px; opacity: 0.9; }
         .form-preview-body { padding: 15px; min-height: 200px; }
         
-        .drop-zone { border: 3px dashed #ccc; border-radius: 8px; padding: 35px; text-align: center; color: #999; font-size: 12px; }
+        /* Drop Zone */
+        .drop-zone { border: 3px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; color: #999; font-size: 12px; min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
         .drop-zone.drag-over { border-color: #004080; background: #e8f4fc; }
-        .drop-zone.has-fields { border: none; padding: 0; }
+        .drop-zone.has-fields { border: none; padding: 0; display: block; min-height: auto; }
         
+        /* Form Fields */
         .form-field { background: #f8f9fa; border: 2px solid #ddd; border-radius: 6px; padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
         .form-field:hover { border-color: #004080; }
         .form-field.selected { border-color: #004080; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
         .form-field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .form-field-label { font-weight: 700; font-size: 10px; text-transform: uppercase; }
-        .form-field-actions { display: flex; gap: 4px; }
-        .field-action-btn { background: #e9ecef; border: none; cursor: pointer; font-size: 12px; padding: 4px 6px; border-radius: 4px; }
+        .form-field-label { font-weight: 700; font-size: 10px; color: #333; text-transform: uppercase; }
+        .form-field-actions { display: flex; gap: 3px; }
+        .field-action-btn { background: #e9ecef; border: none; cursor: pointer; font-size: 11px; padding: 3px 5px; border-radius: 4px; }
         .field-action-btn:hover { background: #dee2e6; }
         .field-action-btn.delete:hover { background: #ffebee; color: #dc3545; }
-        .form-field-preview { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 6px; font-size: 11px; color: #666; }
-        .section-field { background: #004080; color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; cursor: pointer; font-size: 12px; font-weight: 700; }
-        .section-field.selected { box-shadow: 0 0 0 3px rgba(0,64,128,0.3); }
+        .form-field-preview { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 6px; font-size: 10px; color: #666; }
+        .form-field-meta { margin-top: 5px; font-size: 9px; color: #999; display: flex; gap: 8px; flex-wrap: wrap; }
+        .field-badge { padding: 2px 5px; border-radius: 3px; font-size: 8px; }
+        .field-badge.skip { background: #fff3cd; color: #856404; }
+        .field-badge.required { background: #f8d7da; color: #721c24; }
+        .field-badge.validation { background: #d1ecf1; color: #0c5460; }
         
-        .builder-properties { width: 260px; background: white; border-left: 2px solid #ddd; padding: 12px; overflow-y: auto; }
-        .prop-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 12px; text-transform: uppercase; border-bottom: 2px solid #004080; padding-bottom: 6px; }
-        .prop-group { margin-bottom: 10px; }
-        .prop-label { display: block; font-size: 9px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
-        .prop-input, .prop-select { width: 100%; padding: 7px; border: 2px solid #ddd; border-radius: 5px; font-family: 'Oswald', sans-serif; font-size: 11px; }
-        .prop-input:focus, .prop-select:focus { outline: none; border-color: #004080; }
-        .prop-textarea { width: 100%; padding: 7px; border: 2px solid #ddd; border-radius: 5px; font-family: 'Oswald', sans-serif; font-size: 10px; min-height: 50px; }
-        .prop-checkbox { display: flex; align-items: center; gap: 6px; font-size: 10px; cursor: pointer; }
-        .prop-checkbox input { width: 14px; height: 14px; }
+        .section-divider { background: #004080; color: white; padding: 10px 14px; margin: 12px 0; border-radius: 6px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .section-divider.selected { box-shadow: 0 0 0 3px rgba(0,64,128,0.3); }
+        .section-divider .page-badge { background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; }
+        
+        /* Properties Panel */
+        .properties-panel { width: 300px; background: white; border-left: 2px solid #004080; overflow-y: auto; padding: 12px; }
+        .properties-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #004080; text-transform: uppercase; }
+        .property-group { margin-bottom: 10px; }
+        .property-label { display: block; font-size: 9px; font-weight: 700; color: #333; margin-bottom: 4px; text-transform: uppercase; }
+        .property-input, .property-select { width: 100%; padding: 7px; border: 2px solid #ddd; border-radius: 5px; font-family: 'Oswald', sans-serif; font-size: 11px; }
+        .property-input:focus, .property-select:focus { outline: none; border-color: #004080; }
+        .property-textarea { width: 100%; padding: 7px; border: 2px solid #ddd; border-radius: 5px; font-family: 'Oswald', sans-serif; font-size: 10px; min-height: 50px; resize: vertical; }
+        .property-checkbox { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; }
+        .property-checkbox input { width: 14px; height: 14px; }
         .no-selection { text-align: center; color: #999; padding: 30px 10px; font-size: 11px; }
         
-        .skip-logic-box { background: #fff3cd; border: 2px solid #ffc107; border-radius: 6px; padding: 10px; margin-top: 12px; }
-        .skip-logic-title { font-size: 9px; font-weight: 700; color: #856404; margin-bottom: 6px; }
-        .skip-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-bottom: 5px; font-size: 10px; }
-        .skip-row select, .skip-row input { padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 9px; }
+        /* Property Sections */
+        .prop-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 6px; padding: 10px; margin-bottom: 12px; }
+        .prop-section-title { font-size: 10px; font-weight: 700; color: #004080; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+        .prop-section.skip-logic { background: #fff3cd; border-color: #ffc107; }
+        .prop-section.validation { background: #d1ecf1; border-color: #17a2b8; }
+        
+        /* Inline Fields */
+        .prop-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+        .prop-row .property-input, .prop-row .property-select { flex: 1; }
+        .prop-row span { font-size: 9px; color: #666; white-space: nowrap; }
         
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; overflow-y: auto; }
         .modal-overlay.show { display: flex; }
-        .modal { background: white; border-radius: 12px; max-width: 550px; width: 100%; max-height: 85vh; overflow: hidden; border: 4px double #004080; }
+        .modal { background: white; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow: hidden; border: 4px double #004080; }
         .modal-header { background: #004080; color: white; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h3 { font-size: 15px; }
         .modal-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
-        .modal-body { padding: 18px; max-height: 55vh; overflow-y: auto; }
+        .modal-body { padding: 18px; max-height: 65vh; overflow-y: auto; }
         .modal-footer { padding: 12px 18px; border-top: 2px solid #ddd; display: flex; justify-content: flex-end; gap: 8px; }
-        .modal-btn { padding: 9px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; border: none; }
-        .modal-btn.cancel { background: #6c757d; color: white; }
+        .modal-btn { padding: 8px 16px; border-radius: 5px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; border: 2px solid #004080; }
+        .modal-btn.secondary { background: white; color: #004080; }
         .modal-btn.primary { background: #004080; color: white; }
-        .modal-btn.success { background: #28a745; color: white; }
+        .modal-btn.success { background: #28a745; color: white; border-color: #28a745; }
         
-        .settings-group { margin-bottom: 15px; }
-        .settings-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab { padding: 10px 16px; cursor: pointer; font-weight: 700; font-size: 11px; border-bottom: 3px solid transparent; margin-bottom: -2px; text-transform: uppercase; }
+        .tab:hover { background: #f8f9fa; }
+        .tab.active { border-bottom-color: #004080; color: #004080; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Settings */
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .settings-group { margin-bottom: 12px; }
+        .settings-group.full-width { grid-column: span 2; }
+        .settings-label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
         .settings-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; }
         .settings-input:focus { outline: none; border-color: #004080; }
-        .settings-hint { font-size: 10px; color: #666; margin-top: 4px; }
+        .settings-hint { font-size: 9px; color: #666; margin-top: 4px; }
         
+        .toggle-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .toggle-slider { width: 40px; height: 20px; background: #ccc; border-radius: 10px; position: relative; transition: background 0.3s; }
+        .toggle-slider::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; }
+        .toggle-switch input { display: none; }
+        .toggle-switch input:checked + .toggle-slider { background: #28a745; }
+        .toggle-switch input:checked + .toggle-slider::after { left: 22px; }
+        
+        /* Code Preview */
+        .code-preview { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 10px; white-space: pre-wrap; max-height: 300px; overflow: auto; }
+        
+        /* Info Box */
+        .info-box { background: #e8f4fc; border: 2px solid #004080; border-radius: 6px; padding: 10px; font-size: 11px; margin: 10px 0; }
+        .info-box h4 { color: #004080; margin-bottom: 5px; font-size: 11px; }
+        
+        /* QR Code Container */
         .qr-container { text-align: center; padding: 20px; }
         .qr-box { display: inline-block; padding: 25px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
         #qrCode { min-width: 200px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
@@ -154,63 +173,39 @@
         .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 11px; word-break: break-all; margin-top: 15px; max-height: 100px; overflow-y: auto; border: 2px solid #ddd; text-align: left; font-family: monospace; }
         .qr-actions { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         
-        /* Loading & Notification */
-        .loading { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .notification { position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 18px; border-radius: 8px; font-size: 12px; font-weight: 700; z-index: 3000; animation: slideIn 0.3s ease; }
+        /* Notification */
+        .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; }
+        .notification.show { display: block; }
         .notification.error { background: #dc3545; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Form Viewer */
-        .viewer-container { display: none; min-height: 100vh; background: #f5f5f5; }
-        .viewer-nav { background: #fff; padding: 12px; text-align: center; border-bottom: 3px solid #004080; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; position: sticky; top: 0; z-index: 100; }
-        .viewer-nav-btn { padding: 10px 16px; border: 2px solid transparent; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
-        .viewer-nav-btn.active { border-color: currentColor; transform: scale(1.05); }
-        .viewer-nav-btn:hover { transform: scale(1.05); }
-        .viewer-form { max-width: 650px; margin: 20px auto; padding: 0 15px; }
-        .viewer-form-box { border: 4px double #004080; border-radius: 12px; overflow: hidden; background: white; }
-        .viewer-header { background: #004080; color: white; padding: 20px; text-align: center; }
-        .viewer-header h1 { font-size: 18px; margin-bottom: 5px; }
-        .viewer-header p { font-size: 11px; opacity: 0.9; }
-        .viewer-body { padding: 20px; }
-        .viewer-field { margin-bottom: 18px; }
-        .viewer-field-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
-        .viewer-field-label .required { color: red; }
-        .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
-        .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
-        .viewer-section { background: #004080; color: white; padding: 12px 15px; margin: 18px -20px; font-weight: 700; font-size: 13px; }
-        .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
-        .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
-        .viewer-radio-option:hover { border-color: #004080; }
-        .viewer-radio-option input:checked + span { color: #004080; font-weight: 700; }
-        .viewer-submit { width: 100%; padding: 16px; background: #28a745; color: white; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-        .viewer-submit:hover { background: #218838; }
-        .viewer-submit:disabled { background: #ccc; }
-        .viewer-draft-btn { width: 100%; padding: 12px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        /* Dynamic Table Builder */
+        .table-builder { border: 2px solid #ddd; border-radius: 6px; overflow: hidden; margin: 10px 0; }
+        .table-builder-header { background: #004080; color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .table-builder-header span { font-size: 11px; font-weight: 700; }
+        .table-builder-body { max-height: 200px; overflow: auto; }
+        .table-builder table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .table-builder th, .table-builder td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        .table-builder th { background: #f8f9fa; font-weight: 700; }
+        .table-builder input, .table-builder select { width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 9px; }
+        .add-row-btn, .add-col-btn { background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; margin: 2px; }
+        .remove-btn { background: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 9px; cursor: pointer; }
         
-        .viewer-tab { display: none; }
-        .viewer-tab.active { display: block; }
+        /* File Upload */
+        .file-upload-area { border: 3px dashed #ddd; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 12px; transition: all 0.2s; }
+        .file-upload-area:hover { border-color: #004080; background: #f8f9fa; }
+        .file-upload-area.has-file { border-color: #28a745; background: #d4edda; }
         
-        /* Data View */
-        .data-table-wrapper { overflow-x: auto; margin: -20px; margin-top: 0; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 500px; }
-        .data-table th, .data-table td { border: 1px solid #ddd; padding: 10px 8px; text-align: left; }
-        .data-table th { background: #004080; color: white; font-size: 10px; text-transform: uppercase; position: sticky; top: 0; }
-        .data-table tr:nth-child(even) { background: #f9f9f9; }
-        .data-table tr:hover { background: #e8f4fc; }
-        .stat-card { background: linear-gradient(135deg, #004080 0%, #0066cc 100%); border-radius: 10px; padding: 20px; text-align: center; color: white; }
-        .stat-value { font-size: 36px; font-weight: 700; }
-        .stat-label { font-size: 12px; opacity: 0.9; margin-top: 5px; }
-        .chart-bar { height: 24px; background: linear-gradient(90deg, #004080, #0066cc); border-radius: 4px; margin: 6px 0; transition: width 0.5s ease; }
-        .chart-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; }
+        /* Preview Iframe */
+        .preview-frame { width: 100%; height: 500px; border: none; background: white; }
         
         @media (max-width: 768px) {
-            .builder-main { flex-direction: column; }
-            .builder-sidebar, .builder-properties { width: 100%; max-height: 200px; }
-            .header { padding: 10px; }
-            .header h1 { font-size: 14px; }
-            .viewer-nav-btn { padding: 8px 12px; font-size: 10px; }
+            .main-container { flex-direction: column; }
+            .sidebar, .properties-panel { width: 100%; max-height: 180px; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .settings-group.full-width { grid-column: span 1; }
         }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -219,7 +214,7 @@
         <div class="auth-box">
             <div class="auth-header">
                 <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" style="width:70px;border-radius:10px;margin-bottom:12px;">
-                <h1>Form Builder</h1>
+                <h1>Form Builder Pro</h1>
                 <p>Create & Manage Data Collection Forms</p>
             </div>
             <div class="auth-body">
@@ -234,194 +229,290 @@
                 <form class="auth-form active" id="loginForm">
                     <div class="auth-group">
                         <label class="auth-label">Email</label>
-                        <input type="email" class="auth-input" id="loginEmail" required>
+                        <input type="email" class="auth-input" id="loginEmail" required placeholder="your@email.com">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Password</label>
-                        <input type="password" class="auth-input" id="loginPassword" required>
+                        <input type="password" class="auth-input" id="loginPassword" required placeholder="Enter password">
                     </div>
                     <button type="submit" class="auth-btn" id="loginBtn">Login</button>
+                    <div class="auth-link">
+                        <a onclick="showForgotPassword()">Forgot Password?</a>
+                    </div>
                 </form>
                 
                 <form class="auth-form" id="signupForm">
                     <div class="auth-group">
                         <label class="auth-label">Full Name</label>
-                        <input type="text" class="auth-input" id="signupName" required>
+                        <input type="text" class="auth-input" id="signupName" required placeholder="John Doe">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Email</label>
-                        <input type="email" class="auth-input" id="signupEmail" required>
+                        <input type="email" class="auth-input" id="signupEmail" required placeholder="your@email.com">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Organization</label>
-                        <input type="text" class="auth-input" id="signupOrg" value="ICF-SL">
+                        <input type="text" class="auth-input" id="signupOrg" value="ICF-SL" placeholder="Your organization">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Password</label>
-                        <input type="password" class="auth-input" id="signupPassword" required minlength="6">
+                        <input type="password" class="auth-input" id="signupPassword" required minlength="6" placeholder="Min 6 characters">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Confirm Password</label>
-                        <input type="password" class="auth-input" id="signupConfirm" required>
+                        <input type="password" class="auth-input" id="signupConfirm" required placeholder="Confirm password">
                     </div>
                     <button type="submit" class="auth-btn" id="signupBtn">Create Account</button>
+                </form>
+                
+                <form class="auth-form" id="forgotForm">
+                    <div class="auth-group">
+                        <label class="auth-label">Email Address</label>
+                        <input type="email" class="auth-input" id="forgotEmail" required placeholder="Enter your registered email">
+                    </div>
+                    <button type="submit" class="auth-btn" id="forgotBtn">Send Password</button>
+                    <div class="auth-link">
+                        <a onclick="showLogin()">Back to Login</a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Dashboard Container -->
-    <div class="dashboard-container" id="dashboardContainer">
-        <div class="header">
-            <div class="header-brand">
-                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" style="width:40px;height:40px;border-radius:6px;">
-                <h1>Form Builder</h1>
-            </div>
-            <div class="header-user">
-                <span class="header-username" id="headerUsername">👤 User</span>
-                <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
-                <button class="header-btn danger" onclick="logout()">Logout</button>
-            </div>
+    <!-- Main Builder -->
+    <header class="header">
+        <div class="header-brand">
+            <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" class="header-logo">
+            <h1>Form Builder Pro</h1>
         </div>
-        
-        <div class="dashboard" id="dashboard">
-            <div class="dashboard-header">
-                <h2 class="dashboard-title">📋 My Forms</h2>
-                <button class="new-form-btn" onclick="createNewForm()">➕ New Form</button>
-            </div>
-            <div class="forms-grid" id="formsGrid"></div>
+        <div class="header-actions">
+            <span id="headerUser" style="font-size:11px;margin-right:10px;"></span>
+            <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
+            <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
+            <button class="header-btn" onclick="shareForm()">🔗 Share</button>
+            <button class="header-btn success" onclick="generateForm()">⬇️ Generate</button>
+            <button class="header-btn danger" onclick="logout()">Logout</button>
         </div>
-    </div>
+    </header>
 
-    <!-- Form Builder Container -->
-    <div class="builder-container" id="builderContainer">
-        <div class="builder-header">
-            <input type="text" class="builder-title-input" id="formTitleInput" placeholder="Form Title" value="New Form">
-            <div class="builder-actions">
-                <button class="builder-btn" onclick="backToDashboard()">← Back</button>
-                <button class="builder-btn preview" onclick="previewForm()">👁️ Preview</button>
-                <button class="builder-btn save" onclick="saveForm()">💾 Save</button>
+    <div class="main-container" id="mainContainer">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📝 Basic</h3>
+                <div class="field-type" data-type="text"><span class="field-type-icon">📄</span>Text</div>
+                <div class="field-type" data-type="number"><span class="field-type-icon">🔢</span>Number</div>
+                <div class="field-type" data-type="date"><span class="field-type-icon">📅</span>Date</div>
+                <div class="field-type" data-type="time"><span class="field-type-icon">🕐</span>Time</div>
+                <div class="field-type" data-type="email"><span class="field-type-icon">📧</span>Email</div>
+                <div class="field-type" data-type="phone"><span class="field-type-icon">📱</span>Phone</div>
+                <div class="field-type" data-type="textarea"><span class="field-type-icon">📝</span>Long Text</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">☑️ Selection</h3>
+                <div class="field-type" data-type="select"><span class="field-type-icon">📋</span>Dropdown</div>
+                <div class="field-type" data-type="radio"><span class="field-type-icon">🔘</span>Radio</div>
+                <div class="field-type" data-type="checkbox"><span class="field-type-icon">☑️</span>Checkbox</div>
+                <div class="field-type" data-type="yesno"><span class="field-type-icon">✅</span>Yes/No</div>
+                <div class="field-type" data-type="yesnona"><span class="field-type-icon">❓</span>Yes/No/NA</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📊 Tables</h3>
+                <div class="field-type" data-type="table"><span class="field-type-icon">📋</span>Static Table</div>
+                <div class="field-type" data-type="dynamicTable"><span class="field-type-icon">➕</span>Dynamic Table</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🔗 Location</h3>
+                <div class="field-type" data-type="cascading"><span class="field-type-icon">🏢</span>Cascading</div>
+                <div class="field-type" data-type="gps"><span class="field-type-icon">📍</span>GPS</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🎯 Special</h3>
+                <div class="field-type" data-type="signature"><span class="field-type-icon">✍️</span>Signature</div>
+                <div class="field-type" data-type="rating"><span class="field-type-icon">⭐</span>Rating</div>
+                <div class="field-type" data-type="file"><span class="field-type-icon">📎</span>File Upload</div>
+                <div class="field-type" data-type="calculated"><span class="field-type-icon">🔢</span>Calculated</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📑 Structure</h3>
+                <div class="field-type" data-type="section"><span class="field-type-icon">📁</span>Section/Page</div>
             </div>
         </div>
-        <div class="builder-main">
-            <div class="builder-sidebar">
-                <div class="sidebar-title">📦 Field Types</div>
-                <div class="field-type" data-type="text">📝 Text</div>
-                <div class="field-type" data-type="number">🔢 Number</div>
-                <div class="field-type" data-type="date">📅 Date</div>
-                <div class="field-type" data-type="textarea">📄 Long Text</div>
-                <div class="field-type" data-type="select">📋 Dropdown</div>
-                <div class="field-type" data-type="radio">🔘 Radio</div>
-                <div class="field-type" data-type="checkbox">☑️ Checkbox</div>
-                <div class="field-type" data-type="yesno">✅ Yes/No</div>
-                <div class="field-type" data-type="yesnona">❓ Yes/No/NA</div>
-                <div class="field-type" data-type="gps">📍 GPS</div>
-                <div class="field-type" data-type="signature">✍️ Signature</div>
-                <div class="field-type" data-type="section">📑 Section</div>
+
+        <div class="canvas-container">
+            <div class="canvas-header">
+                <input type="text" class="form-title-input" id="formTitle" value="My Data Collection Form" placeholder="Form Title...">
+                <span style="color:#666;font-size:11px;" id="fieldCount">0 fields | 1 page</span>
             </div>
-            
-            <div class="builder-canvas">
+            <div class="canvas">
                 <div class="form-preview">
                     <div class="form-preview-header">
-                        <h2 id="previewTitle">New Form</h2>
-                        <p id="previewSubtitle">Data Collection Form</p>
+                        <h2 id="previewTitle">My Data Collection Form</h2>
+                        <p id="previewSubtitle">Data Collection System</p>
                     </div>
                     <div class="form-preview-body">
                         <div class="drop-zone" id="dropZone">
-                            <div>📥 Click field types to add</div>
-                            <div style="font-size:10px;margin-top:6px;">or drag & drop</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="builder-properties" id="propertiesPanel">
-                <div class="prop-title">⚙️ Properties</div>
-                <div class="no-selection" id="noSelection">
-                    <div style="font-size:24px;margin-bottom:8px;">👆</div>
-                    Select a field to edit
-                </div>
-                <div id="fieldProperties" style="display:none;">
-                    <div class="prop-group">
-                        <label class="prop-label">Label</label>
-                        <input type="text" class="prop-input" id="propLabel">
-                    </div>
-                    <div class="prop-group">
-                        <label class="prop-label">Field Name</label>
-                        <input type="text" class="prop-input" id="propName">
-                    </div>
-                    <div class="prop-group">
-                        <label class="prop-checkbox">
-                            <input type="checkbox" id="propRequired">
-                            <span>Required Field</span>
-                        </label>
-                    </div>
-                    <div class="prop-group" id="optionsGroup" style="display:none;">
-                        <label class="prop-label">Options (one per line)</label>
-                        <textarea class="prop-textarea" id="propOptions"></textarea>
-                    </div>
-                    
-                    <div class="skip-logic-box">
-                        <div class="skip-logic-title">🔀 Skip Logic</div>
-                        <div class="skip-row">
-                            <label class="prop-checkbox">
-                                <input type="checkbox" id="skipEnabled">
-                                <span>Enable</span>
-                            </label>
-                        </div>
-                        <div id="skipDetails" style="display:none;">
-                            <div class="skip-row">
-                                <span>Show when</span>
-                                <select id="skipField"></select>
-                            </div>
-                            <div class="skip-row">
-                                <select id="skipOperator">
-                                    <option value="equals">equals</option>
-                                    <option value="not_equals">not equals</option>
-                                </select>
-                                <input type="text" id="skipValue" placeholder="value" style="width:80px;">
-                            </div>
+                            <p style="font-size:24px;margin-bottom:10px;">📥</p>
+                            <p>Click field types on the left to add them</p>
+                            <p style="margin-top:5px;font-size:10px;color:#aaa;">Or drag and drop here</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="properties-panel">
+            <h3 class="properties-title">⚙️ Field Properties</h3>
+            <div id="propertiesContent">
+                <div class="no-selection">
+                    <p style="font-size:24px;margin-bottom:10px;">👆</p>
+                    <p>Select a field to edit</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Form Viewer Container -->
-    <div class="viewer-container" id="viewerContainer"></div>
+    <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL)</footer>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>⚙️ System Settings</h3>
+                <h3>⚙️ Form Settings</h3>
                 <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="settings-group">
-                    <label class="settings-label">Apps Script Web App URL</label>
-                    <input type="text" class="settings-input" id="settingsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-                    <div class="settings-hint">This handles users, forms, and creates new files</div>
+                <div class="tabs">
+                    <div class="tab active" data-tab="general">General</div>
+                    <div class="tab" data-tab="pages">Pages</div>
+                    <div class="tab" data-tab="cascading">Cascading</div>
+                    <div class="tab" data-tab="google">Google Sheets</div>
                 </div>
-                <div class="settings-group">
-                    <label class="settings-label">Google Drive Folder ID</label>
-                    <input type="text" class="settings-input" id="settingsFolderId" placeholder="Folder ID from Drive URL">
-                    <div class="settings-hint">Each form creates a NEW file in this folder</div>
+
+                <div class="tab-content active" id="tab-general">
+                    <div class="settings-grid">
+                        <div class="settings-group">
+                            <label class="settings-label">Form Title</label>
+                            <input type="text" class="settings-input" id="settingsTitle">
+                        </div>
+                        <div class="settings-group">
+                            <label class="settings-label">Subtitle</label>
+                            <input type="text" class="settings-input" id="settingsSubtitle">
+                        </div>
+                        <div class="settings-group full-width">
+                            <label class="settings-label">Organization</label>
+                            <input type="text" class="settings-input" id="settingsOrg">
+                        </div>
+                        <div class="settings-group full-width">
+                            <label class="settings-label">Logo URL</label>
+                            <input type="text" class="settings-input" id="settingsLogo">
+                        </div>
+                        <div class="settings-group full-width">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="settingsMultiPage" checked>
+                                <span class="toggle-slider"></span>
+                                <span style="font-size:11px;">Enable Multi-Page Navigation</span>
+                            </label>
+                            <div class="settings-hint">Each section becomes a separate page</div>
+                        </div>
+                    </div>
                 </div>
-                <div style="background:#e8f4fc;padding:12px;border-radius:8px;margin-top:15px;font-size:11px;">
-                    <strong>📋 How it works:</strong>
-                    <ul style="margin:8px 0 0 18px;">
-                        <li>User credentials → "Users" sheet</li>
-                        <li>Form definitions → "Forms" sheet</li>
-                        <li>Each form → Creates NEW Google Sheets file</li>
-                        <li>Files stored in your Drive folder</li>
-                    </ul>
+
+                <div class="tab-content" id="tab-pages">
+                    <div class="info-box">
+                        <h4>📄 Multi-Page Forms</h4>
+                        <p>Add "Section" fields to create page breaks. Each section becomes a separate page with navigation buttons.</p>
+                    </div>
+                    <div id="pagesList" style="margin-top:15px;"></div>
+                </div>
+
+                <div class="tab-content" id="tab-cascading">
+                    <p style="font-size:11px;color:#666;margin-bottom:12px;">Upload Excel/CSV with location hierarchy</p>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div style="font-size:28px;margin-bottom:8px;">📁</div>
+                        <div id="fileUploadText" style="font-size:12px;">Click to upload Excel or CSV</div>
+                        <input type="file" id="cascadingFile" accept=".xlsx,.xls,.csv" style="display:none;">
+                    </div>
+                    <button class="modal-btn secondary" onclick="downloadSampleFile()" style="margin-bottom:10px;">⬇️ Download Template</button>
+                    <div class="info-box">
+                        <h4>📋 Required Columns:</h4>
+                        <p>Region | District | Chiefdom | Facility | UID</p>
+                    </div>
+                    <div class="settings-group" style="margin-top:12px;">
+                        <label class="settings-label">Or Enter Manually</label>
+                        <textarea class="property-textarea" id="cascadingData" style="height:100px;font-family:monospace;font-size:9px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-google">
+                    <div class="settings-group">
+                        <label class="settings-label">Apps Script Web App URL</label>
+                        <input type="text" class="settings-input" id="settingsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+                        <div class="settings-hint">For data submission and user authentication</div>
+                    </div>
+                    <div class="info-box" style="background:#fff3cd;border-color:#ffc107;">
+                        <h4 style="color:#856404;">📋 Setup Instructions:</h4>
+                        <ol style="margin-left:15px;font-size:10px;line-height:1.8;color:#856404;">
+                            <li>Create a Google Sheet with sheets: "Users", "Forms", "Submissions"</li>
+                            <li>Go to Extensions → Apps Script</li>
+                            <li>Paste the generated Apps Script code</li>
+                            <li>Deploy as Web App (Anyone can access)</li>
+                            <li>Copy the URL here</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="modal-btn cancel" onclick="closeModal('settingsModal')">Cancel</button>
-                <button class="modal-btn primary" onclick="saveSystemSettings()">Save</button>
+                <button class="modal-btn secondary" onclick="closeModal('settingsModal')">Cancel</button>
+                <button class="modal-btn primary" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Modal -->
+    <div class="modal-overlay" id="generateModal">
+        <div class="modal" style="max-width:850px;">
+            <div class="modal-header">
+                <h3>📥 Generated Form</h3>
+                <button class="modal-close" onclick="closeModal('generateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <div class="tab active" data-tab="html-code">HTML Form</div>
+                    <div class="tab" data-tab="apps-script">Apps Script</div>
+                </div>
+                
+                <div class="tab-content active" id="tab-html-code">
+                    <div style="margin-bottom:10px;">
+                        <button class="modal-btn primary" onclick="downloadHTML()">⬇️ Download HTML</button>
+                        <button class="modal-btn secondary" onclick="copyCode('htmlCode')" style="margin-left:5px;">📋 Copy</button>
+                    </div>
+                    <div class="code-preview" id="htmlCode"></div>
+                </div>
+                
+                <div class="tab-content" id="tab-apps-script">
+                    <div style="margin-bottom:10px;">
+                        <button class="modal-btn primary" onclick="downloadScript()">⬇️ Download .gs</button>
+                        <button class="modal-btn secondary" onclick="copyCode('scriptCode')" style="margin-left:5px;">📋 Copy</button>
+                    </div>
+                    <div class="code-preview" id="scriptCode"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" onclick="closeModal('generateModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal" style="max-width:700px;">
+            <div class="modal-header">
+                <h3>👁️ Form Preview</h3>
+                <button class="modal-close" onclick="closeModal('previewModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="previewBody" style="padding:0;"></div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" onclick="closeModal('previewModal')">Close</button>
             </div>
         </div>
     </div>
@@ -453,97 +544,99 @@
         </div>
     </div>
 
-    <!-- Rename Modal -->
-    <div class="modal-overlay" id="renameModal">
-        <div class="modal" style="max-width:400px;">
+    <!-- Dynamic Table Config Modal -->
+    <div class="modal-overlay" id="tableConfigModal">
+        <div class="modal" style="max-width:700px;">
             <div class="modal-header">
-                <h3>✏️ Rename Form</h3>
-                <button class="modal-close" onclick="closeModal('renameModal')">&times;</button>
+                <h3>📊 Configure Table Columns</h3>
+                <button class="modal-close" onclick="closeModal('tableConfigModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="settings-group">
-                    <label class="settings-label">Form Name</label>
-                    <input type="text" class="settings-input" id="renameInput" placeholder="Enter new form name">
-                </div>
-                <div class="settings-group">
-                    <label class="settings-label">Subtitle (Optional)</label>
-                    <input type="text" class="settings-input" id="renameSubtitle" placeholder="e.g., Data Collection Form">
-                </div>
+                <div id="tableColumnsConfig"></div>
+                <button class="modal-btn success" onclick="addTableColumn()" style="margin-top:10px;">➕ Add Column</button>
             </div>
             <div class="modal-footer">
-                <button class="modal-btn cancel" onclick="closeModal('renameModal')">Cancel</button>
-                <button class="modal-btn primary" onclick="saveRename()">💾 Save</button>
+                <button class="modal-btn secondary" onclick="closeModal('tableConfigModal')">Cancel</button>
+                <button class="modal-btn primary" onclick="saveTableConfig()">Save</button>
             </div>
         </div>
     </div>
 
-    <!-- Compression Library -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <!-- QR Code Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
+
     <script>
-        
-        // ========================================
-        // CONFIGURATION & STATE
-        // ========================================
-        const CONFIG = {
-            LOGO: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
-            ORG_NAME: 'ICF-SL',
-            DEFAULT_ORG: 'ICF-SL',
-            BASE_URL: window.location.origin + window.location.pathname
-        };
-        
-        let state = {
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const state = {
             user: null,
-            forms: [],
-            currentForm: null,
-            currentShareForm: null,
-            currentShareUrl: '',
             fields: [],
             selectedFieldId: null,
-            renameFormId: null,
-            scriptUrl: localStorage.getItem('scriptUrl') || '',
-            folderId: localStorage.getItem('folderId') || ''
+            fieldCounter: 0,
+            editingTableFieldId: null,
+            settings: {
+                title: 'My Data Collection Form',
+                subtitle: 'Data Collection System',
+                organization: 'ICF-SL',
+                logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
+                scriptUrl: '',
+                multiPage: true,
+                cascadingData: 'Eastern Region||Kailahun District\nKailahun District||Luawa Chiefdom\nLuawa Chiefdom||Kailahun Hospital||abc123'
+            }
         };
-        
-        // ========================================
-        // URL ROUTING
-        // ========================================
-        function getHashParams() {
-            const hash = window.location.hash.slice(1);
-            const params = {};
-            hash.split('&').forEach(part => {
-                const [key, value] = part.split('=');
-                if (key) params[key] = decodeURIComponent(value || '');
-            });
-            return params;
-        }
-        
-        function setHashParams(params) {
-            const hash = Object.entries(params)
-                .filter(([k, v]) => v)
-                .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
-                .join('&');
-            window.location.hash = hash;
-        }
-        
-        function updateHash(tab) {
-            const params = getHashParams();
-            params.tab = tab;
-            setHashParams(params);
-        }
-        
-        // ========================================
+
+        const fieldDefs = {
+            text: { label: 'Text', icon: '📄', defaultLabel: 'Text Field' },
+            number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field' },
+            date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field' },
+            time: { label: 'Time', icon: '🕐', defaultLabel: 'Time Field' },
+            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address' },
+            phone: { label: 'Phone', icon: '📱', defaultLabel: 'Phone Number' },
+            textarea: { label: 'Long Text', icon: '📝', defaultLabel: 'Long Text' },
+            select: { label: 'Dropdown', icon: '📋', defaultLabel: 'Dropdown', options: ['Option 1', 'Option 2', 'Option 3'] },
+            radio: { label: 'Radio', icon: '🔘', defaultLabel: 'Radio Choice', options: ['Option 1', 'Option 2', 'Option 3'] },
+            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', options: ['Option 1', 'Option 2', 'Option 3'] },
+            yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question' },
+            yesnona: { label: 'Yes/No/NA', icon: '❓', defaultLabel: 'Yes/No/NA' },
+            table: { label: 'Table', icon: '📋', defaultLabel: 'Data Table', columns: [{ name: 'Column 1', type: 'text' }, { name: 'Column 2', type: 'text' }], rows: 3 },
+            dynamicTable: { label: 'Dynamic Table', icon: '➕', defaultLabel: 'Dynamic Table', columns: [{ name: 'Item', type: 'text' }, { name: 'Quantity', type: 'number' }] },
+            cascading: { label: 'Cascading', icon: '🏢', defaultLabel: 'Location', levels: ['Region', 'District', 'Chiefdom', 'Facility'] },
+            gps: { label: 'GPS', icon: '📍', defaultLabel: 'GPS Location' },
+            signature: { label: 'Signature', icon: '✍️', defaultLabel: 'Signature' },
+            rating: { label: 'Rating', icon: '⭐', defaultLabel: 'Rating', max: 5 },
+            file: { label: 'File', icon: '📎', defaultLabel: 'File Upload', accept: '.pdf,.jpg,.png' },
+            calculated: { label: 'Calculated', icon: '🔢', defaultLabel: 'Calculated Field', formula: '' },
+            section: { label: 'Section', icon: '📁', defaultLabel: 'New Section' }
+        };
+
+        const validationRules = {
+            text: ['required', 'minLength', 'maxLength', 'pattern', 'noSpaces'],
+            number: ['required', 'min', 'max', 'integer', 'positive'],
+            email: ['required'],
+            phone: ['required', 'pattern'],
+            date: ['required', 'minDate', 'maxDate', 'notFuture', 'notPast'],
+            time: ['required'],
+            textarea: ['required', 'minLength', 'maxLength'],
+            select: ['required'],
+            radio: ['required'],
+            checkbox: ['required', 'minSelect', 'maxSelect'],
+            yesno: ['required'],
+            yesnona: ['required']
+        };
+
+        // ============================================
         // INITIALIZATION
-        // ========================================
-        document.addEventListener('DOMContentLoaded', function() {
+        // ============================================
+        function init() {
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('c');
-            const formData = urlParams.get('d');
-            const formId = urlParams.get('form');
             
-            // Check for compressed form data
+            // Check for compressed form data - direct approach like working version
             if (compressedData) {
                 try {
                     const decoded = atob(decodeURIComponent(compressedData));
@@ -551,126 +644,174 @@
                     const binData = new Uint8Array(charData);
                     const decompressed = pako.inflate(binData, { to: 'string' });
                     const data = JSON.parse(decompressed);
-                    
-                    const form = {
-                        id: data.id,
-                        title: data.t,
-                        subtitle: data.s,
-                        fields: data.f.map(f => ({
-                            id: f.i, type: f.y, label: f.l, name: f.n, required: f.r,
-                            options: f.o, skipLogic: f.k
-                        })),
-                        sheetId: data.h
-                    };
-                    
-                    document.getElementById('authContainer').style.display = 'none';
-                    document.getElementById('viewerContainer').style.display = 'block';
-                    renderFormViewer(form);
+                    renderSharedForm(data);
                     return;
                 } catch (err) {
-                    console.error('Error decoding compressed form:', err);
+                    console.error('Error decoding shared form:', err);
                 }
             }
             
-            // Check for embedded form data (legacy)
-            if (formData) {
-                try {
-                    const json = decodeURIComponent(escape(atob(formData)));
-                    const form = JSON.parse(json);
-                    document.getElementById('authContainer').style.display = 'none';
-                    document.getElementById('viewerContainer').style.display = 'block';
-                    renderFormViewer(form);
-                    return;
-                } catch (err) {
-                    console.error('Error decoding form:', err);
-                }
-            }
-            
-            // Legacy: check for form ID
-            if (formId) {
-                loadFormForViewing(formId);
-                return;
-            }
-            
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                state.user = JSON.parse(savedUser);
-                showDashboard();
-            }
-            
-            // Auth tabs
-            document.querySelectorAll('.auth-tab').forEach(tab => {
-                tab.onclick = () => switchAuthTab(tab.dataset.tab);
-            });
-            
-            // Auth forms
-            document.getElementById('loginForm').onsubmit = handleLogin;
-            document.getElementById('signupForm').onsubmit = handleSignup;
-            
-            // Field types
-            document.querySelectorAll('.field-type').forEach(el => {
-                el.onclick = () => addField(el.dataset.type);
-            });
-            
-            // Properties
-            document.getElementById('propLabel').oninput = (e) => updateFieldProp('label', e.target.value);
-            document.getElementById('propName').oninput = (e) => updateFieldProp('name', e.target.value);
-            document.getElementById('propRequired').onchange = (e) => updateFieldProp('required', e.target.checked);
-            document.getElementById('propOptions').oninput = (e) => updateFieldProp('options', e.target.value.split('\n').filter(o => o.trim()));
-            
-            // Skip logic
-            document.getElementById('skipEnabled').onchange = (e) => {
-                document.getElementById('skipDetails').style.display = e.target.checked ? 'block' : 'none';
-                updateSkipLogic();
-            };
-            document.getElementById('skipField').onchange = updateSkipLogic;
-            document.getElementById('skipOperator').onchange = updateSkipLogic;
-            document.getElementById('skipValue').oninput = updateSkipLogic;
-            
-            // Title sync
-            document.getElementById('formTitleInput').oninput = (e) => {
-                document.getElementById('previewTitle').textContent = e.target.value || 'Untitled Form';
-            };
-            
-            // Handle hash changes for routing
-            window.addEventListener('hashchange', handleHashChange);
-        });
-        
-        function handleHashChange() {
-            const params = getHashParams();
-            if (params.tab && window.currentViewForm) {
-                showViewerTab(params.tab, false);
-            }
+            loadFromStorage();
+            setupEventListeners();
+            checkAuth();
         }
         
-        // ========================================
-        // AUTH FUNCTIONS
-        // ========================================
+        function renderSharedForm(data) {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            
+            const formSettings = {
+                title: data.t || 'Form',
+                subtitle: data.s || 'Data Collection',
+                organization: data.o || 'ICF-SL',
+                logo: data.l || 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
+                multiPage: true,
+                cascadingData: '',
+                scriptUrl: ''
+            };
+            
+            const formFields = (data.f || []).map(f => ({
+                id: f.i,
+                type: f.y,
+                label: f.l,
+                name: f.n,
+                required: f.r || false,
+                options: f.o || [],
+                levels: f.v || [],
+                columns: f.c || [],
+                rows: 3,
+                max: 5,
+                accept: '',
+                formula: '',
+                skipLogic: f.k || { enabled: false },
+                validation: { enabled: false }
+            }));
+            
+            state.settings = formSettings;
+            state.fields = formFields;
+            
+            const html = generateHTMLCode();
+            
+            const viewerContainer = document.createElement('div');
+            viewerContainer.id = 'formViewer';
+            viewerContainer.innerHTML = html;
+            document.body.innerHTML = '';
+            document.body.appendChild(viewerContainer);
+            
+            const scripts = viewerContainer.querySelectorAll('script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+            });
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
+            });
+
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('signupForm').addEventListener('submit', handleSignup);
+            document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
+
+            document.querySelectorAll('.field-type').forEach(el => {
+                el.addEventListener('click', () => addField(el.dataset.type));
+                el.setAttribute('draggable', 'true');
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('fieldType', el.dataset.type);
+                    el.style.opacity = '0.5';
+                });
+                el.addEventListener('dragend', () => el.style.opacity = '1');
+            });
+
+            const dropZone = document.getElementById('dropZone');
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const type = e.dataTransfer.getData('fieldType');
+                if (type) addField(type);
+            });
+
+            const titleInput = document.getElementById('formTitle');
+            titleInput.value = state.settings.title;
+            titleInput.addEventListener('input', () => {
+                state.settings.title = titleInput.value;
+                document.getElementById('previewTitle').textContent = titleInput.value;
+                saveToStorage();
+            });
+
+            setupTabs();
+
+            document.getElementById('fileUploadArea').addEventListener('click', () => document.getElementById('cascadingFile').click());
+            document.getElementById('cascadingFile').addEventListener('change', handleFileUpload);
+
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+            });
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tabs').forEach(tabContainer => {
+                tabContainer.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const parent = this.closest('.modal-body') || document;
+                        parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                        document.getElementById('tab-' + this.dataset.tab)?.classList.add('active');
+                    });
+                });
+            });
+        }
+
+        // ============================================
+        // AUTHENTICATION
+        // ============================================
+        function checkAuth() {
+            const saved = localStorage.getItem('formBuilderUser');
+            if (saved) {
+                state.user = JSON.parse(saved);
+                showBuilder();
+            }
+        }
+
         function switchAuthTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            document.querySelector(`.auth-tab[data-tab="${tab}"]`).classList.add('active');
-            document.getElementById(tab + 'Form').classList.add('active');
+            document.querySelector(`.auth-tab[data-tab="${tab}"]`)?.classList.add('active');
+            document.getElementById(tab + 'Form')?.classList.add('active');
             hideAuthMessages();
         }
-        
+
+        function showForgotPassword() {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('forgotForm').classList.add('active');
+            hideAuthMessages();
+        }
+
+        function showLogin() { switchAuthTab('login'); }
+
         function hideAuthMessages() {
             document.getElementById('authError').style.display = 'none';
             document.getElementById('authSuccess').style.display = 'none';
         }
-        
+
         function showAuthError(msg) {
             const el = document.getElementById('authError');
             el.textContent = msg;
             el.style.display = 'block';
         }
-        
+
         function showAuthSuccess(msg) {
             const el = document.getElementById('authSuccess');
             el.textContent = msg;
             el.style.display = 'block';
         }
-        
+
         async function handleLogin(e) {
             e.preventDefault();
             hideAuthMessages();
@@ -679,41 +820,44 @@
             const password = document.getElementById('loginPassword').value;
             const btn = document.getElementById('loginBtn');
             
-            if (!state.scriptUrl) {
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                const user = users.find(u => u.email === email && u.password === password);
-                if (user) {
-                    state.user = user;
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-                    showDashboard();
-                } else {
-                    showAuthError('Invalid email or password');
-                }
-                return;
-            }
-            
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span>';
+            btn.textContent = 'Logging in...';
             
-            try {
-                const response = await fetch(state.scriptUrl + '?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password));
-                const result = await response.json();
-                
-                if (result.success) {
-                    state.user = result.user;
-                    localStorage.setItem('currentUser', JSON.stringify(result.user));
-                    showDashboard();
-                } else {
-                    showAuthError(result.message || 'Login failed');
+            if (state.settings.scriptUrl) {
+                try {
+                    const response = await fetch(`${state.settings.scriptUrl}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        state.user = result.user;
+                        localStorage.setItem('formBuilderUser', JSON.stringify(result.user));
+                        showBuilder();
+                    } else {
+                        showAuthError(result.message || 'Invalid credentials');
+                    }
+                } catch (err) {
+                    loginLocal(email, password);
                 }
-            } catch (err) {
-                showAuthError('Connection error');
+            } else {
+                loginLocal(email, password);
             }
             
             btn.disabled = false;
             btn.textContent = 'Login';
         }
-        
+
+        function loginLocal(email, password) {
+            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                state.user = user;
+                localStorage.setItem('formBuilderUser', JSON.stringify(user));
+                showBuilder();
+            } else {
+                showAuthError('Invalid email or password');
+            }
+        }
+
         async function handleSignup(e) {
             e.preventDefault();
             hideAuthMessages();
@@ -725,1176 +869,650 @@
             const confirm = document.getElementById('signupConfirm').value;
             const btn = document.getElementById('signupBtn');
             
-            if (password !== confirm) {
-                showAuthError('Passwords do not match');
-                return;
-            }
-            
-            if (!state.scriptUrl) {
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                if (users.find(u => u.email === email)) {
-                    showAuthError('Email already registered');
-                    return;
-                }
-                const newUser = { id: Date.now().toString(), name, email, org, password, createdAt: new Date().toISOString() };
-                users.push(newUser);
-                localStorage.setItem('users', JSON.stringify(users));
-                showAuthSuccess('Account created! Please login.');
-                setTimeout(() => switchAuthTab('login'), 1500);
-                return;
-            }
+            if (password !== confirm) { showAuthError('Passwords do not match'); return; }
+            if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
             
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span>';
+            btn.textContent = 'Creating...';
             
-            try {
-                const response = await fetch(state.scriptUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'signup', name, email, org, password })
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAuthSuccess('Account created! Please login.');
-                    setTimeout(() => switchAuthTab('login'), 1500);
-                } else {
-                    showAuthError(result.message || 'Signup failed');
-                }
-            } catch (err) {
-                showAuthError('Connection error');
-            }
+            signupLocal(name, email, org, password);
             
             btn.disabled = false;
             btn.textContent = 'Create Account';
         }
-        
+
+        function signupLocal(name, email, org, password) {
+            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
+            if (users.find(u => u.email === email)) { showAuthError('Email already registered'); return; }
+            const newUser = { id: Date.now().toString(), name, email, org, password, createdAt: new Date().toISOString() };
+            users.push(newUser);
+            localStorage.setItem('formBuilderUsers', JSON.stringify(users));
+            showAuthSuccess('Account created! Please login.');
+            setTimeout(() => switchAuthTab('login'), 1500);
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            hideAuthMessages();
+            const email = document.getElementById('forgotEmail').value;
+            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
+            const user = users.find(u => u.email === email);
+            if (user) {
+                showAuthSuccess(`Password reminder: ${user.password.substring(0, 2)}${'*'.repeat(user.password.length - 2)}`);
+            } else {
+                showAuthError('Email not found');
+            }
+        }
+
+        function showBuilder() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainContainer').classList.add('show');
+            document.getElementById('headerUser').textContent = `👤 ${state.user?.name || 'User'}`;
+            renderFields();
+        }
+
         function logout() {
             state.user = null;
-            localStorage.removeItem('currentUser');
-            document.getElementById('dashboardContainer').style.display = 'none';
-            document.getElementById('builderContainer').style.display = 'none';
-            document.getElementById('viewerContainer').style.display = 'none';
+            localStorage.removeItem('formBuilderUser');
+            document.getElementById('mainContainer').classList.remove('show');
             document.getElementById('authContainer').style.display = 'flex';
         }
-        
-        // ========================================
-        // DASHBOARD
-        // ========================================
-        function showDashboard() {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('builderContainer').style.display = 'none';
-            document.getElementById('viewerContainer').style.display = 'none';
-            document.getElementById('dashboardContainer').style.display = 'block';
-            document.getElementById('headerUsername').textContent = '👤 ' + state.user.name;
-            loadUserForms();
-        }
-        
-        async function loadUserForms() {
-            if (!state.scriptUrl) {
-                state.forms = JSON.parse(localStorage.getItem('forms_' + state.user.id) || '[]');
-                renderFormsGrid();
-                return;
-            }
-            
-            try {
-                const response = await fetch(state.scriptUrl + '?action=getForms&userId=' + state.user.id);
-                const result = await response.json();
-                if (result.success) {
-                    state.forms = result.forms;
-                    renderFormsGrid();
-                }
-            } catch (err) {
-                notify('Error loading forms', 'error');
-            }
-        }
-        
-        function renderFormsGrid() {
-            const grid = document.getElementById('formsGrid');
-            
-            if (state.forms.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📝</div>
-                        <div class="empty-state-text">No forms yet. Create your first!</div>
-                        <button class="new-form-btn" onclick="createNewForm()">➕ Create Form</button>
-                    </div>`;
-                return;
-            }
-            
-            grid.innerHTML = state.forms.map(form => `
-                <div class="form-card">
-                    <div class="form-card-header">
-                        <div class="form-card-title">${form.title}</div>
-                        <div class="form-card-date">Created: ${new Date(form.createdAt).toLocaleDateString()}</div>
-                    </div>
-                    <div class="form-card-body">
-                        <div class="form-card-stat"><span>Fields:</span><span>${form.fields?.length || 0}</span></div>
-                        <div class="form-card-stat"><span>Submissions:</span><span>${form.submissions || 0}</span></div>
-                        <div class="form-card-actions" style="grid-template-columns: 1fr 1fr;">
-                            <button class="card-btn edit" onclick="editForm('${form.id}')">✏️ Edit</button>
-                            <button class="card-btn" style="background:#6c757d;color:white;" onclick="renameForm('${form.id}')">✎ Rename</button>
-                            <button class="card-btn share" onclick="shareForm('${form.id}')">📤 Share</button>
-                            <button class="card-btn view" onclick="viewData('${form.id}')">📊 Data</button>
-                        </div>
-                        <button class="card-btn delete" style="width:100%;margin-top:6px;" onclick="deleteForm('${form.id}')">🗑️ Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // ========================================
-        // FORM BUILDER
-        // ========================================
-        function createNewForm() {
-            state.currentForm = {
-                id: 'form_' + Date.now(),
-                title: 'New Form',
-                subtitle: 'Data Collection Form',
-                userId: state.user.id,
-                createdAt: new Date().toISOString(),
-                fields: []
-            };
-            state.fields = [];
-            state.selectedFieldId = null;
-            
-            document.getElementById('formTitleInput').value = 'New Form';
-            document.getElementById('previewTitle').textContent = 'New Form';
-            showBuilder();
-        }
-        
-        function editForm(formId) {
-            const form = state.forms.find(f => f.id === formId);
-            if (!form) return;
-            
-            state.currentForm = { ...form };
-            state.fields = form.fields ? [...form.fields] : [];
-            state.selectedFieldId = null;
-            
-            document.getElementById('formTitleInput').value = form.title;
-            document.getElementById('previewTitle').textContent = form.title;
-            showBuilder();
-        }
-        
-        function showBuilder() {
-            document.getElementById('dashboardContainer').style.display = 'none';
-            document.getElementById('viewerContainer').style.display = 'none';
-            document.getElementById('builderContainer').style.display = 'block';
-            renderFields();
-            hideFieldProperties();
-        }
-        
-        function backToDashboard() {
-            if (state.fields.length > 0 && !confirm('Leave without saving?')) return;
-            document.getElementById('builderContainer').style.display = 'none';
-            showDashboard();
-        }
-        
+
+        // ============================================
+        // FIELD MANAGEMENT
+        // ============================================
         function addField(type) {
+            const def = fieldDefs[type];
+            if (!def) return;
+
+            state.fieldCounter++;
             const field = {
-                id: 'field_' + Date.now(),
-                type,
-                label: getDefaultLabel(type),
-                name: type + '_' + Date.now(),
-                required: false,
-                options: getDefaultOptions(type),
-                skipLogic: null
+                id: 'field_' + state.fieldCounter,
+                type: type,
+                label: def.defaultLabel,
+                name: type + '_' + state.fieldCounter,
+                required: true,
+                options: def.options ? [...def.options] : [],
+                levels: def.levels ? [...def.levels] : [],
+                columns: def.columns ? JSON.parse(JSON.stringify(def.columns)) : [],
+                rows: def.rows || 3,
+                max: def.max || 5,
+                accept: def.accept || '',
+                formula: def.formula || '',
+                validation: { enabled: false, rules: {} },
+                skipLogic: { enabled: false, action: 'show', sourceField: '', condition: 'equals', sourceValue: '' }
             };
-            
+
             state.fields.push(field);
             renderFields();
             selectField(field.id);
+            saveToStorage();
+            notify('Field added!');
         }
-        
-        function getDefaultLabel(type) {
-            const labels = {
-                text: 'Text Field', number: 'Number Field', date: 'Date Field',
-                textarea: 'Long Text', select: 'Dropdown', radio: 'Radio Choice',
-                checkbox: 'Checkboxes', yesno: 'Yes/No', yesnona: 'Yes/No/NA',
-                gps: 'GPS Location', signature: 'Signature', section: 'Section Title'
-            };
-            return labels[type] || 'Field';
-        }
-        
-        function getDefaultOptions(type) {
-            return ['select', 'radio', 'checkbox'].includes(type) ? ['Option 1', 'Option 2', 'Option 3'] : [];
-        }
-        
-        function renderFields() {
-            const dropZone = document.getElementById('dropZone');
-            
-            if (state.fields.length === 0) {
-                dropZone.className = 'drop-zone';
-                dropZone.innerHTML = '<div>📥 Click field types to add</div><div style="font-size:10px;margin-top:6px;">or drag & drop</div>';
-                return;
-            }
-            
-            dropZone.className = 'drop-zone has-fields';
-            dropZone.innerHTML = state.fields.map(field => {
-                if (field.type === 'section') {
-                    return `<div class="section-field ${field.id === state.selectedFieldId ? 'selected' : ''}" onclick="selectField('${field.id}')">
-                        <span>📑 ${field.label}</span>
-                        <button class="field-action-btn delete" style="float:right;background:rgba(255,255,255,0.2);color:white;" onclick="event.stopPropagation();deleteField('${field.id}')">🗑️</button>
-                    </div>`;
-                }
-                
-                return `<div class="form-field ${field.id === state.selectedFieldId ? 'selected' : ''}" onclick="selectField('${field.id}')">
-                    <div class="form-field-header">
-                        <span class="form-field-label">${field.label} ${field.required ? '<span style="color:red">*</span>' : ''}</span>
-                        <div class="form-field-actions">
-                            <button class="field-action-btn" onclick="event.stopPropagation();moveField('${field.id}',-1)">⬆️</button>
-                            <button class="field-action-btn" onclick="event.stopPropagation();moveField('${field.id}',1)">⬇️</button>
-                            <button class="field-action-btn delete" onclick="event.stopPropagation();deleteField('${field.id}')">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="form-field-preview">${getFieldPreview(field)}</div>
-                    ${field.skipLogic ? '<div style="margin-top:5px;font-size:8px;color:#856404;background:#fff3cd;padding:2px 5px;border-radius:3px;">🔀 Skip logic</div>' : ''}
-                </div>`;
-            }).join('');
-        }
-        
-        function getFieldPreview(field) {
-            switch (field.type) {
-                case 'text': return '<input type="text" disabled style="width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;">';
-                case 'number': return '<input type="number" disabled style="width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;">';
-                case 'date': return '<input type="date" disabled style="width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;">';
-                case 'textarea': return '<textarea disabled style="width:100%;height:35px;padding:5px;border:1px solid #ddd;border-radius:3px;"></textarea>';
-                case 'select': return '<select disabled style="width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;"><option>Select...</option></select>';
-                case 'radio': case 'yesno': case 'yesnona':
-                    const opts = field.type === 'yesno' ? ['Yes','No'] : field.type === 'yesnona' ? ['Yes','No','N/A'] : field.options;
-                    return opts.slice(0,3).map(o => `<label style="margin-right:8px;font-size:10px;"><input type="radio" disabled> ${o}</label>`).join('');
-                case 'checkbox':
-                    return field.options.slice(0,3).map(o => `<label style="margin-right:8px;font-size:10px;"><input type="checkbox" disabled> ${o}</label>`).join('');
-                case 'gps': return '📍 GPS Button';
-                case 'signature': return '✍️ Signature Pad';
-                default: return '';
-            }
-        }
-        
-        function selectField(id) {
-            state.selectedFieldId = id;
-            renderFields();
-            showFieldProperties();
-        }
-        
-        function showFieldProperties() {
-            const field = state.fields.find(f => f.id === state.selectedFieldId);
-            if (!field) return;
-            
-            document.getElementById('noSelection').style.display = 'none';
-            document.getElementById('fieldProperties').style.display = 'block';
-            
-            document.getElementById('propLabel').value = field.label;
-            document.getElementById('propName').value = field.name;
-            document.getElementById('propRequired').checked = field.required;
-            
-            const showOptions = ['select', 'radio', 'checkbox'].includes(field.type);
-            document.getElementById('optionsGroup').style.display = showOptions ? 'block' : 'none';
-            if (showOptions) document.getElementById('propOptions').value = (field.options || []).join('\n');
-            
-            const skipField = document.getElementById('skipField');
-            skipField.innerHTML = '<option value="">Select...</option>' + 
-                state.fields.filter(f => f.id !== field.id && f.type !== 'section')
-                    .map(f => `<option value="${f.id}">${f.label}</option>`).join('');
-            
-            if (field.skipLogic) {
-                document.getElementById('skipEnabled').checked = true;
-                document.getElementById('skipDetails').style.display = 'block';
-                skipField.value = field.skipLogic.field;
-                document.getElementById('skipOperator').value = field.skipLogic.operator;
-                document.getElementById('skipValue').value = field.skipLogic.value;
-            } else {
-                document.getElementById('skipEnabled').checked = false;
-                document.getElementById('skipDetails').style.display = 'none';
-            }
-        }
-        
-        function hideFieldProperties() {
-            document.getElementById('noSelection').style.display = 'block';
-            document.getElementById('fieldProperties').style.display = 'none';
-        }
-        
-        function updateFieldProp(prop, value) {
-            const field = state.fields.find(f => f.id === state.selectedFieldId);
-            if (field) {
-                field[prop] = value;
-                if (prop === 'label') {
-                    field.name = value.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                    document.getElementById('propName').value = field.name;
-                }
-                renderFields();
-            }
-        }
-        
-        function updateSkipLogic() {
-            const field = state.fields.find(f => f.id === state.selectedFieldId);
-            if (!field) return;
-            
-            if (document.getElementById('skipEnabled').checked) {
-                field.skipLogic = {
-                    field: document.getElementById('skipField').value,
-                    operator: document.getElementById('skipOperator').value,
-                    value: document.getElementById('skipValue').value
-                };
-            } else {
-                field.skipLogic = null;
-            }
-        }
-        
-        function moveField(id, dir) {
-            const index = state.fields.findIndex(f => f.id === id);
-            const newIndex = index + dir;
-            if (newIndex < 0 || newIndex >= state.fields.length) return;
-            [state.fields[index], state.fields[newIndex]] = [state.fields[newIndex], state.fields[index]];
-            renderFields();
-        }
-        
-        function deleteField(id) {
-            if (!confirm('Delete this field?')) return;
+
+        function removeField(id) {
+            event?.stopPropagation();
             state.fields = state.fields.filter(f => f.id !== id);
             if (state.selectedFieldId === id) {
                 state.selectedFieldId = null;
-                hideFieldProperties();
+                renderProperties();
             }
             renderFields();
+            saveToStorage();
         }
-        
-        async function saveForm() {
-            if (state.fields.length === 0) {
-                notify('Add at least one field', 'error');
-                return;
-            }
-            
-            state.currentForm.title = document.getElementById('formTitleInput').value || 'Untitled Form';
-            state.currentForm.fields = state.fields;
-            state.currentForm.updatedAt = new Date().toISOString();
-            
-            if (!state.scriptUrl) {
-                const existingIndex = state.forms.findIndex(f => f.id === state.currentForm.id);
-                if (existingIndex >= 0) state.forms[existingIndex] = state.currentForm;
-                else state.forms.push(state.currentForm);
-                localStorage.setItem('forms_' + state.user.id, JSON.stringify(state.forms));
-                notify('Form saved!');
-                return;
-            }
-            
-            try {
-                const response = await fetch(state.scriptUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'saveForm', form: state.currentForm, folderId: state.folderId })
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    if (result.sheetId) state.currentForm.sheetId = result.sheetId;
-                    notify('Form saved!');
-                    loadUserForms();
+
+        function moveField(id, direction) {
+            event?.stopPropagation();
+            const index = state.fields.findIndex(f => f.id === id);
+            if (index < 0) return;
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= state.fields.length) return;
+            [state.fields[index], state.fields[newIndex]] = [state.fields[newIndex], state.fields[index]];
+            renderFields();
+            saveToStorage();
+        }
+
+        function selectField(id) {
+            state.selectedFieldId = id;
+            renderFields();
+            renderProperties();
+        }
+
+        function updateField(prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field) {
+                if (prop.includes('.')) {
+                    const [parent, child] = prop.split('.');
+                    if (!field[parent]) field[parent] = {};
+                    field[parent][child] = value;
                 } else {
-                    notify(result.message || 'Save failed', 'error');
+                    field[prop] = value;
                 }
-            } catch (err) {
-                notify('Error saving form', 'error');
+                renderFields();
+                saveToStorage();
             }
         }
-        
-        function shareForm(formId) {
-            const form = state.forms.find(f => f.id === formId);
-            if (!form) return;
+
+        // ============================================
+        // RENDERING
+        // ============================================
+        function renderFields() {
+            const dropZone = document.getElementById('dropZone');
+            const sectionCount = state.fields.filter(f => f.type === 'section').length;
+            const pageCount = sectionCount + 1;
             
-            document.getElementById('shareFormTitle').textContent = form.title;
+            document.getElementById('fieldCount').textContent = `${state.fields.length} fields | ${pageCount} page${pageCount > 1 ? 's' : ''}`;
             
-            // Create compressed form data
-            const formData = {
-                id: form.id,
-                t: form.title,
-                s: form.subtitle || 'Data Collection',
-                f: form.fields.map(f => ({
-                    i: f.id, y: f.type, l: f.label, n: f.name, r: f.required,
-                    o: f.options, k: f.skipLogic
-                })),
-                h: form.sheetId || ''
+            if (state.fields.length === 0) {
+                dropZone.classList.remove('has-fields');
+                dropZone.innerHTML = '<p style="font-size:24px;margin-bottom:10px;">📥</p><p>Click field types on the left to add them</p>';
+                return;
+            }
+            
+            dropZone.classList.add('has-fields');
+            let currentPage = 1;
+            
+            dropZone.innerHTML = state.fields.map(f => {
+                if (f.type === 'section') { currentPage++; return renderSectionHTML(f, currentPage); }
+                return renderFieldHTML(f);
+            }).join('');
+            
+            dropZone.querySelectorAll('.form-field, .section-divider').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (!e.target.closest('.field-action-btn')) selectField(el.dataset.id);
+                });
+            });
+        }
+
+        function renderSectionHTML(field, pageNum) {
+            const selected = field.id === state.selectedFieldId;
+            return `<div class="section-divider ${selected ? 'selected' : ''}" data-id="${field.id}">
+                <span>📁 ${field.label.toUpperCase()}</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="page-badge">Page ${pageNum}</span>
+                    <div class="form-field-actions">
+                        <button class="field-action-btn" onclick="moveField('${field.id}','up')" style="background:rgba(255,255,255,0.2);color:white;">⬆</button>
+                        <button class="field-action-btn" onclick="moveField('${field.id}','down')" style="background:rgba(255,255,255,0.2);color:white;">⬇</button>
+                        <button class="field-action-btn delete" onclick="removeField('${field.id}')" style="background:rgba(255,255,255,0.2);color:white;">🗑</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderFieldHTML(field) {
+            const def = fieldDefs[field.type];
+            const selected = field.id === state.selectedFieldId;
+            let badges = '';
+            if (field.required) badges += '<span class="field-badge required">Required</span>';
+            if (field.skipLogic?.enabled) badges += '<span class="field-badge skip">Skip Logic</span>';
+            if (field.validation?.enabled) badges += '<span class="field-badge validation">Validation</span>';
+            
+            return `<div class="form-field ${selected ? 'selected' : ''}" data-id="${field.id}">
+                <div class="form-field-header">
+                    <span class="form-field-label">${def?.icon || ''} ${field.label}</span>
+                    <div class="form-field-actions">
+                        <button class="field-action-btn" onclick="moveField('${field.id}','up')">⬆</button>
+                        <button class="field-action-btn" onclick="moveField('${field.id}','down')">⬇</button>
+                        <button class="field-action-btn delete" onclick="removeField('${field.id}')">🗑</button>
+                    </div>
+                </div>
+                <div class="form-field-preview">${renderFieldPreview(field)}</div>
+                <div class="form-field-meta">${field.name} ${badges}</div>
+            </div>`;
+        }
+
+        function renderFieldPreview(field) {
+            const inputStyle = 'width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;font-size:10px;';
+            switch (field.type) {
+                case 'text': case 'email': case 'phone': return `<input type="text" style="${inputStyle}" placeholder="${field.label}" disabled>`;
+                case 'number': return `<input type="number" style="${inputStyle}" placeholder="0" disabled>`;
+                case 'date': return `<input type="date" style="${inputStyle}" disabled>`;
+                case 'time': return `<input type="time" style="${inputStyle}" disabled>`;
+                case 'textarea': return `<textarea style="${inputStyle}height:40px;" disabled></textarea>`;
+                case 'select': return `<select style="${inputStyle}" disabled><option>-- Select --</option></select>`;
+                case 'radio': case 'yesno': case 'yesnona':
+                    const opts = field.type === 'yesno' ? ['Yes', 'No'] : field.type === 'yesnona' ? ['Yes', 'No', 'N/A'] : field.options;
+                    return opts.slice(0, 3).map(o => `<label style="margin-right:8px;font-size:9px;"><input type="radio" disabled> ${o}</label>`).join('');
+                case 'checkbox': return field.options.slice(0, 3).map(o => `<label style="display:inline;margin-right:8px;font-size:9px;"><input type="checkbox" disabled> ${o}</label>`).join('');
+                case 'gps': return `<button style="padding:5px 10px;background:#004080;color:white;border:none;border-radius:3px;font-size:9px;" disabled>📍 Capture GPS</button>`;
+                case 'signature': return `<div style="border:2px dashed #ddd;height:40px;display:flex;align-items:center;justify-content:center;color:#999;font-size:9px;">✍️ Signature Pad</div>`;
+                case 'rating': return '⭐'.repeat(field.max || 5);
+                case 'file': return `<input type="file" style="${inputStyle}" disabled>`;
+                case 'calculated': return `<div style="background:#e9ecef;padding:5px;border-radius:3px;font-size:9px;">🔢 = ${field.formula || 'formula'}</div>`;
+                default: return '';
+            }
+        }
+
+        function renderProperties() {
+            const container = document.getElementById('propertiesContent');
+            if (!state.selectedFieldId) {
+                container.innerHTML = '<div class="no-selection"><p style="font-size:24px;margin-bottom:10px;">👆</p><p>Select a field to edit</p></div>';
+                return;
+            }
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field) return;
+            
+            let html = `<div class="property-group"><label class="property-label">Label</label><input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}"></div>
+                <div class="property-group"><label class="property-label">Field Name</label><input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}"></div>`;
+            
+            if (field.type !== 'section') {
+                html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}><span>Required Field</span></label></div>`;
+            }
+            
+            if (['select', 'radio', 'checkbox'].includes(field.type)) {
+                html += `<div class="property-group"><label class="property-label">Options (one per line)</label><textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea></div>`;
+            }
+            
+            container.innerHTML = html;
+            attachPropertyListeners(field);
+        }
+
+        function attachPropertyListeners(field) {
+            document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
+            document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
+            document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
+            document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
+        }
+
+        // ============================================
+        // SETTINGS
+        // ============================================
+        function openSettings() {
+            document.getElementById('settingsTitle').value = state.settings.title;
+            document.getElementById('settingsSubtitle').value = state.settings.subtitle;
+            document.getElementById('settingsOrg').value = state.settings.organization;
+            document.getElementById('settingsLogo').value = state.settings.logo;
+            document.getElementById('settingsMultiPage').checked = state.settings.multiPage;
+            document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl;
+            document.getElementById('cascadingData').value = state.settings.cascadingData;
+            document.getElementById('settingsModal').classList.add('show');
+        }
+
+        function saveSettings() {
+            state.settings.title = document.getElementById('settingsTitle').value;
+            state.settings.subtitle = document.getElementById('settingsSubtitle').value;
+            state.settings.organization = document.getElementById('settingsOrg').value;
+            state.settings.logo = document.getElementById('settingsLogo').value;
+            state.settings.multiPage = document.getElementById('settingsMultiPage').checked;
+            state.settings.scriptUrl = document.getElementById('settingsScriptUrl').value;
+            state.settings.cascadingData = document.getElementById('cascadingData').value;
+            
+            document.getElementById('formTitle').value = state.settings.title;
+            document.getElementById('previewTitle').textContent = state.settings.title;
+            document.getElementById('previewSubtitle').textContent = state.settings.subtitle;
+            
+            saveToStorage();
+            closeModal('settingsModal');
+            notify('Settings saved!');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    const lines = [];
+                    json.forEach(row => {
+                        const reg = row.Region || row.region || '';
+                        const dis = row.District || row.district || '';
+                        const chi = row.Chiefdom || row.chiefdom || '';
+                        const fac = row.Facility || row.facility || '';
+                        const uid = row.UID || row.uid || '';
+                        if (reg && dis) lines.push(`${reg}||${dis}`);
+                        if (dis && chi) lines.push(`${dis}||${chi}`);
+                        if (chi && fac) lines.push(uid ? `${chi}||${fac}||${uid}` : `${chi}||${fac}`);
+                    });
+                    document.getElementById('cascadingData').value = [...new Set(lines)].join('\n');
+                    document.getElementById('fileUploadArea').classList.add('has-file');
+                    document.getElementById('fileUploadText').textContent = `✅ Loaded ${json.length} rows`;
+                    notify('File loaded successfully!');
+                } catch (err) { notify('Error reading file: ' + err.message, 'error'); }
             };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function downloadSampleFile() {
+            const data = [
+                { Region: 'Eastern Region', District: 'Kailahun District', Chiefdom: 'Luawa Chiefdom', Facility: 'Kailahun Hospital', UID: 'abc123' },
+                { Region: 'Southern Region', District: 'Bo District', Chiefdom: 'Badjia Chiefdom', Facility: 'Ngelehun CHC', UID: 'def456' }
+            ];
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Locations');
+            XLSX.writeFile(wb, 'cascading-template.xlsx');
+            notify('Template downloaded!');
+        }
+
+        // ============================================
+        // PREVIEW
+        // ============================================
+        function previewForm() {
+            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
+            const html = generateHTMLCode();
+            const previewBody = document.getElementById('previewBody');
+            previewBody.innerHTML = '<iframe class="preview-frame"></iframe>';
+            const iframe = previewBody.querySelector('iframe');
+            const doc = iframe.contentDocument;
+            doc.open();
+            doc.write(html);
+            doc.close();
+            document.getElementById('previewModal').classList.add('show');
+        }
+
+        // ============================================
+        // GENERATE FORM
+        // ============================================
+        function generateForm() {
+            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
+            const htmlCode = generateHTMLCode();
+            const scriptCode = generateAppsScriptCode();
+            document.getElementById('htmlCode').textContent = htmlCode;
+            document.getElementById('scriptCode').textContent = scriptCode;
+            document.getElementById('generateModal').classList.add('show');
+        }
+
+        function generateHTMLCode() {
+            const s = state.settings;
+            const fields = state.fields;
             
-            const jsonStr = JSON.stringify(formData);
-            const compressed = pako.deflate(jsonStr);
-            const encoded = btoa(String.fromCharCode.apply(null, compressed));
-            const shareUrl = CONFIG.BASE_URL + '?c=' + encodeURIComponent(encoded) + '#tab=form';
-            
-            document.getElementById('shareUrl').textContent = shareUrl;
-            
-            // Clear previous QR code
-            const qrContainer = document.getElementById('qrCode');
-            qrContainer.innerHTML = '';
-            
-            // Generate QR code using qrcodejs library
-            new QRCode(qrContainer, {
-                text: shareUrl,
-                width: 200,
-                height: 200,
-                colorDark: '#004080',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.M
+            let fieldsHTML = '';
+            fields.forEach(f => {
+                if (f.type === 'section') {
+                    fieldsHTML += `<div class="section-header">${f.label.toUpperCase()}</div>`;
+                } else {
+                    fieldsHTML += generateFieldHTML(f);
+                }
             });
             
-            state.currentShareUrl = shareUrl;
-            state.currentShareForm = form;
-            document.getElementById('shareModal').classList.add('show');
+            fieldsHTML += `<button type="submit" class="btn-submit">SUBMIT</button>`;
+            
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${s.title}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Oswald',sans-serif;background:#f5f5f5;padding:20px}
+        .container{max-width:650px;margin:0 auto}
+        .header{background:#004080;color:#fff;padding:20px;text-align:center;border-radius:12px 12px 0 0}
+        .header img{width:70px;border-radius:8px;margin-bottom:10px}
+        .header h1{font-size:18px;margin-bottom:3px}
+        .header p{font-size:11px;opacity:0.9}
+        .form-card{border:4px double #004080;border-radius:12px;background:#fff}
+        .form-body{padding:20px}
+        .form-group{margin-bottom:16px}
+        .form-label{display:block;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase}
+        .required{color:red}
+        .form-input,.form-select,.form-textarea{width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:12px}
+        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(0,64,128,0.2)}
+        .radio-group{display:flex;flex-wrap:wrap;gap:10px}
+        .radio-option{display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;font-size:11px}
+        .radio-option:hover{border-color:#004080}
+        .section-header{background:#004080;color:#fff;padding:12px 15px;margin:20px -20px;font-size:13px;font-weight:700}
+        .btn-submit{width:100%;padding:14px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase}
+        .btn-submit:hover{background:#218838}
+        .footer{text-align:center;padding:15px;font-size:10px;color:#666;margin-top:15px}
+        .notification{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:6px;color:#fff;font-weight:700;font-size:12px;z-index:1000;display:none}
+        .notification.show{display:block}
+        .notification.success{background:#28a745}
+        .notification.error{background:#dc3545}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="header">
+                <img src="${s.logo}" alt="Logo">
+                <h1>${s.title}</h1>
+                <p>${s.subtitle}</p>
+            </div>
+            <div class="form-body">
+                <form id="dataForm">
+${fieldsHTML}
+                </form>
+            </div>
+        </div>
+        <div class="footer">© 2025 ${s.organization}</div>
+    </div>
+    <div class="notification" id="notification"></div>
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {};
+            new FormData(this).forEach((v, k) => data[k] = v);
+            data._timestamp = new Date().toISOString();
+            console.log('Form data:', data);
+            showNotification('Submitted successfully!', 'success');
+            this.reset();
+        });
+        function showNotification(msg, type) {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.className = 'notification show ' + type;
+            setTimeout(() => n.classList.remove('show'), 3000);
         }
-        
+    <\/script>
+</body>
+</html>`;
+        }
+
+        function generateFieldHTML(field) {
+            const req = field.required ? '<span class="required">*</span>' : '';
+            const reqAttr = field.required ? 'required' : '';
+            let inner = '';
+            switch (field.type) {
+                case 'text': inner = `<input type="text" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'email': inner = `<input type="email" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'phone': inner = `<input type="tel" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'number': inner = `<input type="number" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'date': inner = `<input type="date" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'time': inner = `<input type="time" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'textarea': inner = `<textarea class="form-textarea" name="${field.name}" rows="3" ${reqAttr}></textarea>`; break;
+                case 'select': inner = `<select class="form-select" name="${field.name}" ${reqAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
+                case 'radio': inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                case 'yesno': inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label></div>`; break;
+                case 'yesnona': inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="N/A" ${reqAttr}><span>N/A</span></label></div>`; break;
+                case 'checkbox': inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                default: return '';
+            }
+            return `                        <div class="form-group"><label class="form-label">${escapeHtml(field.label)} ${req}</label>${inner}</div>\n`;
+        }
+
+        function generateAppsScriptCode() {
+            return `// Apps Script for ${state.settings.title}
+function doPost(e) {
+    const data = JSON.parse(e.postData.contents);
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    sheet.appendRow(Object.values(data));
+    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
+}`;
+        }
+
+        // ============================================
+        // SHARE - FIXED QR CODE GENERATION
+        // ============================================
+        let currentShareUrl = '';
+
+        function shareForm() {
+            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
+            
+            document.getElementById('shareFormTitle').textContent = state.settings.title;
+            
+            // Simplified field mapping for smaller URL
+            const formData = {
+                id: 'form_' + Date.now(),
+                t: state.settings.title,
+                s: state.settings.subtitle,
+                o: state.settings.organization,
+                l: state.settings.logo,
+                f: state.fields.map(f => {
+                    const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
+                    if (f.options && f.options.length) field.o = f.options;
+                    if (f.levels && f.levels.length) field.v = f.levels;
+                    if (f.columns && f.columns.length) field.c = f.columns;
+                    if (f.skipLogic && f.skipLogic.enabled) field.k = f.skipLogic;
+                    return field;
+                })
+            };
+            
+            try {
+                const jsonStr = JSON.stringify(formData);
+                const compressed = pako.deflate(jsonStr);
+                const encoded = btoa(String.fromCharCode.apply(null, compressed));
+                
+                const baseUrl = window.location.protocol === 'file:' 
+                    ? 'https://yourdomain.com/' + state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html'
+                    : window.location.origin + window.location.pathname;
+                
+                currentShareUrl = baseUrl + '?c=' + encodeURIComponent(encoded);
+                document.getElementById('shareUrl').textContent = currentShareUrl;
+                
+                // Clear and generate QR code
+                const qrContainer = document.getElementById('qrCode');
+                qrContainer.innerHTML = '';
+                
+                new QRCode(qrContainer, {
+                    text: currentShareUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#004080',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+                
+                document.getElementById('shareModal').classList.add('show');
+            } catch (err) {
+                console.error('Share error:', err);
+                notify('Error creating share link', 'error');
+            }
+        }
+
         function copyShareUrl() {
-            navigator.clipboard.writeText(state.currentShareUrl).then(() => notify('URL copied!'));
+            navigator.clipboard.writeText(currentShareUrl).then(() => notify('URL copied!'));
         }
-        
+
         function downloadQR() {
             const qrContainer = document.getElementById('qrCode');
             let canvas = qrContainer.querySelector('canvas');
             const img = qrContainer.querySelector('img');
             
-            // Create a new canvas with padding and title
+            if (!canvas && !img) { notify('No QR code to download', 'error'); return; }
+            
             const newCanvas = document.createElement('canvas');
             const ctx = newCanvas.getContext('2d');
-            const padding = 40;
-            const titleHeight = 40;
+            const padding = 30;
+            const titleHeight = 50;
             const qrSize = 200;
             
             newCanvas.width = qrSize + padding * 2;
             newCanvas.height = qrSize + padding * 2 + titleHeight;
             
-            // White background
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
             
-            // Add title
             ctx.fillStyle = '#004080';
-            ctx.font = 'bold 18px Oswald, Arial, sans-serif';
+            ctx.font = 'bold 18px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(state.currentShareForm?.title || 'Form', newCanvas.width / 2, 28);
+            ctx.fillText(state.settings.title, newCanvas.width / 2, 28);
             
-            // Draw QR code from canvas or img
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666';
+            ctx.fillText('Scan to open form', newCanvas.width / 2, 45);
+            
             if (canvas) {
-                ctx.drawImage(canvas, padding, titleHeight + padding / 2, qrSize, qrSize);
+                ctx.drawImage(canvas, padding, titleHeight + 10, qrSize, qrSize);
                 downloadImage();
             } else if (img) {
                 const tempImg = new Image();
                 tempImg.crossOrigin = 'anonymous';
                 tempImg.onload = function() {
-                    ctx.drawImage(tempImg, padding, titleHeight + padding / 2, qrSize, qrSize);
+                    ctx.drawImage(tempImg, padding, titleHeight + 10, qrSize, qrSize);
                     downloadImage();
                 };
                 tempImg.src = img.src;
-            } else {
-                notify('QR code not ready', 'error');
-                return;
             }
             
             function downloadImage() {
                 const link = document.createElement('a');
-                const formTitle = state.currentShareForm?.title || 'form';
-                link.download = formTitle.replace(/[^a-zA-Z0-9]/g, '_') + '-QR.png';
+                link.download = state.settings.title.replace(/[^a-z0-9]/gi, '-') + '-QR.png';
                 link.href = newCanvas.toDataURL('image/png');
                 link.click();
-                notify('QR code downloaded!');
+                notify('QR Code downloaded!');
             }
         }
-        
-        async function deleteForm(formId) {
-            if (!confirm('Delete this form permanently?')) return;
-            
-            if (!state.scriptUrl) {
-                state.forms = state.forms.filter(f => f.id !== formId);
-                localStorage.setItem('forms_' + state.user.id, JSON.stringify(state.forms));
-                renderFormsGrid();
-                notify('Form deleted');
-                return;
-            }
-            
-            try {
-                await fetch(state.scriptUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'deleteForm', formId, userId: state.user.id })
-                });
-                loadUserForms();
-                notify('Form deleted');
-            } catch (err) {
-                notify('Error deleting', 'error');
-            }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function downloadHTML() {
+            const code = document.getElementById('htmlCode').textContent;
+            const blob = new Blob([code], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
+            a.click();
+            notify('HTML downloaded!');
         }
-        
-        // ========================================
-        // RENAME FORM
-        // ========================================
-        function renameForm(formId) {
-            const form = state.forms.find(f => f.id === formId);
-            if (!form) return;
-            
-            state.renameFormId = formId;
-            document.getElementById('renameInput').value = form.title;
-            document.getElementById('renameSubtitle').value = form.subtitle || 'Data Collection Form';
-            document.getElementById('renameModal').classList.add('show');
-            
-            // Focus the input
-            setTimeout(() => document.getElementById('renameInput').focus(), 100);
+
+        function downloadScript() {
+            const code = document.getElementById('scriptCode').textContent;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'apps-script.gs';
+            a.click();
+            notify('Script downloaded!');
         }
-        
-        async function saveRename() {
-            const newTitle = document.getElementById('renameInput').value.trim();
-            const newSubtitle = document.getElementById('renameSubtitle').value.trim();
-            
-            if (!newTitle) {
-                notify('Please enter a form name', 'error');
-                return;
-            }
-            
-            const form = state.forms.find(f => f.id === state.renameFormId);
-            if (!form) return;
-            
-            form.title = newTitle;
-            form.subtitle = newSubtitle || 'Data Collection Form';
-            form.updatedAt = new Date().toISOString();
-            
-            if (!state.scriptUrl) {
-                localStorage.setItem('forms_' + state.user.id, JSON.stringify(state.forms));
-                renderFormsGrid();
-                closeModal('renameModal');
-                notify('Form renamed!');
-                return;
-            }
-            
-            try {
-                const response = await fetch(state.scriptUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'saveForm', form: form, folderId: state.folderId })
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    closeModal('renameModal');
-                    notify('Form renamed!');
-                    loadUserForms();
-                } else {
-                    notify(result.message || 'Rename failed', 'error');
-                }
-            } catch (err) {
-                notify('Error renaming form', 'error');
-            }
+
+        function copyCode(id) {
+            const code = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(code);
+            notify('Copied to clipboard!');
         }
-        
-        // ========================================
-        // FORM VIEWER
-        // ========================================
-        async function loadFormForViewing(formId) {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('dashboardContainer').style.display = 'none';
-            document.getElementById('builderContainer').style.display = 'none';
-            document.getElementById('viewerContainer').style.display = 'block';
-            
-            const scriptUrl = localStorage.getItem('scriptUrl');
-            if (scriptUrl) {
-                try {
-                    const response = await fetch(scriptUrl + '?action=getForm&formId=' + formId);
-                    const result = await response.json();
-                    if (result.success) {
-                        renderFormViewer(result.form);
-                        return;
-                    }
-                } catch (err) {}
-            }
-            
-            const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-            for (const user of allUsers) {
-                const forms = JSON.parse(localStorage.getItem('forms_' + user.id) || '[]');
-                const form = forms.find(f => f.id === formId);
-                if (form) {
-                    renderFormViewer(form);
-                    return;
-                }
-            }
-            
-            document.getElementById('viewerContainer').innerHTML = `
-                <div style="text-align:center;padding:50px;">
-                    <h2 style="color:#dc3545;">Form Not Found</h2>
-                    <p>This form may have been deleted.</p>
-                    <a href="./" style="color:#004080;">← Go to Form Builder</a>
-                </div>`;
-        }
-        
-        function renderFormViewer(form) {
-            const hashParams = getHashParams();
-            const initialTab = hashParams.tab || 'form';
-            
-            let fieldsHtml = form.fields.map(field => {
-                if (field.type === 'section') return `<div class="viewer-section">${field.label}</div>`;
-                
-                const req = field.required ? '<span class="required">*</span>' : '';
-                const reqAttr = field.required ? 'required' : '';
-                let input = '';
-                
-                switch (field.type) {
-                    case 'text': input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
-                    case 'number': input = `<input type="number" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
-                    case 'date': input = `<input type="date" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
-                    case 'textarea': input = `<textarea name="${field.name}" class="viewer-input" rows="3" ${reqAttr}></textarea>`; break;
-                    case 'select':
-                        input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
-                            <option value="">-- Select --</option>
-                            ${(field.options||[]).map(o => `<option value="${o}">${o}</option>`).join('')}
-                        </select>`; break;
-                    case 'radio': case 'yesno': case 'yesnona':
-                        const opts = field.type === 'yesno' ? ['Yes','No'] : field.type === 'yesnona' ? ['Yes','No','N/A'] : (field.options||[]);
-                        input = `<div class="viewer-radio-group">${opts.map(o => `<label class="viewer-radio-option"><input type="radio" name="${field.name}" value="${o}" ${reqAttr}><span>${o}</span></label>`).join('')}</div>`; break;
-                    case 'checkbox':
-                        input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${o}"><span>${o}</span></label>`).join('')}</div>`; break;
-                    case 'gps':
-                        input = `<div class="gps-container"><input type="hidden" name="${field.name}_lat" class="gps-lat"><input type="hidden" name="${field.name}_lng" class="gps-lng"><button type="button" class="viewer-draft-btn" onclick="captureGPS(this)">📍 Capture GPS</button><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`; break;
-                    case 'signature':
-                        input = `<div class="sig-container"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:5px 10px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button></div>`; break;
-                }
-                
-                return `<div class="viewer-field" data-field-id="${field.id}" ${field.skipLogic ? `data-skip='${JSON.stringify(field.skipLogic)}'` : ''}><label class="viewer-field-label">${field.label} ${req}</label>${input}</div>`;
-            }).join('');
-            
-            document.getElementById('viewerContainer').innerHTML = `
-                <div class="viewer-nav">
-                    <a href="#tab=form" class="viewer-nav-btn ${initialTab === 'form' ? 'active' : ''}" style="background:#004080;color:#fff;" onclick="showViewerTab('form', true); return false;">📝 Form</a>
-                    <a href="#tab=data" class="viewer-nav-btn ${initialTab === 'data' ? 'active' : ''}" style="background:#28a745;color:#fff;" onclick="showViewerTab('data', true); return false;">📊 Data</a>
-                    <a href="#tab=dashboard" class="viewer-nav-btn ${initialTab === 'dashboard' ? 'active' : ''}" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard', true); return false;">📈 Dashboard</a>
-                    <a href="#tab=report" class="viewer-nav-btn ${initialTab === 'report' ? 'active' : ''}" style="background:#6c757d;color:#fff;" onclick="showViewerTab('report', true); return false;">📄 Report</a>
-                    <a href="#tab=drafts" class="viewer-nav-btn ${initialTab === 'drafts' ? 'active' : ''}" style="background:#ffc107;color:#000;" onclick="showViewerTab('drafts', true); return false;">💾 Drafts</a>
-                </div>
-                
-                <div id="tabForm" class="viewer-tab ${initialTab === 'form' ? 'active' : ''}">
-                    <div class="viewer-form">
-                        <div class="viewer-form-box">
-                            <div class="viewer-header">
-                                <img src="${CONFIG.LOGO}" style="width:60px;border-radius:8px;margin-bottom:8px;">
-                                <h1>${form.title}</h1>
-                                <p>${form.subtitle || 'Data Collection'}</p>
-                            </div>
-                            <div class="viewer-body">
-                                <form id="viewerForm">${fieldsHtml}
-                                    <button type="button" class="viewer-draft-btn" onclick="saveDraft('${form.id}')">💾 Save Draft</button>
-                                    <button type="submit" class="viewer-submit">✅ Submit</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="tabData" class="viewer-tab ${initialTab === 'data' ? 'active' : ''}">
-                    <div class="viewer-form">
-                        <div class="viewer-form-box">
-                            <div class="viewer-header" style="background:#28a745;">
-                                <h1>📊 Submitted Data</h1>
-                                <p>${form.title}</p>
-                            </div>
-                            <div class="viewer-body" id="dataContainer">
-                                <p style="text-align:center;">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="tabDashboard" class="viewer-tab ${initialTab === 'dashboard' ? 'active' : ''}">
-                    <div class="viewer-form">
-                        <div class="viewer-form-box">
-                            <div class="viewer-header" style="background:#17a2b8;">
-                                <h1>📈 Dashboard</h1>
-                                <p>${form.title}</p>
-                            </div>
-                            <div class="viewer-body" id="dashContainer">
-                                <p style="text-align:center;">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="tabReport" class="viewer-tab ${initialTab === 'report' ? 'active' : ''}">
-                    <div class="viewer-form">
-                        <div class="viewer-form-box">
-                            <div class="viewer-header" style="background:#6c757d;">
-                                <h1>📄 Report</h1>
-                                <button onclick="printReport()" style="background:#fff;color:#6c757d;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;font-weight:700;margin-top:8px;font-family:Oswald;">🖨️ Print Report</button>
-                            </div>
-                            <div class="viewer-body" id="reportContainer">
-                                <p style="text-align:center;">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="tabDrafts" class="viewer-tab ${initialTab === 'drafts' ? 'active' : ''}">
-                    <div class="viewer-form">
-                        <div class="viewer-form-box">
-                            <div class="viewer-header" style="background:#ffc107;color:#000;">
-                                <h1>💾 Saved Drafts</h1>
-                                <p>${form.title}</p>
-                            </div>
-                            <div class="viewer-body" id="draftsContainer">
-                                <p style="text-align:center;">No drafts saved</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            
-            window.currentViewForm = form;
-            document.querySelectorAll('.sig-container').forEach(initSignature);
-            document.getElementById('viewerForm').onsubmit = (e) => { e.preventDefault(); submitViewerForm(form); };
-            applySkipLogic(form);
-            
-            // Load initial tab content
-            if (initialTab !== 'form') {
-                showViewerTab(initialTab, false);
-            }
-        }
-        
-        function showViewerTab(tab, updateUrl = true) {
-            // Hide all tabs
-            document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
-            
-            // Show selected tab
-            const tabId = 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1);
-            const tabEl = document.getElementById(tabId);
-            if (tabEl) tabEl.classList.add('active');
-            
-            // Highlight nav button
-            document.querySelectorAll('.viewer-nav-btn').forEach(btn => {
-                if (btn.getAttribute('href') === '#tab=' + tab) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            // Update URL hash
-            if (updateUrl) {
-                updateHash(tab);
-            }
-            
-            // Load tab content
-            if (tab === 'data') loadViewerData();
-            if (tab === 'dashboard') loadViewerDashboard();
-            if (tab === 'report') loadViewerReport();
-            if (tab === 'drafts') loadDrafts();
-        }
-        
-        async function submitViewerForm(form) {
-            const formEl = document.getElementById('viewerForm');
-            const formData = new FormData(formEl);
-            const data = { _formId: form.id, _formTitle: form.title, _timestamp: new Date().toISOString() };
-            formData.forEach((v, k) => data[k] = v);
-            
-            const btn = formEl.querySelector('.viewer-submit');
-            btn.disabled = true;
-            btn.textContent = '⏳ Submitting...';
-            
-            const scriptUrl = localStorage.getItem('scriptUrl');
-            if (scriptUrl && form.sheetId) {
-                try {
-                    await fetch(scriptUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'submitForm', formId: form.id, sheetId: form.sheetId, data })
-                    });
-                } catch (err) {}
-            }
-            
-            const submissions = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
-            submissions.push(data);
-            localStorage.setItem('submissions_' + form.id, JSON.stringify(submissions));
-            
-            alert('✅ Submitted successfully!');
-            formEl.reset();
-            document.querySelectorAll('.sig-canvas').forEach(c => c.getContext('2d').clearRect(0, 0, c.width, c.height));
-            document.querySelectorAll('.gps-status').forEach(s => s.textContent = '');
-            btn.disabled = false;
-            btn.textContent = '✅ Submit';
-        }
-        
-        async function loadViewerData() {
-            const form = window.currentViewForm;
-            const container = document.getElementById('dataContainer');
-            let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
-            
-            if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#666;padding:30px;">📭 No submissions yet</p>';
-                return;
-            }
-            
-            const headers = Object.keys(data[0]).filter(h => !h.startsWith('_'));
-            container.innerHTML = `
-                <div style="margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <span style="font-size:13px;color:#28a745;font-weight:700;">✅ ${data.length} submission${data.length > 1 ? 's' : ''}</span>
-                    <button onclick="exportData()" style="padding:8px 14px;background:#004080;color:#fff;border:none;border-radius:5px;cursor:pointer;font-family:Oswald;font-size:11px;">📥 Export CSV</button>
-                </div>
-                <div class="data-table-wrapper">
-                    <table class="data-table">
-                        <thead><tr><th>#</th>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                        <tbody>${data.map((row, i) => `<tr><td>${i+1}</td>${headers.map(h => `<td>${row[h] || '-'}</td>`).join('')}</tr>`).join('')}</tbody>
-                    </table>
-                </div>`;
-        }
-        
-        window.exportData = function() {
-            const form = window.currentViewForm;
-            const data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
-            if (data.length === 0) return notify('No data to export', 'error');
-            
-            const headers = Object.keys(data[0]).filter(h => !h.startsWith('_'));
-            let csv = headers.join(',') + '\n';
-            data.forEach(row => {
-                csv += headers.map(h => `"${(row[h] || '').toString().replace(/"/g, '""')}"`).join(',') + '\n';
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = form.title.replace(/[^a-zA-Z0-9]/g, '_') + '_data.csv';
-            link.click();
-            notify('Data exported!');
-        };
-        
-        async function loadViewerDashboard() {
-            const form = window.currentViewForm;
-            const container = document.getElementById('dashContainer');
-            let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
-            
-            if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center;padding:30px;">📊 No data to display</p>';
-                return;
-            }
-            
-            const today = new Date().toDateString();
-            const todayCount = data.filter(r => new Date(r._timestamp).toDateString() === today).length;
-            
-            let html = `
-                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:15px;margin-bottom:20px;">
-                    <div class="stat-card">
-                        <div class="stat-value">${data.length}</div>
-                        <div class="stat-label">Total Submissions</div>
-                    </div>
-                    <div class="stat-card" style="background:linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                        <div class="stat-value">${todayCount}</div>
-                        <div class="stat-label">Today</div>
-                    </div>
-                </div>`;
-            
-            // Charts for categorical fields
-            form.fields.filter(f => ['radio', 'yesno', 'yesnona', 'select'].includes(f.type)).forEach(field => {
-                const counts = {};
-                data.forEach(row => { 
-                    const val = row[field.name] || '(empty)'; 
-                    counts[val] = (counts[val] || 0) + 1; 
-                });
-                const max = Math.max(...Object.values(counts));
-                
-                html += `
-                    <div style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:10px;border:2px solid #e9ecef;">
-                        <h4 style="margin:0 0 12px;font-size:13px;color:#004080;">${field.label}</h4>
-                        ${Object.entries(counts).sort((a,b) => b[1] - a[1]).map(([key, val]) => `
-                            <div style="margin:8px 0;">
-                                <div class="chart-label">
-                                    <span>${key}</span>
-                                    <span><strong>${val}</strong> (${(val/data.length*100).toFixed(0)}%)</span>
-                                </div>
-                                <div class="chart-bar" style="width:${val/max*100}%;"></div>
-                            </div>
-                        `).join('')}
-                    </div>`;
-            });
-            
-            container.innerHTML = html;
-        }
-        
-        async function loadViewerReport() {
-            const form = window.currentViewForm;
-            const container = document.getElementById('reportContainer');
-            let data = JSON.parse(localStorage.getItem('submissions_' + form.id) || '[]');
-            
-            let html = `<div id="printableReport">
-                <div style="text-align:center;margin-bottom:20px;padding-bottom:15px;border-bottom:3px solid #004080;">
-                    <img src="${CONFIG.LOGO}" style="width:60px;border-radius:8px;">
-                    <h2 style="color:#004080;margin:10px 0 5px;">${form.title}</h2>
-                    <p style="font-size:11px;color:#666;">Report Generated: ${new Date().toLocaleString()}</p>
-                </div>
-                
-                <div style="background:#e8f4fc;padding:15px;border-radius:8px;margin-bottom:20px;">
-                    <div style="display:flex;justify-content:space-around;text-align:center;">
-                        <div><div style="font-size:24px;font-weight:700;color:#004080;">${data.length}</div><div style="font-size:11px;">Total Submissions</div></div>
-                        <div><div style="font-size:24px;font-weight:700;color:#28a745;">${form.fields.filter(f => f.type !== 'section').length}</div><div style="font-size:11px;">Questions</div></div>
-                    </div>
-                </div>`;
-            
-            if (data.length > 0) {
-                form.fields.filter(f => f.type !== 'section').forEach(field => {
-                    html += `<div style="margin:15px 0;padding:12px;background:#f8f9fa;border-radius:8px;border-left:4px solid #004080;">
-                        <h4 style="margin:0 0 8px;font-size:12px;color:#004080;">${field.label}</h4>`;
-                    
-                    if (['radio', 'yesno', 'yesnona', 'select'].includes(field.type)) {
-                        const counts = {};
-                        data.forEach(row => { 
-                            const val = row[field.name] || '(no response)'; 
-                            counts[val] = (counts[val] || 0) + 1; 
-                        });
-                        html += '<table style="width:100%;font-size:11px;border-collapse:collapse;"><tbody>';
-                        Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([key, val]) => { 
-                            html += `<tr><td style="padding:4px 0;">${key}</td><td style="text-align:right;font-weight:700;">${val} <span style="color:#666;">(${(val/data.length*100).toFixed(1)}%)</span></td></tr>`; 
-                        });
-                        html += '</tbody></table>';
-                    } else if (field.type === 'number') {
-                        const nums = data.map(r => parseFloat(r[field.name])).filter(n => !isNaN(n));
-                        if (nums.length) {
-                            const avg = nums.reduce((a,b) => a+b, 0) / nums.length;
-                            html += `<p style="font-size:11px;margin:0;">Average: <strong>${avg.toFixed(2)}</strong> | Min: <strong>${Math.min(...nums)}</strong> | Max: <strong>${Math.max(...nums)}</strong></p>`;
-                        }
-                    } else {
-                        const responseCount = data.filter(r => r[field.name]).length;
-                        html += `<p style="font-size:11px;margin:0;">Response rate: <strong>${responseCount}/${data.length}</strong> (${(responseCount/data.length*100).toFixed(0)}%)</p>`;
-                    }
-                    html += '</div>';
-                });
-            } else {
-                html += '<p style="text-align:center;color:#666;padding:20px;">No submissions to report</p>';
-            }
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
-        
-        function printReport() {
-            const content = document.getElementById('printableReport');
-            if (!content) return;
-            const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Report - ${window.currentViewForm?.title || 'Form'}</title>
-                <style>body{font-family:Arial,sans-serif;padding:30px;max-width:800px;margin:0 auto;}</style></head><body>`);
-            win.document.write(content.innerHTML);
-            win.document.write('</body></html>');
-            win.document.close();
-            win.print();
-        }
-        
-        function saveDraft(formId) {
-            const form = document.getElementById('viewerForm');
-            const formData = new FormData(form);
-            const draft = { timestamp: new Date().toISOString(), data: {} };
-            formData.forEach((v, k) => draft.data[k] = v);
-            
-            const drafts = JSON.parse(localStorage.getItem('drafts_' + formId) || '[]');
-            drafts.unshift(draft);
-            if (drafts.length > 10) drafts.pop();
-            localStorage.setItem('drafts_' + formId, JSON.stringify(drafts));
-            notify('Draft saved!');
-        }
-        
-        function loadDrafts() {
-            const form = window.currentViewForm;
-            const container = document.getElementById('draftsContainer');
-            const drafts = JSON.parse(localStorage.getItem('drafts_' + form.id) || '[]');
-            
-            if (drafts.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#666;padding:30px;">💾 No drafts saved yet</p>';
-                return;
-            }
-            
-            container.innerHTML = drafts.map((draft, i) => `
-                <div style="background:#fffbeb;border:2px solid #ffc107;border-radius:8px;padding:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <strong style="color:#856404;">Draft ${i+1}</strong><br>
-                        <small style="color:#666;">${new Date(draft.timestamp).toLocaleString()}</small>
-                    </div>
-                    <div style="display:flex;gap:6px;">
-                        <button onclick="loadDraft(${i})" style="padding:8px 14px;background:#004080;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-family:Oswald;">📂 Load</button>
-                        <button onclick="deleteDraft(${i})" style="padding:8px 14px;background:#dc3545;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-family:Oswald;">🗑️</button>
-                    </div>
-                </div>`).join('');
-        }
-        
-        window.loadDraft = function(index) {
-            const form = window.currentViewForm;
-            const drafts = JSON.parse(localStorage.getItem('drafts_' + form.id) || '[]');
-            if (!drafts[index]) return;
-            
-            const formEl = document.getElementById('viewerForm');
-            Object.entries(drafts[index].data).forEach(([name, value]) => {
-                const el = formEl.querySelector(`[name="${name}"]`);
-                if (el) {
-                    if (el.type === 'checkbox' || el.type === 'radio') {
-                        formEl.querySelectorAll(`[name="${name}"]`).forEach(inp => inp.checked = inp.value === value);
-                    } else {
-                        el.value = value;
-                    }
-                }
-            });
-            showViewerTab('form', true);
-            notify('Draft loaded!');
-        };
-        
-        window.deleteDraft = function(index) {
-            if (!confirm('Delete this draft?')) return;
-            const form = window.currentViewForm;
-            const drafts = JSON.parse(localStorage.getItem('drafts_' + form.id) || '[]');
-            drafts.splice(index, 1);
-            localStorage.setItem('drafts_' + form.id, JSON.stringify(drafts));
-            loadDrafts();
-            notify('Draft deleted');
-        };
-        
-        function applySkipLogic(form) {
-            document.querySelectorAll('[data-skip]').forEach(fieldEl => {
-                const skip = JSON.parse(fieldEl.dataset.skip);
-                if (!skip.field) return;
-                
-                const sourceField = form.fields.find(f => f.id === skip.field);
-                if (!sourceField) return;
-                
-                const checkVisibility = () => {
-                    let sourceVal = '';
-                    if (['radio', 'yesno', 'yesnona'].includes(sourceField.type)) {
-                        const checked = document.querySelector(`[name="${sourceField.name}"]:checked`);
-                        sourceVal = checked ? checked.value : '';
-                    } else {
-                        const el = document.querySelector(`[name="${sourceField.name}"]`);
-                        sourceVal = el ? el.value : '';
-                    }
-                    
-                    let show = skip.operator === 'equals' ? sourceVal === skip.value : sourceVal !== skip.value;
-                    fieldEl.style.display = show ? 'block' : 'none';
-                };
-                
-                if (['radio', 'yesno', 'yesnona'].includes(sourceField.type)) {
-                    document.querySelectorAll(`[name="${sourceField.name}"]`).forEach(r => r.onchange = checkVisibility);
-                } else {
-                    const el = document.querySelector(`[name="${sourceField.name}"]`);
-                    if (el) el.onchange = checkVisibility;
-                }
-                checkVisibility();
-            });
-        }
-        
-        // ========================================
-        // GPS & SIGNATURE
-        // ========================================
-        window.captureGPS = function(btn) {
-            const container = btn.closest('.gps-container');
-            const status = container.querySelector('.gps-status');
-            const latInput = container.querySelector('.gps-lat');
-            const lngInput = container.querySelector('.gps-lng');
-            
-            status.textContent = '📡 Getting location...';
-            status.style.color = '#004080';
-            
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const lat = pos.coords.latitude.toFixed(6);
-                    const lng = pos.coords.longitude.toFixed(6);
-                    latInput.value = lat;
-                    lngInput.value = lng;
-                    status.innerHTML = '✅ <strong>' + lat + ', ' + lng + '</strong>';
-                    status.style.color = '#28a745';
-                    btn.textContent = '📍 Update GPS';
-                },
-                err => {
-                    status.textContent = '❌ ' + (err.code === 1 ? 'Permission denied' : 'Location unavailable');
-                    status.style.color = '#dc3545';
-                },
-                { enableHighAccuracy: true, timeout: 15000 }
-            );
-        };
-        
-        function initSignature(container) {
-            const canvas = container.querySelector('.sig-canvas');
-            const ctx = canvas.getContext('2d');
-            const dataInput = container.querySelector('.sig-data');
-            let drawing = false;
-            
-            const getPos = e => {
-                const rect = canvas.getBoundingClientRect();
-                const touch = e.touches ? e.touches[0] : e;
-                return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-            };
-            
-            const start = e => { e.preventDefault(); drawing = true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); };
-            const draw = e => { if (!drawing) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
-            const stop = () => { drawing = false; dataInput.value = canvas.toDataURL(); };
-            
-            canvas.addEventListener('mousedown', start);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stop);
-            canvas.addEventListener('mouseleave', stop);
-            canvas.addEventListener('touchstart', start);
-            canvas.addEventListener('touchmove', draw);
-            canvas.addEventListener('touchend', stop);
-            
-            ctx.strokeStyle = '#004080';
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-        }
-        
-        window.clearSig = function(btn) {
-            const container = btn.closest('.sig-container');
-            const canvas = container.querySelector('.sig-canvas');
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-            container.querySelector('.sig-data').value = '';
-        };
-        
-        // ========================================
-        // SETTINGS & UTILITIES
-        // ========================================
-        function openSettings() {
-            document.getElementById('settingsScriptUrl').value = state.scriptUrl;
-            document.getElementById('settingsFolderId').value = state.folderId;
-            document.getElementById('settingsModal').classList.add('show');
-        }
-        
-        function saveSystemSettings() {
-            state.scriptUrl = document.getElementById('settingsScriptUrl').value;
-            state.folderId = document.getElementById('settingsFolderId').value;
-            localStorage.setItem('scriptUrl', state.scriptUrl);
-            localStorage.setItem('folderId', state.folderId);
-            closeModal('settingsModal');
-            notify('Settings saved!');
-        }
-        
+
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-        
-        function notify(msg, type = 'success') {
-            const el = document.createElement('div');
-            el.className = 'notification' + (type === 'error' ? ' error' : '');
-            el.textContent = msg;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 3000);
+
+        function notify(message, type = 'success') {
+            const el = document.getElementById('notification');
+            el.textContent = message;
+            el.className = 'notification show' + (type === 'error' ? ' error' : '');
+            setTimeout(() => el.classList.remove('show'), 3000);
         }
-        
-        function previewForm() {
-            if (state.fields.length === 0) { notify('Add fields first', 'error'); return; }
-            const form = { 
-                id: state.currentForm.id, 
-                title: document.getElementById('formTitleInput').value, 
-                subtitle: 'Data Collection', 
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('formBuilderPro', JSON.stringify({
                 fields: state.fields,
-                sheetId: state.currentForm.sheetId || ''
-            };
-            window.currentViewForm = form;
-            document.getElementById('builderContainer').style.display = 'none';
-            document.getElementById('viewerContainer').style.display = 'block';
-            renderFormViewer(form);
+                settings: state.settings,
+                fieldCounter: state.fieldCounter
+            }));
         }
-        
-        function viewData(formId) {
-            const form = state.forms.find(f => f.id === formId);
-            if (!form) return;
-            window.currentViewForm = form;
-            document.getElementById('dashboardContainer').style.display = 'none';
-            document.getElementById('viewerContainer').style.display = 'block';
-            window.location.hash = 'tab=data';
-            renderFormViewer(form);
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('formBuilderPro');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state.fields = data.fields || [];
+                    state.settings = { ...state.settings, ...data.settings };
+                    state.fieldCounter = data.fieldCounter || 0;
+                } catch (e) { console.error('Error loading state:', e); }
+            }
         }
-        
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('show'); };
-        });
+
+        // Initialize
+        init();
     </script>
 </body>
 </html>
