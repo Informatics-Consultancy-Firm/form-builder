@@ -165,9 +165,13 @@
         .info-box { background: #e8f4fc; border: 2px solid #004080; border-radius: 6px; padding: 10px; font-size: 11px; margin: 10px 0; }
         .info-box h4 { color: #004080; margin-bottom: 5px; font-size: 11px; }
         
-        /* QR Code */
+        /* QR Code Container */
         .qr-container { text-align: center; padding: 20px; }
-        .qr-box { display: inline-block; padding: 20px; background: white; border: 3px solid #004080; border-radius: 12px; }
+        .qr-box { display: inline-block; padding: 25px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
+        #qrCode { min-width: 200px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        #qrCode canvas, #qrCode img { display: block !important; }
+        .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 11px; word-break: break-all; margin-top: 15px; max-height: 100px; overflow-y: auto; border: 2px solid #ddd; text-align: left; font-family: monospace; }
+        .qr-actions { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         
         /* Notification */
         .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; }
@@ -200,6 +204,8 @@
             .settings-grid { grid-template-columns: 1fr; }
             .settings-group.full-width { grid-column: span 1; }
         }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -513,29 +519,26 @@
 
     <!-- Share Modal -->
     <div class="modal-overlay" id="shareModal">
-        <div class="modal" style="max-width:500px;">
+        <div class="modal">
             <div class="modal-header">
-                <h3>🔗 Share Form</h3>
+                <h3>📤 Share Form</h3>
                 <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <div style="text-align:center;margin-bottom:15px;">
                     <div style="font-size:18px;font-weight:700;color:#004080;" id="shareFormTitle">Form Title</div>
+                    <div style="font-size:11px;color:#666;">Share this form with anyone</div>
                 </div>
-                
-                <div style="text-align:center;padding:15px;background:#f8f9fa;border-radius:8px;margin-bottom:15px;">
-                    <img id="qrCodeImg" src="" style="width:220px;height:220px;border:4px solid #004080;border-radius:8px;background:white;">
-                    <div style="margin-top:10px;font-size:12px;color:#004080;font-weight:700;">📱 Scan to open form</div>
-                </div>
-                
-                <div class="settings-group">
-                    <label class="settings-label">Form URL</label>
-                    <textarea id="shareUrlArea" rows="3" style="width:100%;font-size:9px;font-family:monospace;padding:8px;border:2px solid #ddd;border-radius:6px;resize:none;" readonly></textarea>
-                </div>
-                
-                <div style="display:flex;gap:8px;margin-top:10px;">
-                    <button class="modal-btn primary" onclick="copyShareUrl()" style="flex:1;">📋 Copy URL</button>
-                    <button class="modal-btn success" onclick="downloadQRImg()" style="flex:1;">⬇️ Download QR</button>
+                <div class="qr-container">
+                    <div class="qr-box" id="qrBox">
+                        <div id="qrCode"></div>
+                    </div>
+                    <div style="margin-top:15px;font-weight:700;color:#004080;">📱 Scan to open form</div>
+                    <div class="qr-url" id="shareUrl"></div>
+                    <div class="qr-actions">
+                        <button class="modal-btn primary" onclick="copyShareUrl()">📋 Copy URL</button>
+                        <button class="modal-btn success" onclick="downloadQR()">⬇️ Download QR</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -630,10 +633,10 @@
         // INITIALIZATION
         // ============================================
         function init() {
-            // Check for shared form URL first
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('c');
             
+            // Check for compressed form data - direct approach like working version
             if (compressedData) {
                 try {
                     const decoded = atob(decodeURIComponent(compressedData));
@@ -641,8 +644,6 @@
                     const binData = new Uint8Array(charData);
                     const decompressed = pako.inflate(binData, { to: 'string' });
                     const data = JSON.parse(decompressed);
-                    
-                    // Render the shared form
                     renderSharedForm(data);
                     return;
                 } catch (err) {
@@ -656,11 +657,9 @@
         }
         
         function renderSharedForm(data) {
-            // Hide auth and builder, show form viewer
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainContainer').classList.remove('show');
             
-            // Reconstruct form data
             const formSettings = {
                 title: data.t || 'Form',
                 subtitle: data.s || 'Data Collection',
@@ -688,20 +687,17 @@
                 validation: f.d || { enabled: false }
             }));
             
-            // Generate and display the form HTML
             state.settings = formSettings;
             state.fields = formFields;
             
             const html = generateHTMLCode();
             
-            // Create viewer container
             const viewerContainer = document.createElement('div');
             viewerContainer.id = 'formViewer';
             viewerContainer.innerHTML = html;
             document.body.innerHTML = '';
             document.body.appendChild(viewerContainer);
             
-            // Execute scripts in the generated HTML
             const scripts = viewerContainer.querySelectorAll('script');
             scripts.forEach(script => {
                 const newScript = document.createElement('script');
@@ -711,17 +707,14 @@
         }
 
         function setupEventListeners() {
-            // Auth tabs
             document.querySelectorAll('.auth-tab').forEach(tab => {
                 tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
             });
 
-            // Auth forms
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
             document.getElementById('signupForm').addEventListener('submit', handleSignup);
             document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
 
-            // Field types
             document.querySelectorAll('.field-type').forEach(el => {
                 el.addEventListener('click', () => addField(el.dataset.type));
                 el.setAttribute('draggable', 'true');
@@ -732,7 +725,6 @@
                 el.addEventListener('dragend', () => el.style.opacity = '1');
             });
 
-            // Drop zone
             const dropZone = document.getElementById('dropZone');
             dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
             dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -743,7 +735,6 @@
                 if (type) addField(type);
             });
 
-            // Form title
             const titleInput = document.getElementById('formTitle');
             titleInput.value = state.settings.title;
             titleInput.addEventListener('input', () => {
@@ -752,14 +743,11 @@
                 saveToStorage();
             });
 
-            // Modal tabs
             setupTabs();
 
-            // File upload
             document.getElementById('fileUploadArea').addEventListener('click', () => document.getElementById('cascadingFile').click());
             document.getElementById('cascadingFile').addEventListener('change', handleFileUpload);
 
-            // Close modals on outside click
             document.querySelectorAll('.modal-overlay').forEach(overlay => {
                 overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
             });
@@ -805,9 +793,7 @@
             hideAuthMessages();
         }
 
-        function showLogin() {
-            switchAuthTab('login');
-        }
+        function showLogin() { switchAuthTab('login'); }
 
         function hideAuthMessages() {
             document.getElementById('authError').style.display = 'none';
@@ -850,7 +836,6 @@
                         showAuthError(result.message || 'Invalid credentials');
                     }
                 } catch (err) {
-                    // Fallback to local
                     loginLocal(email, password);
                 }
             } else {
@@ -884,40 +869,13 @@
             const confirm = document.getElementById('signupConfirm').value;
             const btn = document.getElementById('signupBtn');
             
-            if (password !== confirm) {
-                showAuthError('Passwords do not match');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showAuthError('Password must be at least 6 characters');
-                return;
-            }
+            if (password !== confirm) { showAuthError('Passwords do not match'); return; }
+            if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
             
             btn.disabled = true;
             btn.textContent = 'Creating...';
             
-            if (state.settings.scriptUrl) {
-                try {
-                    const response = await fetch(state.settings.scriptUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'signup', name, email, org, password })
-                    });
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showAuthSuccess('Account created! Please login.');
-                        setTimeout(() => switchAuthTab('login'), 1500);
-                    } else {
-                        showAuthError(result.message || 'Signup failed');
-                    }
-                } catch (err) {
-                    signupLocal(name, email, org, password);
-                }
-            } else {
-                signupLocal(name, email, org, password);
-            }
+            signupLocal(name, email, org, password);
             
             btn.disabled = false;
             btn.textContent = 'Create Account';
@@ -925,10 +883,7 @@
 
         function signupLocal(name, email, org, password) {
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
-            if (users.find(u => u.email === email)) {
-                showAuthError('Email already registered');
-                return;
-            }
+            if (users.find(u => u.email === email)) { showAuthError('Email already registered'); return; }
             const newUser = { id: Date.now().toString(), name, email, org, password, createdAt: new Date().toISOString() };
             users.push(newUser);
             localStorage.setItem('formBuilderUsers', JSON.stringify(users));
@@ -939,40 +894,11 @@
         async function handleForgotPassword(e) {
             e.preventDefault();
             hideAuthMessages();
-            
             const email = document.getElementById('forgotEmail').value;
-            const btn = document.getElementById('forgotBtn');
-            
-            btn.disabled = true;
-            btn.textContent = 'Sending...';
-            
-            if (state.settings.scriptUrl) {
-                try {
-                    const response = await fetch(`${state.settings.scriptUrl}?action=forgotPassword&email=${encodeURIComponent(email)}`);
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showAuthSuccess('Password sent to your email!');
-                    } else {
-                        showAuthError(result.message || 'Email not found');
-                    }
-                } catch (err) {
-                    forgotPasswordLocal(email);
-                }
-            } else {
-                forgotPasswordLocal(email);
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'Send Password';
-        }
-
-        function forgotPasswordLocal(email) {
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
             const user = users.find(u => u.email === email);
             if (user) {
                 showAuthSuccess(`Password reminder: ${user.password.substring(0, 2)}${'*'.repeat(user.password.length - 2)}`);
-                notify('In production, password would be emailed');
             } else {
                 showAuthError('Email not found');
             }
@@ -1039,10 +965,8 @@
             event?.stopPropagation();
             const index = state.fields.findIndex(f => f.id === id);
             if (index < 0) return;
-            
             const newIndex = direction === 'up' ? index - 1 : index + 1;
             if (newIndex < 0 || newIndex >= state.fields.length) return;
-            
             [state.fields[index], state.fields[newIndex]] = [state.fields[newIndex], state.fields[index]];
             renderFields();
             saveToStorage();
@@ -1089,19 +1013,13 @@
             let currentPage = 1;
             
             dropZone.innerHTML = state.fields.map(f => {
-                if (f.type === 'section') {
-                    currentPage++;
-                    return renderSectionHTML(f, currentPage);
-                }
+                if (f.type === 'section') { currentPage++; return renderSectionHTML(f, currentPage); }
                 return renderFieldHTML(f);
             }).join('');
             
-            // Attach click listeners
             dropZone.querySelectorAll('.form-field, .section-divider').forEach(el => {
                 el.addEventListener('click', (e) => {
-                    if (!e.target.closest('.field-action-btn')) {
-                        selectField(el.dataset.id);
-                    }
+                    if (!e.target.closest('.field-action-btn')) selectField(el.dataset.id);
                 });
             });
         }
@@ -1124,7 +1042,6 @@
         function renderFieldHTML(field) {
             const def = fieldDefs[field.type];
             const selected = field.id === state.selectedFieldId;
-            
             let badges = '';
             if (field.required) badges += '<span class="field-badge required">Required</span>';
             if (field.skipLogic?.enabled) badges += '<span class="field-badge skip">Skip Logic</span>';
@@ -1146,393 +1063,55 @@
 
         function renderFieldPreview(field) {
             const inputStyle = 'width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;font-size:10px;';
-            
             switch (field.type) {
-                case 'text':
-                case 'email':
-                case 'phone':
-                    return `<input type="text" style="${inputStyle}" placeholder="${field.label}" disabled>`;
-                case 'number':
-                    return `<input type="number" style="${inputStyle}" placeholder="0" disabled>`;
-                case 'date':
-                    return `<input type="date" style="${inputStyle}" disabled>`;
-                case 'time':
-                    return `<input type="time" style="${inputStyle}" disabled>`;
-                case 'textarea':
-                    return `<textarea style="${inputStyle}height:40px;" disabled></textarea>`;
-                case 'select':
-                    return `<select style="${inputStyle}" disabled><option>-- Select --</option></select>`;
-                case 'radio':
-                case 'yesno':
-                case 'yesnona':
+                case 'text': case 'email': case 'phone': return `<input type="text" style="${inputStyle}" placeholder="${field.label}" disabled>`;
+                case 'number': return `<input type="number" style="${inputStyle}" placeholder="0" disabled>`;
+                case 'date': return `<input type="date" style="${inputStyle}" disabled>`;
+                case 'time': return `<input type="time" style="${inputStyle}" disabled>`;
+                case 'textarea': return `<textarea style="${inputStyle}height:40px;" disabled></textarea>`;
+                case 'select': return `<select style="${inputStyle}" disabled><option>-- Select --</option></select>`;
+                case 'radio': case 'yesno': case 'yesnona':
                     const opts = field.type === 'yesno' ? ['Yes', 'No'] : field.type === 'yesnona' ? ['Yes', 'No', 'N/A'] : field.options;
                     return opts.slice(0, 3).map(o => `<label style="margin-right:8px;font-size:9px;"><input type="radio" disabled> ${o}</label>`).join('');
-                case 'checkbox':
-                    return field.options.slice(0, 3).map(o => `<label style="display:inline;margin-right:8px;font-size:9px;"><input type="checkbox" disabled> ${o}</label>`).join('');
-                case 'table':
-                case 'dynamicTable':
-                    return `<table style="width:100%;border-collapse:collapse;font-size:9px;"><tr>${field.columns.map(c => `<th style="border:1px solid #ddd;padding:3px;background:#f8f9fa;">${c.name}</th>`).join('')}</tr><tr>${field.columns.map(c => `<td style="border:1px solid #ddd;padding:3px;">[${c.type}]</td>`).join('')}</tr></table>`;
-                case 'cascading':
-                    return field.levels.map(l => `<select style="${inputStyle}margin-bottom:3px;" disabled><option>-- ${l} --</option></select>`).join('');
-                case 'gps':
-                    return `<button style="padding:5px 10px;background:#004080;color:white;border:none;border-radius:3px;font-size:9px;" disabled>📍 Capture GPS</button>`;
-                case 'signature':
-                    return `<div style="border:2px dashed #ddd;height:40px;display:flex;align-items:center;justify-content:center;color:#999;font-size:9px;">✍️ Signature Pad</div>`;
-                case 'rating':
-                    return '⭐'.repeat(field.max || 5);
-                case 'file':
-                    return `<input type="file" style="${inputStyle}" disabled>`;
-                case 'calculated':
-                    return `<div style="background:#e9ecef;padding:5px;border-radius:3px;font-size:9px;">🔢 = ${field.formula || 'formula'}</div>`;
-                default:
-                    return '';
+                case 'checkbox': return field.options.slice(0, 3).map(o => `<label style="display:inline;margin-right:8px;font-size:9px;"><input type="checkbox" disabled> ${o}</label>`).join('');
+                case 'gps': return `<button style="padding:5px 10px;background:#004080;color:white;border:none;border-radius:3px;font-size:9px;" disabled>📍 Capture GPS</button>`;
+                case 'signature': return `<div style="border:2px dashed #ddd;height:40px;display:flex;align-items:center;justify-content:center;color:#999;font-size:9px;">✍️ Signature Pad</div>`;
+                case 'rating': return '⭐'.repeat(field.max || 5);
+                case 'file': return `<input type="file" style="${inputStyle}" disabled>`;
+                case 'calculated': return `<div style="background:#e9ecef;padding:5px;border-radius:3px;font-size:9px;">🔢 = ${field.formula || 'formula'}</div>`;
+                default: return '';
             }
         }
 
         function renderProperties() {
             const container = document.getElementById('propertiesContent');
-            
             if (!state.selectedFieldId) {
                 container.innerHTML = '<div class="no-selection"><p style="font-size:24px;margin-bottom:10px;">👆</p><p>Select a field to edit</p></div>';
                 return;
             }
-            
             const field = state.fields.find(f => f.id === state.selectedFieldId);
             if (!field) return;
             
-            let html = `
-                <div class="property-group">
-                    <label class="property-label">Label</label>
-                    <input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}">
-                </div>
-                <div class="property-group">
-                    <label class="property-label">Field Name</label>
-                    <input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}">
-                </div>`;
+            let html = `<div class="property-group"><label class="property-label">Label</label><input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}"></div>
+                <div class="property-group"><label class="property-label">Field Name</label><input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}"></div>`;
             
             if (field.type !== 'section') {
-                html += `<div class="property-group">
-                    <label class="property-checkbox">
-                        <input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}>
-                        <span>Required Field</span>
-                    </label>
-                </div>`;
+                html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}><span>Required Field</span></label></div>`;
             }
             
-            // Options for select/radio/checkbox
             if (['select', 'radio', 'checkbox'].includes(field.type)) {
-                html += `<div class="property-group">
-                    <label class="property-label">Options (one per line)</label>
-                    <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
-                </div>`;
-            }
-            
-            // Table configuration
-            if (['table', 'dynamicTable'].includes(field.type)) {
-                html += `<div class="property-group">
-                    <label class="property-label">Table Columns</label>
-                    <button class="modal-btn primary" onclick="openTableConfig('${field.id}')" style="width:100%;">⚙️ Configure Columns</button>
-                </div>`;
-                if (field.type === 'table') {
-                    html += `<div class="property-group">
-                        <label class="property-label">Number of Rows</label>
-                        <input type="number" class="property-input" id="propRows" value="${field.rows || 3}" min="1" max="50">
-                    </div>`;
-                }
-            }
-            
-            // Cascading levels
-            if (field.type === 'cascading') {
-                html += `<div class="property-group">
-                    <label class="property-label">Levels (one per line)</label>
-                    <textarea class="property-textarea" id="propLevels">${(field.levels || []).join('\n')}</textarea>
-                </div>`;
-            }
-            
-            // Rating max
-            if (field.type === 'rating') {
-                html += `<div class="property-group">
-                    <label class="property-label">Max Stars</label>
-                    <input type="number" class="property-input" id="propMax" value="${field.max || 5}" min="3" max="10">
-                </div>`;
-            }
-            
-            // File accept
-            if (field.type === 'file') {
-                html += `<div class="property-group">
-                    <label class="property-label">Accepted File Types</label>
-                    <input type="text" class="property-input" id="propAccept" value="${field.accept || '.pdf,.jpg,.png'}" placeholder=".pdf,.jpg,.png">
-                </div>`;
-            }
-            
-            // Calculated formula
-            if (field.type === 'calculated') {
-                html += `<div class="property-group">
-                    <label class="property-label">Formula</label>
-                    <input type="text" class="property-input" id="propFormula" value="${escapeHtml(field.formula || '')}" placeholder="e.g., field1 + field2">
-                    <div style="font-size:9px;color:#666;margin-top:3px;">Use field names like: number_1 + number_2</div>
-                </div>`;
-            }
-            
-            // Validation Rules
-            if (field.type !== 'section' && validationRules[field.type]) {
-                html += renderValidationSection(field);
-            }
-            
-            // Skip Logic
-            if (field.type !== 'section') {
-                html += renderSkipLogicSection(field);
+                html += `<div class="property-group"><label class="property-label">Options (one per line)</label><textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea></div>`;
             }
             
             container.innerHTML = html;
             attachPropertyListeners(field);
         }
 
-        function renderValidationSection(field) {
-            const rules = validationRules[field.type] || [];
-            if (rules.length === 0) return '';
-            
-            const v = field.validation || { enabled: false, rules: {} };
-            
-            let html = `<div class="prop-section validation">
-                <div class="prop-section-title">✓ Validation Rules</div>
-                <div class="property-group">
-                    <label class="property-checkbox">
-                        <input type="checkbox" id="validationEnabled" ${v.enabled ? 'checked' : ''}>
-                        <span>Enable Validation</span>
-                    </label>
-                </div>
-                <div id="validationRulesContainer" style="display:${v.enabled ? 'block' : 'none'};">`;
-            
-            rules.forEach(rule => {
-                const ruleValue = v.rules?.[rule] || '';
-                switch (rule) {
-                    case 'minLength':
-                        html += `<div class="prop-row"><span>Min Length:</span><input type="number" class="property-input" data-rule="minLength" value="${ruleValue}" min="0"></div>`;
-                        break;
-                    case 'maxLength':
-                        html += `<div class="prop-row"><span>Max Length:</span><input type="number" class="property-input" data-rule="maxLength" value="${ruleValue}" min="0"></div>`;
-                        break;
-                    case 'min':
-                        html += `<div class="prop-row"><span>Min Value:</span><input type="number" class="property-input" data-rule="min" value="${ruleValue}"></div>`;
-                        break;
-                    case 'max':
-                        html += `<div class="prop-row"><span>Max Value:</span><input type="number" class="property-input" data-rule="max" value="${ruleValue}"></div>`;
-                        break;
-                    case 'pattern':
-                        html += `<div class="property-group"><label class="property-label">Pattern (RegEx)</label><input type="text" class="property-input" data-rule="pattern" value="${escapeHtml(ruleValue)}" placeholder="e.g., ^[0-9]{10}$"></div>`;
-                        break;
-                    case 'minDate':
-                        html += `<div class="prop-row"><span>Min Date:</span><input type="date" class="property-input" data-rule="minDate" value="${ruleValue}"></div>`;
-                        break;
-                    case 'maxDate':
-                        html += `<div class="prop-row"><span>Max Date:</span><input type="date" class="property-input" data-rule="maxDate" value="${ruleValue}"></div>`;
-                        break;
-                    case 'notFuture':
-                        html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" data-rule="notFuture" ${ruleValue ? 'checked' : ''}><span>Cannot be future date</span></label></div>`;
-                        break;
-                    case 'notPast':
-                        html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" data-rule="notPast" ${ruleValue ? 'checked' : ''}><span>Cannot be past date</span></label></div>`;
-                        break;
-                    case 'integer':
-                        html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" data-rule="integer" ${ruleValue ? 'checked' : ''}><span>Integer only</span></label></div>`;
-                        break;
-                    case 'positive':
-                        html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" data-rule="positive" ${ruleValue ? 'checked' : ''}><span>Positive only</span></label></div>`;
-                        break;
-                    case 'noSpaces':
-                        html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" data-rule="noSpaces" ${ruleValue ? 'checked' : ''}><span>No spaces allowed</span></label></div>`;
-                        break;
-                    case 'minSelect':
-                        html += `<div class="prop-row"><span>Min Selections:</span><input type="number" class="property-input" data-rule="minSelect" value="${ruleValue}" min="0"></div>`;
-                        break;
-                    case 'maxSelect':
-                        html += `<div class="prop-row"><span>Max Selections:</span><input type="number" class="property-input" data-rule="maxSelect" value="${ruleValue}" min="0"></div>`;
-                        break;
-                }
-            });
-            
-            html += `</div></div>`;
-            return html;
-        }
-
-        function renderSkipLogicSection(field) {
-            const skip = field.skipLogic || { enabled: false, action: 'show', sourceField: '', condition: 'equals', sourceValue: '' };
-            const sourceFields = state.fields.filter(f => f.id !== field.id && ['yesno', 'yesnona', 'radio', 'select', 'checkbox'].includes(f.type));
-            
-            // Get options for selected source field
-            const selectedSource = state.fields.find(f => f.id === skip.sourceField);
-            let sourceOptions = [];
-            if (selectedSource) {
-                if (selectedSource.type === 'yesno') sourceOptions = ['Yes', 'No'];
-                else if (selectedSource.type === 'yesnona') sourceOptions = ['Yes', 'No', 'N/A'];
-                else sourceOptions = selectedSource.options || [];
-            }
-            
-            let html = `<div class="prop-section skip-logic">
-                <div class="prop-section-title">⚡ Skip Logic</div>
-                <div class="property-group">
-                    <label class="property-checkbox">
-                        <input type="checkbox" id="skipEnabled" ${skip.enabled ? 'checked' : ''}>
-                        <span>Enable Skip Logic</span>
-                    </label>
-                </div>
-                <div id="skipOptionsContainer" style="display:${skip.enabled ? 'block' : 'none'};">
-                    <div class="prop-row">
-                        <select id="skipAction" class="property-select">
-                            <option value="show" ${skip.action === 'show' ? 'selected' : ''}>Show</option>
-                            <option value="hide" ${skip.action === 'hide' ? 'selected' : ''}>Hide</option>
-                        </select>
-                        <span>this field when</span>
-                    </div>
-                    <div class="property-group">
-                        <label class="property-label">Source Field</label>
-                        <select id="skipSourceField" class="property-select">
-                            <option value="">-- Select field --</option>
-                            ${sourceFields.map(f => `<option value="${f.id}" ${skip.sourceField === f.id ? 'selected' : ''}>${f.label}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="prop-row">
-                        <select id="skipCondition" class="property-select">
-                            <option value="equals" ${skip.condition === 'equals' ? 'selected' : ''}>equals</option>
-                            <option value="not_equals" ${skip.condition === 'not_equals' ? 'selected' : ''}>not equals</option>
-                            <option value="contains" ${skip.condition === 'contains' ? 'selected' : ''}>contains</option>
-                        </select>
-                    </div>
-                    <div class="property-group">
-                        <label class="property-label">Value</label>
-                        ${sourceOptions.length > 0 
-                            ? `<select id="skipValue" class="property-select">
-                                <option value="">-- Select value --</option>
-                                ${sourceOptions.map(o => `<option value="${escapeHtml(o)}" ${skip.sourceValue === o ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('')}
-                            </select>`
-                            : `<input type="text" id="skipValue" class="property-input" value="${escapeHtml(skip.sourceValue || '')}" placeholder="Enter value">`
-                        }
-                    </div>
-                </div>
-            </div>`;
-            
-            return html;
-        }
-
         function attachPropertyListeners(field) {
-            // Basic properties
             document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
             document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
             document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
             document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
-            document.getElementById('propLevels')?.addEventListener('change', (e) => updateField('levels', e.target.value.split('\n').filter(l => l.trim())));
-            document.getElementById('propRows')?.addEventListener('change', (e) => updateField('rows', parseInt(e.target.value)));
-            document.getElementById('propMax')?.addEventListener('change', (e) => updateField('max', parseInt(e.target.value)));
-            document.getElementById('propAccept')?.addEventListener('change', (e) => updateField('accept', e.target.value));
-            document.getElementById('propFormula')?.addEventListener('change', (e) => updateField('formula', e.target.value));
-            
-            // Validation
-            document.getElementById('validationEnabled')?.addEventListener('change', (e) => {
-                updateField('validation.enabled', e.target.checked);
-                document.getElementById('validationRulesContainer').style.display = e.target.checked ? 'block' : 'none';
-            });
-            
-            document.querySelectorAll('[data-rule]').forEach(el => {
-                el.addEventListener('change', (e) => {
-                    const rule = e.target.dataset.rule;
-                    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-                    const f = state.fields.find(f => f.id === state.selectedFieldId);
-                    if (f) {
-                        if (!f.validation) f.validation = { enabled: true, rules: {} };
-                        if (!f.validation.rules) f.validation.rules = {};
-                        f.validation.rules[rule] = value;
-                        saveToStorage();
-                    }
-                });
-            });
-            
-            // Skip Logic
-            document.getElementById('skipEnabled')?.addEventListener('change', (e) => {
-                updateField('skipLogic.enabled', e.target.checked);
-                document.getElementById('skipOptionsContainer').style.display = e.target.checked ? 'block' : 'none';
-            });
-            
-            document.getElementById('skipAction')?.addEventListener('change', (e) => updateField('skipLogic.action', e.target.value));
-            document.getElementById('skipSourceField')?.addEventListener('change', (e) => {
-                updateField('skipLogic.sourceField', e.target.value);
-                // Re-render to update value dropdown
-                renderProperties();
-            });
-            document.getElementById('skipCondition')?.addEventListener('change', (e) => updateField('skipLogic.condition', e.target.value));
-            document.getElementById('skipValue')?.addEventListener('change', (e) => updateField('skipLogic.sourceValue', e.target.value));
-        }
-
-        // ============================================
-        // TABLE CONFIGURATION
-        // ============================================
-        function openTableConfig(fieldId) {
-            state.editingTableFieldId = fieldId;
-            const field = state.fields.find(f => f.id === fieldId);
-            if (!field) return;
-            
-            renderTableColumnsConfig(field);
-            document.getElementById('tableConfigModal').classList.add('show');
-        }
-
-        function renderTableColumnsConfig(field) {
-            const container = document.getElementById('tableColumnsConfig');
-            const columnTypes = ['text', 'number', 'date', 'select', 'radio', 'checkbox', 'yesno'];
-            
-            container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:11px;">
-                <thead><tr>
-                    <th style="border:1px solid #ddd;padding:8px;background:#004080;color:white;">Column Name</th>
-                    <th style="border:1px solid #ddd;padding:8px;background:#004080;color:white;">Type</th>
-                    <th style="border:1px solid #ddd;padding:8px;background:#004080;color:white;">Options</th>
-                    <th style="border:1px solid #ddd;padding:8px;background:#004080;color:white;">Required</th>
-                    <th style="border:1px solid #ddd;padding:8px;background:#004080;color:white;width:50px;"></th>
-                </tr></thead>
-                <tbody id="tableColumnsBody">
-                    ${field.columns.map((col, i) => `<tr data-index="${i}">
-                        <td style="border:1px solid #ddd;padding:6px;"><input type="text" value="${escapeHtml(col.name)}" class="col-name" style="width:100%;padding:4px;border:1px solid #ddd;border-radius:3px;"></td>
-                        <td style="border:1px solid #ddd;padding:6px;"><select class="col-type" style="width:100%;padding:4px;border:1px solid #ddd;border-radius:3px;">
-                            ${columnTypes.map(t => `<option value="${t}" ${col.type === t ? 'selected' : ''}>${t}</option>`).join('')}
-                        </select></td>
-                        <td style="border:1px solid #ddd;padding:6px;"><input type="text" value="${escapeHtml((col.options || []).join(','))}" class="col-options" placeholder="opt1,opt2,opt3" style="width:100%;padding:4px;border:1px solid #ddd;border-radius:3px;font-size:9px;"></td>
-                        <td style="border:1px solid #ddd;padding:6px;text-align:center;"><input type="checkbox" class="col-required" ${col.required ? 'checked' : ''}></td>
-                        <td style="border:1px solid #ddd;padding:6px;text-align:center;"><button class="remove-btn" onclick="removeTableColumn(${i})">✕</button></td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>`;
-        }
-
-        function addTableColumn() {
-            const field = state.fields.find(f => f.id === state.editingTableFieldId);
-            if (!field) return;
-            
-            field.columns.push({ name: 'New Column', type: 'text', options: [], required: false });
-            renderTableColumnsConfig(field);
-        }
-
-        function removeTableColumn(index) {
-            const field = state.fields.find(f => f.id === state.editingTableFieldId);
-            if (!field || field.columns.length <= 1) return;
-            
-            field.columns.splice(index, 1);
-            renderTableColumnsConfig(field);
-        }
-
-        function saveTableConfig() {
-            const field = state.fields.find(f => f.id === state.editingTableFieldId);
-            if (!field) return;
-            
-            const rows = document.querySelectorAll('#tableColumnsBody tr');
-            field.columns = Array.from(rows).map(row => ({
-                name: row.querySelector('.col-name').value || 'Column',
-                type: row.querySelector('.col-type').value || 'text',
-                options: row.querySelector('.col-options').value.split(',').filter(o => o.trim()),
-                required: row.querySelector('.col-required').checked
-            }));
-            
-            renderFields();
-            saveToStorage();
-            closeModal('tableConfigModal');
-            notify('Table configuration saved!');
         }
 
         // ============================================
@@ -1546,24 +1125,7 @@
             document.getElementById('settingsMultiPage').checked = state.settings.multiPage;
             document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl;
             document.getElementById('cascadingData').value = state.settings.cascadingData;
-            
-            renderPagesList();
             document.getElementById('settingsModal').classList.add('show');
-        }
-
-        function renderPagesList() {
-            const sections = state.fields.filter(f => f.type === 'section');
-            const container = document.getElementById('pagesList');
-            
-            if (sections.length === 0) {
-                container.innerHTML = '<p style="color:#666;font-size:11px;">No sections added. Add "Section" fields to create multi-page forms.</p>';
-                return;
-            }
-            
-            container.innerHTML = `<div style="font-size:11px;">
-                <div style="padding:8px;background:#004080;color:white;border-radius:4px 4px 0 0;">Page 1: Introduction</div>
-                ${sections.map((s, i) => `<div style="padding:8px;background:#f8f9fa;border:1px solid #ddd;border-top:none;">Page ${i + 2}: ${s.label}</div>`).join('')}
-            </div>`;
         }
 
         function saveSettings() {
@@ -1584,20 +1146,15 @@
             notify('Settings saved!');
         }
 
-        // ============================================
-        // FILE UPLOAD
-        // ============================================
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    
                     const lines = [];
                     json.forEach(row => {
                         const reg = row.Region || row.region || '';
@@ -1605,20 +1162,15 @@
                         const chi = row.Chiefdom || row.chiefdom || '';
                         const fac = row.Facility || row.facility || '';
                         const uid = row.UID || row.uid || '';
-                        
                         if (reg && dis) lines.push(`${reg}||${dis}`);
                         if (dis && chi) lines.push(`${dis}||${chi}`);
                         if (chi && fac) lines.push(uid ? `${chi}||${fac}||${uid}` : `${chi}||${fac}`);
                     });
-                    
                     document.getElementById('cascadingData').value = [...new Set(lines)].join('\n');
                     document.getElementById('fileUploadArea').classList.add('has-file');
                     document.getElementById('fileUploadText').textContent = `✅ Loaded ${json.length} rows`;
-                    
                     notify('File loaded successfully!');
-                } catch (err) {
-                    notify('Error reading file: ' + err.message, 'error');
-                }
+                } catch (err) { notify('Error reading file: ' + err.message, 'error'); }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -1639,21 +1191,15 @@
         // PREVIEW
         // ============================================
         function previewForm() {
-            if (state.fields.length === 0) {
-                notify('Add some fields first!', 'error');
-                return;
-            }
-            
+            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
             const html = generateHTMLCode();
             const previewBody = document.getElementById('previewBody');
             previewBody.innerHTML = '<iframe class="preview-frame"></iframe>';
-            
             const iframe = previewBody.querySelector('iframe');
             const doc = iframe.contentDocument;
             doc.open();
             doc.write(html);
             doc.close();
-            
             document.getElementById('previewModal').classList.add('show');
         }
 
@@ -1661,14 +1207,9 @@
         // GENERATE FORM
         // ============================================
         function generateForm() {
-            if (state.fields.length === 0) {
-                notify('Add some fields first!', 'error');
-                return;
-            }
-            
+            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
             const htmlCode = generateHTMLCode();
             const scriptCode = generateAppsScriptCode();
-            
             document.getElementById('htmlCode').textContent = htmlCode;
             document.getElementById('scriptCode').textContent = scriptCode;
             document.getElementById('generateModal').classList.add('show');
@@ -1678,54 +1219,16 @@
             const s = state.settings;
             const fields = state.fields;
             
-            // Split fields into pages
-            const pages = [{ title: 'Page 1', fields: [] }];
-            let currentPage = 0;
-            
+            let fieldsHTML = '';
             fields.forEach(f => {
                 if (f.type === 'section') {
-                    currentPage++;
-                    pages.push({ title: f.label, fields: [] });
+                    fieldsHTML += `<div class="section-header">${f.label.toUpperCase()}</div>`;
                 } else {
-                    pages[currentPage].fields.push(f);
-                }
-            });
-            
-            const multiPage = s.multiPage && pages.length > 1;
-            
-            let fieldsHTML = '';
-            pages.forEach((page, pageIndex) => {
-                if (multiPage) {
-                    fieldsHTML += `<div class="form-page ${pageIndex === 0 ? 'active' : ''}" data-page="${pageIndex}">`;
-                    if (pageIndex > 0) {
-                        fieldsHTML += `<div class="section-header">${page.title.toUpperCase()}</div>`;
-                    }
-                }
-                
-                page.fields.forEach(f => {
                     fieldsHTML += generateFieldHTML(f);
-                });
-                
-                if (multiPage) {
-                    fieldsHTML += `<div class="page-nav">`;
-                    if (pageIndex > 0) {
-                        fieldsHTML += `<button type="button" class="nav-btn prev" onclick="prevPage()">← Previous</button>`;
-                    }
-                    if (pageIndex < pages.length - 1) {
-                        fieldsHTML += `<button type="button" class="nav-btn next" onclick="nextPage()">Next →</button>`;
-                    } else {
-                        fieldsHTML += `<button type="submit" class="btn-submit">SUBMIT</button>`;
-                    }
-                    fieldsHTML += `</div></div>`;
                 }
             });
             
-            if (!multiPage) {
-                fieldsHTML += `<button type="submit" class="btn-submit">SUBMIT</button>`;
-            }
-            
-            const skipLogicJS = generateSkipLogicJS();
-            const validationJS = generateValidationJS();
+            fieldsHTML += `<button type="submit" class="btn-submit">SUBMIT</button>`;
             
             return `<!DOCTYPE html>
 <html lang="en">
@@ -1734,7 +1237,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${s.title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"><\/script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Oswald',sans-serif;background:#f5f5f5;padding:20px}
@@ -1746,42 +1248,16 @@
         .form-card{border:4px double #004080;border-radius:12px;background:#fff}
         .form-body{padding:20px}
         .form-group{margin-bottom:16px}
-        .form-group.hidden{display:none}
         .form-label{display:block;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase}
         .required{color:red}
         .form-input,.form-select,.form-textarea{width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:12px}
         .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(0,64,128,0.2)}
-        .form-input.error,.form-select.error{border-color:#dc3545}
-        .error-msg{color:#dc3545;font-size:10px;margin-top:3px;display:none}
-        .radio-group,.checkbox-group{display:flex;flex-wrap:wrap;gap:10px}
-        .radio-option,.checkbox-option{display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;font-size:11px}
-        .radio-option:hover,.checkbox-option:hover{border-color:#004080}
+        .radio-group{display:flex;flex-wrap:wrap;gap:10px}
+        .radio-option{display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;font-size:11px}
+        .radio-option:hover{border-color:#004080}
         .section-header{background:#004080;color:#fff;padding:12px 15px;margin:20px -20px;font-size:13px;font-weight:700}
         .btn-submit{width:100%;padding:14px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase}
         .btn-submit:hover{background:#218838}
-        .btn-submit:disabled{background:#ccc;cursor:not-allowed}
-        .page-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
-        .nav-btn{padding:12px 24px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase}
-        .nav-btn.prev{background:#fff;color:#004080}
-        .nav-btn.next{background:#004080;color:#fff}
-        .form-page{display:none}
-        .form-page.active{display:block}
-        .page-indicator{text-align:center;margin-bottom:15px;font-size:11px;color:#666}
-        .signature-container{border:2px solid #004080;border-radius:6px;overflow:hidden}
-        .signature-canvas{width:100%;height:100px;background:#fff}
-        .signature-controls{padding:6px;background:#f8f9fa;text-align:right}
-        .signature-btn{padding:5px 10px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:10px}
-        .gps-btn{padding:10px 14px;background:#004080;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Oswald',sans-serif;font-weight:700;font-size:11px}
-        .gps-status{margin-top:8px;font-size:10px}
-        .rating-container{display:flex;gap:5px}
-        .rating-star{font-size:24px;cursor:pointer;color:#ddd;transition:color 0.2s}
-        .rating-star.active,.rating-star:hover{color:#ffc107}
-        .data-table{width:100%;border-collapse:collapse;font-size:11px}
-        .data-table th,.data-table td{border:1px solid #ddd;padding:8px}
-        .data-table th{background:#004080;color:#fff;font-size:10px;text-transform:uppercase}
-        .data-table input,.data-table select{width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:10px}
-        .add-row-btn{margin-top:10px;padding:8px 14px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px}
-        .remove-row-btn{background:#dc3545;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px}
         .footer{text-align:center;padding:15px;font-size:10px;color:#666;margin-top:15px}
         .notification{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:6px;color:#fff;font-weight:700;font-size:12px;z-index:1000;display:none}
         .notification.show{display:block}
@@ -1798,7 +1274,6 @@
                 <p>${s.subtitle}</p>
             </div>
             <div class="form-body">
-                ${multiPage ? `<div class="page-indicator">Page <span id="currentPage">1</span> of ${pages.length}</div>` : ''}
                 <form id="dataForm">
 ${fieldsHTML}
                 </form>
@@ -1808,235 +1283,15 @@ ${fieldsHTML}
     </div>
     <div class="notification" id="notification"></div>
     <script>
-        const CONFIG = { SCRIPT_URL: '${s.scriptUrl || ''}' };
-        const CASCADING_DATA = \`${s.cascadingData}\`;
-        const signaturePads = {};
-        let currentPage = 0;
-        const totalPages = ${pages.length};
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('dataForm').addEventListener('submit', handleSubmit);
-            setupCascading();
-            setupSignatures();
-            setupRatings();
-            setupDynamicTables();
-            setupSkipLogic();
-        });
-
-        ${multiPage ? `
-        function nextPage() {
-            if (!validateCurrentPage()) return;
-            if (currentPage < totalPages - 1) {
-                document.querySelector('.form-page.active').classList.remove('active');
-                currentPage++;
-                document.querySelector('[data-page="' + currentPage + '"]').classList.add('active');
-                document.getElementById('currentPage').textContent = currentPage + 1;
-                window.scrollTo(0, 0);
-            }
-        }
-        function prevPage() {
-            if (currentPage > 0) {
-                document.querySelector('.form-page.active').classList.remove('active');
-                currentPage--;
-                document.querySelector('[data-page="' + currentPage + '"]').classList.add('active');
-                document.getElementById('currentPage').textContent = currentPage + 1;
-                window.scrollTo(0, 0);
-            }
-        }
-        function validateCurrentPage() {
-            const page = document.querySelector('.form-page.active');
-            const requiredFields = page.querySelectorAll('[required]');
-            let valid = true;
-            requiredFields.forEach(f => {
-                if (!f.value) {
-                    f.classList.add('error');
-                    valid = false;
-                } else {
-                    f.classList.remove('error');
-                }
-            });
-            if (!valid) showNotification('Please fill all required fields', 'error');
-            return valid;
-        }
-        ` : ''}
-
-        function handleSubmit(e) {
+        document.getElementById('dataForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!validateForm()) return;
-            
-            const fd = new FormData(e.target);
-            const data = { _timestamp: new Date().toISOString() };
-            fd.forEach((v, k) => { 
-                if (data[k]) {
-                    data[k] = Array.isArray(data[k]) ? [...data[k], v] : [data[k], v];
-                } else {
-                    data[k] = v;
-                }
-            });
-            Object.keys(signaturePads).forEach(k => {
-                if (!signaturePads[k].isEmpty()) data[k] = signaturePads[k].toDataURL();
-            });
-            
-            // Collect dynamic table data
-            document.querySelectorAll('.dynamic-table').forEach(table => {
-                const name = table.dataset.name;
-                const rows = [];
-                table.querySelectorAll('tbody tr').forEach(tr => {
-                    const row = {};
-                    tr.querySelectorAll('input, select').forEach(inp => {
-                        row[inp.dataset.col] = inp.type === 'checkbox' ? inp.checked : inp.value;
-                    });
-                    rows.push(row);
-                });
-                data[name] = JSON.stringify(rows);
-            });
-            
-            if (CONFIG.SCRIPT_URL) {
-                fetch(CONFIG.SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                }).then(() => {
-                    showNotification('Submitted successfully!', 'success');
-                    e.target.reset();
-                    Object.values(signaturePads).forEach(sp => sp.clear());
-                }).catch(() => showNotification('Error submitting', 'error'));
-            } else {
-                console.log('Form data:', data);
-                showNotification('Submitted successfully!', 'success');
-                e.target.reset();
-            }
-        }
-
-        function validateForm() {
-            let valid = true;
-            ${validationJS}
-            return valid;
-        }
-
-        function parseCascading() {
-            const m = { r: {}, d: {}, c: {}, u: {} };
-            CASCADING_DATA.trim().split('\\n').forEach(l => {
-                const p = l.split('||').map(s => s.trim());
-                if (p.length >= 2) {
-                    const key = p[0], val = p[1];
-                    if (key.includes('Region') || key === 'Western Area') {
-                        if (!m.r[key]) m.r[key] = [];
-                        m.r[key].push(val);
-                    } else if (key.includes('District')) {
-                        if (!m.d[key]) m.d[key] = [];
-                        m.d[key].push(val);
-                    } else {
-                        if (!m.c[key]) m.c[key] = [];
-                        m.c[key].push(val);
-                        if (p.length === 3) m.u[val] = p[2];
-                    }
-                }
-            });
-            return m;
-        }
-
-        function setupCascading() {
-            const m = parseCascading();
-            document.querySelectorAll('.cascading-region').forEach(s => {
-                Object.keys(m.r).sort().forEach(r => s.innerHTML += '<option value="' + r + '">' + r + '</option>');
-                s.addEventListener('change', function() {
-                    const d = this.closest('.cascading-group').querySelector('.cascading-district');
-                    d.innerHTML = '<option value="">-- District --</option>';
-                    if (this.value && m.r[this.value]) m.r[this.value].forEach(x => d.innerHTML += '<option value="' + x + '">' + x + '</option>');
-                    d.dispatchEvent(new Event('change'));
-                });
-            });
-            document.querySelectorAll('.cascading-district').forEach(s => {
-                s.addEventListener('change', function() {
-                    const c = this.closest('.cascading-group').querySelector('.cascading-chiefdom');
-                    if (c) {
-                        c.innerHTML = '<option value="">-- Chiefdom --</option>';
-                        if (this.value && m.d[this.value]) m.d[this.value].forEach(x => c.innerHTML += '<option value="' + x + '">' + x + '</option>');
-                        c.dispatchEvent(new Event('change'));
-                    }
-                });
-            });
-            document.querySelectorAll('.cascading-chiefdom').forEach(s => {
-                s.addEventListener('change', function() {
-                    const f = this.closest('.cascading-group').querySelector('.cascading-facility');
-                    if (f) {
-                        f.innerHTML = '<option value="">-- Facility --</option>';
-                        if (this.value && m.c[this.value]) m.c[this.value].forEach(x => f.innerHTML += '<option value="' + x + '">' + x + '</option>');
-                    }
-                });
-            });
-            document.querySelectorAll('.cascading-facility').forEach(s => {
-                s.addEventListener('change', function() {
-                    const u = this.closest('.cascading-group').querySelector('.facility-uid');
-                    if (u && this.value && m.u[this.value]) u.value = m.u[this.value];
-                });
-            });
-        }
-
-        function setupSignatures() {
-            document.querySelectorAll('.signature-canvas').forEach(c => {
-                signaturePads[c.dataset.field] = new SignaturePad(c, { penColor: '#004080' });
-            });
-        }
-        function clearSignature(f) { if (signaturePads[f]) signaturePads[f].clear(); }
-
-        function captureGPS(btn) {
-            const c = btn.closest('.gps-container');
-            const s = c.querySelector('.gps-status');
-            s.textContent = '📡 Capturing...';
-            s.style.color = '#004080';
-            navigator.geolocation.getCurrentPosition(
-                p => {
-                    c.querySelector('.gps-lat').value = p.coords.latitude.toFixed(6);
-                    c.querySelector('.gps-lng').value = p.coords.longitude.toFixed(6);
-                    s.textContent = '✅ ' + p.coords.latitude.toFixed(5) + ', ' + p.coords.longitude.toFixed(5);
-                    s.style.color = '#28a745';
-                },
-                err => { s.textContent = '❌ ' + err.message; s.style.color = '#dc3545'; },
-                { enableHighAccuracy: true, timeout: 60000 }
-            );
-        }
-
-        function setupRatings() {
-            document.querySelectorAll('.rating-container').forEach(c => {
-                const stars = c.querySelectorAll('.rating-star');
-                const input = c.querySelector('input[type="hidden"]');
-                stars.forEach((star, i) => {
-                    star.addEventListener('click', () => {
-                        input.value = i + 1;
-                        stars.forEach((s, j) => s.classList.toggle('active', j <= i));
-                    });
-                    star.addEventListener('mouseenter', () => {
-                        stars.forEach((s, j) => s.style.color = j <= i ? '#ffc107' : '#ddd');
-                    });
-                });
-                c.addEventListener('mouseleave', () => {
-                    const val = parseInt(input.value) || 0;
-                    stars.forEach((s, j) => s.style.color = j < val ? '#ffc107' : '#ddd');
-                });
-            });
-        }
-
-        function setupDynamicTables() {
-            document.querySelectorAll('.add-row-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const table = this.previousElementSibling;
-                    const tbody = table.querySelector('tbody');
-                    const template = tbody.querySelector('tr').cloneNode(true);
-                    template.querySelectorAll('input, select').forEach(inp => { inp.value = ''; if (inp.type === 'checkbox') inp.checked = false; });
-                    tbody.appendChild(template);
-                });
-            });
-        }
-
-        function removeTableRow(btn) {
-            const tbody = btn.closest('tbody');
-            if (tbody.querySelectorAll('tr').length > 1) btn.closest('tr').remove();
-        }
-
-        ${skipLogicJS}
-
+            const data = {};
+            new FormData(this).forEach((v, k) => data[k] = v);
+            data._timestamp = new Date().toISOString();
+            console.log('Form data:', data);
+            showNotification('Submitted successfully!', 'success');
+            this.reset();
+        });
         function showNotification(msg, type) {
             const n = document.getElementById('notification');
             n.textContent = msg;
@@ -2051,429 +1306,46 @@ ${fieldsHTML}
         function generateFieldHTML(field) {
             const req = field.required ? '<span class="required">*</span>' : '';
             const reqAttr = field.required ? 'required' : '';
-            const hiddenClass = field.skipLogic?.enabled ? ' hidden' : '';
-            
             let inner = '';
             switch (field.type) {
-                case 'text':
-                    inner = `<input type="text" class="form-input" name="${field.name}" ${reqAttr}>`;
-                    break;
-                case 'email':
-                    inner = `<input type="email" class="form-input" name="${field.name}" ${reqAttr}>`;
-                    break;
-                case 'phone':
-                    inner = `<input type="tel" class="form-input" name="${field.name}" ${reqAttr} pattern="[0-9+\\-\\s()]+">`;
-                    break;
-                case 'number':
-                    inner = `<input type="number" class="form-input" name="${field.name}" ${reqAttr}>`;
-                    break;
-                case 'date':
-                    inner = `<input type="date" class="form-input" name="${field.name}" ${reqAttr}>`;
-                    break;
-                case 'time':
-                    inner = `<input type="time" class="form-input" name="${field.name}" ${reqAttr}>`;
-                    break;
-                case 'textarea':
-                    inner = `<textarea class="form-textarea" name="${field.name}" rows="3" ${reqAttr}></textarea>`;
-                    break;
-                case 'select':
-                    inner = `<select class="form-select" name="${field.name}" ${reqAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`;
-                    break;
-                case 'radio':
-                    inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
-                    break;
-                case 'yesno':
-                    inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label></div>`;
-                    break;
-                case 'yesnona':
-                    inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="N/A" ${reqAttr}><span>N/A</span></label></div>`;
-                    break;
-                case 'checkbox':
-                    inner = `<div class="checkbox-group">${(field.options || []).map(o => `<label class="checkbox-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
-                    break;
-                case 'table':
-                    inner = generateStaticTableHTML(field);
-                    break;
-                case 'dynamicTable':
-                    inner = generateDynamicTableHTML(field);
-                    break;
-                case 'cascading':
-                    inner = `<div class="cascading-group">${(field.levels || []).map((l, i) => `<select class="form-select cascading-${i === 0 ? 'region' : i === 1 ? 'district' : i === 2 ? 'chiefdom' : 'facility'}" name="${field.name}_${l.toLowerCase().replace(/\s+/g, '_')}" ${reqAttr} style="margin-bottom:8px;"><option value="">-- ${l} --</option></select>`).join('')}<input type="hidden" class="facility-uid" name="${field.name}_uid"></div>`;
-                    break;
-                case 'gps':
-                    inner = `<div class="gps-container"><input type="hidden" class="gps-lat" name="${field.name}_lat"><input type="hidden" class="gps-lng" name="${field.name}_lng"><button type="button" class="gps-btn" onclick="captureGPS(this)">📍 Capture GPS Location</button><div class="gps-status"></div></div>`;
-                    break;
-                case 'signature':
-                    inner = `<div class="signature-container"><canvas class="signature-canvas" data-field="${field.name}" width="300" height="100"></canvas><div class="signature-controls"><button type="button" class="signature-btn" onclick="clearSignature('${field.name}')">Clear</button></div></div>`;
-                    break;
-                case 'rating':
-                    const max = field.max || 5;
-                    inner = `<div class="rating-container">${Array(max).fill(0).map((_, i) => `<span class="rating-star" data-value="${i + 1}">★</span>`).join('')}<input type="hidden" name="${field.name}" value=""></div>`;
-                    break;
-                case 'file':
-                    inner = `<input type="file" class="form-input" name="${field.name}" accept="${field.accept || ''}" ${reqAttr}>`;
-                    break;
-                case 'calculated':
-                    inner = `<input type="text" class="form-input" name="${field.name}" readonly style="background:#e9ecef;">`;
-                    break;
-                default:
-                    return '';
+                case 'text': inner = `<input type="text" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'email': inner = `<input type="email" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'phone': inner = `<input type="tel" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'number': inner = `<input type="number" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'date': inner = `<input type="date" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'time': inner = `<input type="time" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'textarea': inner = `<textarea class="form-textarea" name="${field.name}" rows="3" ${reqAttr}></textarea>`; break;
+                case 'select': inner = `<select class="form-select" name="${field.name}" ${reqAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
+                case 'radio': inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                case 'yesno': inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label></div>`; break;
+                case 'yesnona': inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="N/A" ${reqAttr}><span>N/A</span></label></div>`; break;
+                case 'checkbox': inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                default: return '';
             }
-            
-            return `                        <div class="form-group${hiddenClass}" id="group_${field.id}">
-                            <label class="form-label">${escapeHtml(field.label)} ${req}</label>
-                            ${inner}
-                            <div class="error-msg" id="error_${field.id}"></div>
-                        </div>\n`;
-        }
-
-        function generateStaticTableHTML(field) {
-            const cols = field.columns || [];
-            const rows = field.rows || 3;
-            
-            let html = `<table class="data-table"><thead><tr>${cols.map(c => `<th>${escapeHtml(c.name)}</th>`).join('')}</tr></thead><tbody>`;
-            
-            for (let r = 0; r < rows; r++) {
-                html += '<tr>';
-                cols.forEach((col, ci) => {
-                    html += `<td>${generateTableCellInput(field.name, r, col)}</td>`;
-                });
-                html += '</tr>';
-            }
-            
-            html += '</tbody></table>';
-            return html;
-        }
-
-        function generateDynamicTableHTML(field) {
-            const cols = field.columns || [];
-            
-            let html = `<table class="data-table dynamic-table" data-name="${field.name}"><thead><tr>${cols.map(c => `<th>${escapeHtml(c.name)}</th>`).join('')}<th style="width:40px;"></th></tr></thead><tbody>`;
-            html += '<tr>';
-            cols.forEach((col, ci) => {
-                html += `<td>${generateTableCellInput(field.name, 0, col)}</td>`;
-            });
-            html += '<td><button type="button" class="remove-row-btn" onclick="removeTableRow(this)">✕</button></td></tr>';
-            html += '</tbody></table>';
-            html += `<button type="button" class="add-row-btn">➕ Add Row</button>`;
-            
-            return html;
-        }
-
-        function generateTableCellInput(tableName, rowIndex, col) {
-            const name = `${tableName}_${rowIndex}_${col.name.replace(/\s+/g, '_')}`;
-            const dataCol = col.name.replace(/\s+/g, '_');
-            
-            switch (col.type) {
-                case 'number':
-                    return `<input type="number" name="${name}" data-col="${dataCol}" ${col.required ? 'required' : ''}>`;
-                case 'date':
-                    return `<input type="date" name="${name}" data-col="${dataCol}" ${col.required ? 'required' : ''}>`;
-                case 'select':
-                    return `<select name="${name}" data-col="${dataCol}" ${col.required ? 'required' : ''}><option value="">--</option>${(col.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`;
-                case 'radio':
-                    return (col.options || []).map(o => `<label style="font-size:9px;"><input type="radio" name="${name}" value="${escapeHtml(o)}" data-col="${dataCol}"> ${escapeHtml(o)}</label>`).join(' ');
-                case 'checkbox':
-                    return `<input type="checkbox" name="${name}" data-col="${dataCol}">`;
-                case 'yesno':
-                    return `<select name="${name}" data-col="${dataCol}"><option value="">--</option><option value="Yes">Yes</option><option value="No">No</option></select>`;
-                default:
-                    return `<input type="text" name="${name}" data-col="${dataCol}" ${col.required ? 'required' : ''}>`;
-            }
-        }
-
-        function generateSkipLogicJS() {
-            const fieldsWithSkip = state.fields.filter(f => f.skipLogic?.enabled && f.skipLogic?.sourceField);
-            if (fieldsWithSkip.length === 0) return 'function setupSkipLogic() {}';
-            
-            let js = 'function setupSkipLogic() {\n';
-            fieldsWithSkip.forEach(f => {
-                const src = state.fields.find(x => x.id === f.skipLogic.sourceField);
-                if (!src) return;
-                
-                const condition = f.skipLogic.condition === 'equals' 
-                    ? `val === '${f.skipLogic.sourceValue}'`
-                    : f.skipLogic.condition === 'not_equals'
-                    ? `val !== '${f.skipLogic.sourceValue}'`
-                    : `val.includes('${f.skipLogic.sourceValue}')`;
-                
-                js += `    document.querySelectorAll('[name="${src.name}"]').forEach(el => {
-        el.addEventListener('change', function() {
-            const container = document.getElementById('group_${f.id}');
-            let val = this.type === 'radio' ? (document.querySelector('[name="${src.name}"]:checked')?.value || '') : this.value;
-            const cond = ${condition};
-            container.classList.toggle('hidden', ${f.skipLogic.action === 'show' ? '!cond' : 'cond'});
-        });
-    });\n`;
-            });
-            js += '}';
-            return js;
-        }
-
-        function generateValidationJS() {
-            const fieldsWithValidation = state.fields.filter(f => f.validation?.enabled);
-            if (fieldsWithValidation.length === 0) return '';
-            
-            let js = '';
-            fieldsWithValidation.forEach(f => {
-                const rules = f.validation.rules || {};
-                
-                Object.entries(rules).forEach(([rule, value]) => {
-                    if (!value && value !== 0) return;
-                    
-                    switch (rule) {
-                        case 'minLength':
-                            js += `    if (document.querySelector('[name="${f.name}"]')?.value.length < ${value}) { document.getElementById('error_${f.id}').textContent = 'Minimum ${value} characters required'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'maxLength':
-                            js += `    if (document.querySelector('[name="${f.name}"]')?.value.length > ${value}) { document.getElementById('error_${f.id}').textContent = 'Maximum ${value} characters allowed'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'min':
-                            js += `    if (parseFloat(document.querySelector('[name="${f.name}"]')?.value) < ${value}) { document.getElementById('error_${f.id}').textContent = 'Minimum value is ${value}'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'max':
-                            js += `    if (parseFloat(document.querySelector('[name="${f.name}"]')?.value) > ${value}) { document.getElementById('error_${f.id}').textContent = 'Maximum value is ${value}'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'pattern':
-                            js += `    if (document.querySelector('[name="${f.name}"]')?.value && !new RegExp('${value}').test(document.querySelector('[name="${f.name}"]').value)) { document.getElementById('error_${f.id}').textContent = 'Invalid format'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'notFuture':
-                            if (value) js += `    if (document.querySelector('[name="${f.name}"]')?.value && new Date(document.querySelector('[name="${f.name}"]').value) > new Date()) { document.getElementById('error_${f.id}').textContent = 'Date cannot be in the future'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'notPast':
-                            if (value) js += `    if (document.querySelector('[name="${f.name}"]')?.value && new Date(document.querySelector('[name="${f.name}"]').value) < new Date().setHours(0,0,0,0)) { document.getElementById('error_${f.id}').textContent = 'Date cannot be in the past'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'positive':
-                            if (value) js += `    if (parseFloat(document.querySelector('[name="${f.name}"]')?.value) < 0) { document.getElementById('error_${f.id}').textContent = 'Value must be positive'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                        case 'integer':
-                            if (value) js += `    if (document.querySelector('[name="${f.name}"]')?.value && !Number.isInteger(parseFloat(document.querySelector('[name="${f.name}"]').value))) { document.getElementById('error_${f.id}').textContent = 'Value must be an integer'; document.getElementById('error_${f.id}').style.display = 'block'; valid = false; }\n`;
-                            break;
-                    }
-                });
-            });
-            
-            return js;
+            return `                        <div class="form-group"><label class="form-label">${escapeHtml(field.label)} ${req}</label>${inner}</div>\n`;
         }
 
         function generateAppsScriptCode() {
-            const fields = state.fields.filter(f => f.type !== 'section');
-            const s = state.settings;
-            
-            let headers = ['Timestamp'];
-            fields.forEach(f => {
-                if (f.type === 'cascading') {
-                    (f.levels || []).forEach(l => headers.push(l));
-                    headers.push('UID');
-                } else if (f.type === 'gps') {
-                    headers.push(f.label + ' Lat', f.label + ' Lng');
-                } else {
-                    headers.push(f.label);
-                }
-            });
-            
-            return `// ============================================
-// AUTO-GENERATED APPS SCRIPT
-// Form: ${s.title}
-// Generated: ${new Date().toLocaleString()}
-// ============================================
-
-const SHEET_NAME = 'Submissions';
-const USERS_SHEET = 'Users';
-const HEADERS = ${JSON.stringify(headers, null, 2)};
-
+            return `// Apps Script for ${state.settings.title}
 function doPost(e) {
-    try {
-        const data = JSON.parse(e.postData.contents);
-        
-        if (data.action === 'signup') {
-            return handleSignup(data);
-        }
-        
-        // Handle form submission
-        const sheet = getOrCreateSheet(SHEET_NAME, HEADERS);
-        const row = [data._timestamp || new Date().toISOString()];
-        
-        HEADERS.slice(1).forEach(h => {
-            const key = Object.keys(data).find(k => data[k] !== undefined && h.toLowerCase().includes(k.toLowerCase().split('_')[0]));
-            row.push(data[key] || '');
-        });
-        
-        sheet.appendRow(row);
-        return jsonResponse({ success: true });
-    } catch (err) {
-        return jsonResponse({ success: false, error: err.toString() });
-    }
-}
-
-function doGet(e) {
-    const action = e.parameter.action;
-    
-    if (action === 'login') {
-        return handleLogin(e.parameter.email, e.parameter.password);
-    }
-    
-    if (action === 'forgotPassword') {
-        return handleForgotPassword(e.parameter.email);
-    }
-    
-    if (action === 'getData') {
-        return getData();
-    }
-    
-    return jsonResponse({ status: 'OK', message: 'Form Builder API' });
-}
-
-function handleSignup(data) {
-    const sheet = getOrCreateSheet(USERS_SHEET, ['ID', 'Name', 'Email', 'Organization', 'Password', 'Created']);
-    const emails = sheet.getRange(2, 3, Math.max(1, sheet.getLastRow() - 1), 1).getValues().flat();
-    
-    if (emails.includes(data.email)) {
-        return jsonResponse({ success: false, message: 'Email already registered' });
-    }
-    
-    sheet.appendRow([
-        Utilities.getUuid(),
-        data.name,
-        data.email,
-        data.org || '',
-        data.password,
-        new Date().toISOString()
-    ]);
-    
-    return jsonResponse({ success: true });
-}
-
-function handleLogin(email, password) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(USERS_SHEET);
-    if (!sheet) return jsonResponse({ success: false, message: 'User not found' });
-    
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-        if (data[i][2] === email && data[i][4] === password) {
-            return jsonResponse({
-                success: true,
-                user: { id: data[i][0], name: data[i][1], email: data[i][2], org: data[i][3] }
-            });
-        }
-    }
-    
-    return jsonResponse({ success: false, message: 'Invalid credentials' });
-}
-
-function handleForgotPassword(email) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(USERS_SHEET);
-    if (!sheet) return jsonResponse({ success: false, message: 'Email not found' });
-    
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-        if (data[i][2] === email) {
-            const password = data[i][4];
-            const name = data[i][1];
-            
-            try {
-                MailApp.sendEmail({
-                    to: email,
-                    subject: 'Password Recovery - ${s.title}',
-                    htmlBody: \`
-                        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-                            <h2 style="color: #004080;">Password Recovery</h2>
-                            <p>Hello \${name},</p>
-                            <p>Your password is: <strong>\${password}</strong></p>
-                            <p>Please keep this information secure.</p>
-                            <hr style="margin: 20px 0;">
-                            <p style="font-size: 12px; color: #666;">© 2025 ${s.organization}</p>
-                        </div>
-                    \`
-                });
-                return jsonResponse({ success: true, message: 'Password sent to your email' });
-            } catch (err) {
-                return jsonResponse({ success: false, message: 'Failed to send email: ' + err.toString() });
-            }
-        }
-    }
-    
-    return jsonResponse({ success: false, message: 'Email not found' });
-}
-
-function getData() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-    if (!sheet || sheet.getLastRow() < 2) return jsonResponse({ data: [] });
-    
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
-    const result = data.slice(1).map(row => {
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = row[i]);
-        return obj;
-    });
-    
-    return jsonResponse({ data: result });
-}
-
-function getOrCreateSheet(name, headers) {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName(name);
-    
-    if (!sheet) {
-        sheet = ss.insertSheet(name);
-        sheet.appendRow(headers);
-        sheet.getRange(1, 1, 1, headers.length)
-            .setFontWeight('bold')
-            .setBackground('#004080')
-            .setFontColor('#ffffff');
-        sheet.setFrozenRows(1);
-    }
-    
-    return sheet;
-}
-
-function jsonResponse(data) {
-    return ContentService.createTextOutput(JSON.stringify(data))
-        .setMimeType(ContentService.MimeType.JSON);
-}
-
-function onOpen() {
-    SpreadsheetApp.getUi()
-        .createMenu('📋 ${s.title}')
-        .addItem('📊 View Stats', 'viewStats')
-        .addItem('🗑️ Clear Submissions', 'clearData')
-        .addToUi();
-}
-
-function viewStats() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-    const count = sheet ? sheet.getLastRow() - 1 : 0;
-    SpreadsheetApp.getUi().alert('Total Submissions: ' + count);
-}
-
-function clearData() {
-    const ui = SpreadsheetApp.getUi();
-    if (ui.alert('Clear all submissions?', ui.ButtonSet.YES_NO) === ui.Button.YES) {
-        const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-        if (sheet && sheet.getLastRow() > 1) {
-            sheet.deleteRows(2, sheet.getLastRow() - 1);
-        }
-        ui.alert('Data cleared!');
-    }
+    const data = JSON.parse(e.postData.contents);
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    sheet.appendRow(Object.values(data));
+    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
 }`;
         }
 
         // ============================================
-        // SHARE - Auto Generate URL and QR Code
+        // SHARE - FIXED QR CODE GENERATION
         // ============================================
         let currentShareUrl = '';
+        let qrCodeInstance = null;
 
         function shareForm() {
-            if (state.fields.length === 0) {
-                notify('Add some fields first!', 'error');
-                return;
-            }
+            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
             
-            // Set form title
             document.getElementById('shareFormTitle').textContent = state.settings.title;
             
-            // Create compressed form data
             const formData = {
                 id: 'form_' + Date.now(),
                 t: state.settings.title,
@@ -2495,10 +1367,8 @@ function clearData() {
                 const compressed = pako.deflate(jsonStr);
                 const encoded = btoa(String.fromCharCode.apply(null, compressed));
                 
-                // Use proper web URL - if on file://, use placeholder base
                 let baseUrl;
                 if (window.location.protocol === 'file:') {
-                    // Create a clean filename-based URL
                     const filename = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
                     baseUrl = 'https://yourdomain.com/' + filename;
                 } else {
@@ -2506,17 +1376,23 @@ function clearData() {
                 }
                 
                 currentShareUrl = baseUrl + '?c=' + encodeURIComponent(encoded);
+                document.getElementById('shareUrl').textContent = currentShareUrl;
                 
-                // Set URL in textarea
-                document.getElementById('shareUrlArea').value = currentShareUrl;
+                // Clear previous QR code
+                const qrContainer = document.getElementById('qrCode');
+                qrContainer.innerHTML = '';
                 
-                // Generate QR code
-                const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(currentShareUrl) + '&color=004080';
-                document.getElementById('qrCodeImg').src = qrUrl;
+                // Generate QR code using QRCode.js library
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: currentShareUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#004080',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
                 
-                // Show modal
                 document.getElementById('shareModal').classList.add('show');
-                
             } catch (err) {
                 console.error('Share error:', err);
                 notify('Error creating share link', 'error');
@@ -2524,62 +1400,57 @@ function clearData() {
         }
 
         function copyShareUrl() {
-            const url = document.getElementById('shareUrlArea').value || currentShareUrl;
-            if (url) {
-                navigator.clipboard.writeText(url).then(() => notify('URL copied!'));
-            }
+            navigator.clipboard.writeText(currentShareUrl).then(() => notify('URL copied!'));
         }
 
-        function downloadQRImg() {
-            const img = document.getElementById('qrCodeImg');
-            if (!img.src) {
-                notify('No QR code to download', 'error');
-                return;
-            }
+        function downloadQR() {
+            const qrContainer = document.getElementById('qrCode');
+            let canvas = qrContainer.querySelector('canvas');
+            const img = qrContainer.querySelector('img');
             
-            // Create canvas with title
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            if (!canvas && !img) { notify('No QR code to download', 'error'); return; }
+            
+            const newCanvas = document.createElement('canvas');
+            const ctx = newCanvas.getContext('2d');
             const padding = 30;
             const titleHeight = 50;
-            const qrSize = 220;
+            const qrSize = 200;
             
-            canvas.width = qrSize + padding * 2;
-            canvas.height = qrSize + padding * 2 + titleHeight;
+            newCanvas.width = qrSize + padding * 2;
+            newCanvas.height = qrSize + padding * 2 + titleHeight;
             
-            // White background
             ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
             
-            // Title
             ctx.fillStyle = '#004080';
             ctx.font = 'bold 18px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(state.settings.title, canvas.width / 2, 30);
+            ctx.fillText(state.settings.title, newCanvas.width / 2, 28);
             
-            // Subtitle
-            ctx.font = '11px Arial';
+            ctx.font = '12px Arial';
             ctx.fillStyle = '#666';
-            ctx.fillText('Scan to open form', canvas.width / 2, 45);
+            ctx.fillText('Scan to open form', newCanvas.width / 2, 45);
             
-            // Draw QR image
-            const tempImg = new Image();
-            tempImg.crossOrigin = 'anonymous';
-            tempImg.onload = function() {
-                ctx.drawImage(tempImg, padding, titleHeight + 10, qrSize, qrSize);
-                
-                // Download
+            if (canvas) {
+                ctx.drawImage(canvas, padding, titleHeight + 10, qrSize, qrSize);
+                downloadImage();
+            } else if (img) {
+                const tempImg = new Image();
+                tempImg.crossOrigin = 'anonymous';
+                tempImg.onload = function() {
+                    ctx.drawImage(tempImg, padding, titleHeight + 10, qrSize, qrSize);
+                    downloadImage();
+                };
+                tempImg.src = img.src;
+            }
+            
+            function downloadImage() {
                 const link = document.createElement('a');
                 link.download = state.settings.title.replace(/[^a-z0-9]/gi, '-') + '-QR.png';
-                link.href = canvas.toDataURL('image/png');
+                link.href = newCanvas.toDataURL('image/png');
                 link.click();
                 notify('QR Code downloaded!');
-            };
-            tempImg.onerror = function() {
-                window.open(img.src, '_blank');
-                notify('Opening QR in new tab - right-click to save');
-            };
-            tempImg.src = img.src;
+            }
         }
 
         // ============================================
@@ -2611,9 +1482,7 @@ function clearData() {
             notify('Copied to clipboard!');
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('show');
-        }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
         function notify(message, type = 'success') {
             const el = document.getElementById('notification');
@@ -2643,9 +1512,7 @@ function clearData() {
                     state.fields = data.fields || [];
                     state.settings = { ...state.settings, ...data.settings };
                     state.fieldCounter = data.fieldCounter || 0;
-                } catch (e) {
-                    console.error('Error loading state:', e);
-                }
+                } catch (e) { console.error('Error loading state:', e); }
             }
         }
 
