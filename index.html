@@ -13,7 +13,8 @@
         .auth-container { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #004080 0%, #001a33 100%); padding: 20px; }
         .auth-box { background: white; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .auth-header { background: #004080; color: white; padding: 25px; text-align: center; }
-        .auth-header h1 { font-size: 22px; margin-bottom: 5px; }
+        .auth-header img { width: 80px; border-radius: 10px; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto; }
+        .auth-header h1 { font-size: 24px; margin-bottom: 5px; }
         .auth-header p { font-size: 12px; opacity: 0.9; }
         .auth-body { padding: 25px; }
         .auth-tabs { display: flex; margin-bottom: 20px; }
@@ -28,20 +29,18 @@
         .auth-input:focus { outline: none; border-color: #004080; }
         .auth-btn { width: 100%; padding: 14px; background: #004080; color: white; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; }
         .auth-btn:hover { background: #003366; }
-        .auth-btn:disabled { background: #ccc; cursor: not-allowed; }
         .auth-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: none; }
         .auth-success { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: none; }
-        .auth-link { text-align: center; margin-top: 15px; font-size: 12px; }
-        .auth-link a { color: #004080; cursor: pointer; text-decoration: underline; }
         
-        /* Header */
-        .header { background: #004080; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+        /* Header - FIXED */
+        .header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); min-height: 60px; }
         .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-logo { width: 40px; height: 40px; border-radius: 6px; }
-        .header h1 { font-size: 18px; }
-        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .header-btn { background: white; color: #004080; border: none; padding: 8px 16px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
-        .header-btn:hover { background: #f0f0f0; }
+        .header-logo { width: 45px; height: 45px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); }
+        .header h1 { font-size: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .header-user { font-size: 12px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 20px; margin-right: 8px; }
+        .header-btn { background: white; color: #004080; border: none; padding: 10px 16px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+        .header-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
         .header-btn.primary { background: #ffc107; color: #000; }
         .header-btn.success { background: #28a745; color: white; }
         .header-btn.danger { background: #dc3545; color: white; }
@@ -52,160 +51,186 @@
         .footer { background: #004080; color: white; padding: 8px 20px; text-align: center; font-size: 11px; position: fixed; bottom: 0; left: 0; right: 0; }
         
         /* Sidebar */
-        .sidebar { width: 200px; background: white; border-right: 2px solid #004080; overflow-y: auto; padding: 12px; }
-        .sidebar-section { margin-bottom: 12px; }
-        .sidebar-title { font-size: 10px; font-weight: 700; color: #004080; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #004080; text-transform: uppercase; }
-        .field-type { background: #f8f9fa; border: 2px solid #ddd; border-radius: 6px; padding: 8px 10px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; transition: all 0.2s; }
-        .field-type:hover { border-color: #004080; background: #e8f4fc; transform: translateX(2px); }
-        .field-type-icon { font-size: 14px; }
+        .sidebar { width: 220px; background: white; border-right: 3px solid #004080; overflow-y: auto; padding: 15px; }
+        .sidebar-section { margin-bottom: 15px; }
+        .sidebar-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #004080; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .field-type { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 2px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+        .field-type:hover { border-color: #004080; background: linear-gradient(135deg, #e8f4fc 0%, #cce5ff 100%); transform: translateX(3px); box-shadow: 2px 2px 8px rgba(0,64,128,0.15); }
+        .field-type-icon { font-size: 16px; }
         
         /* Canvas */
         .canvas-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .canvas-header { background: white; padding: 10px 20px; border-bottom: 2px solid #ddd; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .form-title-input { font-size: 15px; font-weight: 700; border: 2px solid transparent; padding: 6px 10px; border-radius: 6px; font-family: 'Oswald', sans-serif; width: 280px; }
+        .canvas-header { background: white; padding: 12px 20px; border-bottom: 3px solid #004080; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .form-title-input { font-size: 16px; font-weight: 700; border: 2px solid #ddd; padding: 8px 12px; border-radius: 6px; font-family: 'Oswald', sans-serif; width: 300px; transition: all 0.2s; }
         .form-title-input:focus { outline: none; border-color: #004080; background: #f8f9fa; }
-        .canvas { flex: 1; overflow-y: auto; padding: 20px; background: #e9ecef; }
-        .form-preview { max-width: 600px; margin: 0 auto; background: white; border: 4px double #004080; border-radius: 12px; min-height: 300px; }
-        .form-preview-header { background: #004080; color: white; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
-        .form-preview-header h2 { font-size: 16px; margin-bottom: 3px; }
-        .form-preview-header p { font-size: 10px; opacity: 0.9; }
-        .form-preview-body { padding: 15px; min-height: 200px; }
+        .canvas { flex: 1; overflow-y: auto; padding: 20px; background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%); }
+        .form-preview { max-width: 650px; margin: 0 auto; background: white; border: 4px double #004080; border-radius: 12px; min-height: 350px; box-shadow: 0 4px 20px rgba(0,64,128,0.15); }
+        .form-preview-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 18px; text-align: center; border-radius: 8px 8px 0 0; }
+        .form-preview-header h2 { font-size: 18px; margin-bottom: 4px; }
+        .form-preview-header p { font-size: 11px; opacity: 0.9; }
+        .form-preview-body { padding: 18px; min-height: 250px; }
         
         /* Drop Zone */
-        .drop-zone { border: 3px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; color: #999; font-size: 12px; min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
+        .drop-zone { border: 3px dashed #adb5bd; border-radius: 10px; padding: 40px; text-align: center; color: #6c757d; font-size: 13px; min-height: 180px; display: flex; flex-direction: column; justify-content: center; transition: all 0.3s; }
         .drop-zone.drag-over { border-color: #004080; background: #e8f4fc; }
         .drop-zone.has-fields { border: none; padding: 0; display: block; min-height: auto; }
         
-        /* Form Fields */
-        .form-field { background: #f8f9fa; border: 2px solid #ddd; border-radius: 6px; padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
-        .form-field:hover { border-color: #004080; }
-        .form-field.selected { border-color: #004080; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
-        .form-field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .form-field-label { font-weight: 700; font-size: 10px; color: #333; text-transform: uppercase; }
-        .form-field-actions { display: flex; gap: 3px; }
-        .field-action-btn { background: #e9ecef; border: none; cursor: pointer; font-size: 11px; padding: 3px 5px; border-radius: 4px; }
-        .field-action-btn:hover { background: #dee2e6; }
-        .field-action-btn.delete:hover { background: #ffebee; color: #dc3545; }
-        .form-field-preview { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 6px; font-size: 10px; color: #666; }
-        .form-field-meta { margin-top: 5px; font-size: 9px; color: #999; display: flex; gap: 8px; flex-wrap: wrap; }
-        .field-badge { padding: 2px 5px; border-radius: 3px; font-size: 8px; }
-        .field-badge.skip { background: #fff3cd; color: #856404; }
-        .field-badge.required { background: #f8d7da; color: #721c24; }
-        .field-badge.validation { background: #d1ecf1; color: #0c5460; }
+        /* Form Fields - ENHANCED */
+        .form-field { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 2px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .form-field:hover { border-color: #004080; box-shadow: 0 3px 12px rgba(0,64,128,0.15); }
+        .form-field.selected { border-color: #004080; border-width: 3px; box-shadow: 0 0 0 4px rgba(0,64,128,0.2); }
+        .form-field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .form-field-label { font-weight: 700; font-size: 12px; color: #333; display: flex; align-items: center; gap: 6px; }
+        .form-field-label .field-icon { font-size: 14px; }
         
-        .section-divider { background: #004080; color: white; padding: 10px 14px; margin: 12px 0; border-radius: 6px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .section-divider.selected { box-shadow: 0 0 0 3px rgba(0,64,128,0.3); }
-        .section-divider .page-badge { background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; }
+        /* BOLD VISIBLE ARROWS & DELETE */
+        .form-field-actions { display: flex; gap: 4px; }
+        .field-action-btn { background: #e9ecef; border: 2px solid #adb5bd; cursor: pointer; font-size: 16px; padding: 6px 10px; border-radius: 6px; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 36px; }
+        .field-action-btn:hover { background: #004080; color: white; border-color: #004080; transform: scale(1.1); }
+        .field-action-btn.move-up, .field-action-btn.move-down { background: #17a2b8; color: white; border-color: #17a2b8; }
+        .field-action-btn.move-up:hover, .field-action-btn.move-down:hover { background: #138496; border-color: #138496; }
+        .field-action-btn.delete { background: #dc3545; color: white; border-color: #dc3545; font-size: 18px; }
+        .field-action-btn.delete:hover { background: #c82333; border-color: #c82333; transform: scale(1.15); }
         
-        /* Properties Panel */
-        .properties-panel { width: 300px; background: white; border-left: 2px solid #004080; overflow-y: auto; padding: 12px; }
-        .properties-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #004080; text-transform: uppercase; }
-        .property-group { margin-bottom: 10px; }
-        .property-label { display: block; font-size: 9px; font-weight: 700; color: #333; margin-bottom: 4px; text-transform: uppercase; }
-        .property-input, .property-select { width: 100%; padding: 7px; border: 2px solid #ddd; border-radius: 5px; font-family: 'Oswald', sans-serif; font-size: 11px; }
+        .form-field-preview { background: white; border: 1px solid #dee2e6; border-radius: 5px; padding: 8px; font-size: 11px; color: #666; }
+        .form-field-meta { margin-top: 8px; font-size: 10px; color: #868e96; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .field-badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+        .field-badge.skip { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .field-badge.required { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .field-badge.validation { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .field-badge.conditional { background: #e2d5f1; color: #6f42c1; border: 1px solid #c9b8e8; }
+        
+        .section-divider { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 12px 16px; margin: 15px 0; border-radius: 8px; font-weight: 700; font-size: 13px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,64,128,0.3); }
+        .section-divider.selected { box-shadow: 0 0 0 4px rgba(0,64,128,0.3); }
+        .section-divider .page-badge { background: rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 12px; font-size: 10px; }
+        .section-divider .form-field-actions .field-action-btn { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color: white; }
+        .section-divider .form-field-actions .field-action-btn:hover { background: rgba(255,255,255,0.4); }
+        
+        /* Properties Panel - ENHANCED */
+        .properties-panel { width: 340px; background: white; border-left: 3px solid #004080; overflow-y: auto; padding: 15px; }
+        .properties-title { font-size: 12px; font-weight: 700; color: #004080; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #004080; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .property-group { margin-bottom: 12px; }
+        .property-label { display: block; font-size: 10px; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; }
+        .property-input, .property-select { width: 100%; padding: 8px 10px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; transition: border-color 0.2s; }
         .property-input:focus, .property-select:focus { outline: none; border-color: #004080; }
-        .property-textarea { width: 100%; padding: 7px; border: 2px solid #ddd; border-radius: 5px; font-family: 'Oswald', sans-serif; font-size: 10px; min-height: 50px; resize: vertical; }
-        .property-checkbox { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; }
-        .property-checkbox input { width: 14px; height: 14px; }
-        .no-selection { text-align: center; color: #999; padding: 30px 10px; font-size: 11px; }
+        .property-textarea { width: 100%; padding: 8px 10px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; min-height: 60px; resize: vertical; }
+        .property-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; padding: 6px 0; }
+        .property-checkbox input { width: 18px; height: 18px; cursor: pointer; }
+        .no-selection { text-align: center; color: #868e96; padding: 40px 15px; font-size: 12px; }
         
-        /* Property Sections */
-        .prop-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 6px; padding: 10px; margin-bottom: 12px; }
-        .prop-section-title { font-size: 10px; font-weight: 700; color: #004080; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
-        .prop-section.skip-logic { background: #fff3cd; border-color: #ffc107; }
-        .prop-section.validation { background: #d1ecf1; border-color: #17a2b8; }
+        /* Property Sections - FULL FEATURES */
+        .prop-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; margin-bottom: 15px; }
+        .prop-section-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .prop-section-title .toggle-icon { transition: transform 0.2s; }
+        .prop-section-title.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .prop-section-content { display: block; }
+        .prop-section-content.hidden { display: none; }
+        .prop-section.skip-logic { background: #fff8e1; border-color: #ffca28; }
+        .prop-section.validation { background: #e3f2fd; border-color: #42a5f5; }
+        .prop-section.conditional { background: #f3e5f5; border-color: #ab47bc; }
         
-        /* Inline Fields */
-        .prop-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
-        .prop-row .property-input, .prop-row .property-select { flex: 1; }
-        .prop-row span { font-size: 9px; color: #666; white-space: nowrap; }
+        .prop-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+        .prop-row .property-input, .prop-row .property-select { flex: 1; min-width: 80px; }
+        .prop-row span { font-size: 10px; color: #666; white-space: nowrap; }
+        
+        /* Validation Rules Grid */
+        .validation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .validation-item { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 6px 8px; background: white; border-radius: 4px; border: 1px solid #dee2e6; }
+        .validation-item input[type="checkbox"] { width: 14px; height: 14px; }
+        .validation-item input[type="text"], .validation-item input[type="number"] { width: 60px; padding: 4px; border: 1px solid #dee2e6; border-radius: 3px; font-size: 10px; }
         
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; overflow-y: auto; }
         .modal-overlay.show { display: flex; }
         .modal { background: white; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow: hidden; border: 4px double #004080; }
-        .modal-header { background: #004080; color: white; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { font-size: 15px; }
-        .modal-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
-        .modal-body { padding: 18px; max-height: 65vh; overflow-y: auto; }
-        .modal-footer { padding: 12px 18px; border-top: 2px solid #ddd; display: flex; justify-content: flex-end; gap: 8px; }
-        .modal-btn { padding: 8px 16px; border-radius: 5px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; border: 2px solid #004080; }
-        .modal-btn.secondary { background: white; color: #004080; }
-        .modal-btn.primary { background: #004080; color: white; }
+        .modal-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 5px; }
+        .modal-body { padding: 20px; max-height: 65vh; overflow-y: auto; }
+        .modal-footer { padding: 15px 20px; border-top: 2px solid #dee2e6; display: flex; justify-content: flex-end; gap: 10px; background: #f8f9fa; }
+        .modal-btn { padding: 10px 20px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; border: 2px solid; transition: all 0.2s; }
+        .modal-btn.secondary { background: white; color: #004080; border-color: #004080; }
+        .modal-btn.secondary:hover { background: #f0f0f0; }
+        .modal-btn.primary { background: #004080; color: white; border-color: #004080; }
+        .modal-btn.primary:hover { background: #003366; }
         .modal-btn.success { background: #28a745; color: white; border-color: #28a745; }
+        .modal-btn.success:hover { background: #218838; }
         
         /* Tabs */
-        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; flex-wrap: wrap; }
-        .tab { padding: 10px 16px; cursor: pointer; font-weight: 700; font-size: 11px; border-bottom: 3px solid transparent; margin-bottom: -2px; text-transform: uppercase; }
+        .tabs { display: flex; border-bottom: 2px solid #dee2e6; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab { padding: 12px 18px; cursor: pointer; font-weight: 700; font-size: 12px; border-bottom: 3px solid transparent; margin-bottom: -2px; text-transform: uppercase; transition: all 0.2s; }
         .tab:hover { background: #f8f9fa; }
         .tab.active { border-bottom-color: #004080; color: #004080; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
         /* Settings */
-        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .settings-group { margin-bottom: 12px; }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .settings-group { margin-bottom: 15px; }
         .settings-group.full-width { grid-column: span 2; }
-        .settings-label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
-        .settings-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; }
+        .settings-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+        .settings-input { width: 100%; padding: 10px 12px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
         .settings-input:focus { outline: none; border-color: #004080; }
-        .settings-hint { font-size: 9px; color: #666; margin-top: 4px; }
+        .settings-hint { font-size: 10px; color: #868e96; margin-top: 4px; }
         
-        .toggle-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .toggle-slider { width: 40px; height: 20px; background: #ccc; border-radius: 10px; position: relative; transition: background 0.3s; }
-        .toggle-slider::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; }
-        .toggle-switch input { display: none; }
-        .toggle-switch input:checked + .toggle-slider { background: #28a745; }
-        .toggle-switch input:checked + .toggle-slider::after { left: 22px; }
+        /* Table Builder - ENHANCED */
+        .table-builder { border: 2px solid #004080; border-radius: 8px; overflow: hidden; margin: 12px 0; }
+        .table-builder-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .table-builder-header span { font-size: 12px; font-weight: 700; }
+        .table-builder-body { max-height: 250px; overflow: auto; }
+        .table-builder table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .table-builder th, .table-builder td { border: 1px solid #dee2e6; padding: 8px 10px; text-align: left; }
+        .table-builder th { background: #e9ecef; font-weight: 700; text-transform: uppercase; font-size: 10px; position: sticky; top: 0; }
+        .table-builder input, .table-builder select { width: 100%; padding: 6px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 11px; font-family: 'Oswald', sans-serif; }
+        .table-builder input:focus, .table-builder select:focus { outline: none; border-color: #004080; }
+        .table-actions { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px; background: #f8f9fa; border-top: 1px solid #dee2e6; }
+        .table-action-btn { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .table-action-btn:hover { opacity: 0.9; }
+        .table-action-btn.remove { background: #dc3545; }
+        .table-action-btn.secondary { background: #6c757d; }
         
-        /* Code Preview */
-        .code-preview { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 10px; white-space: pre-wrap; max-height: 300px; overflow: auto; }
+        /* Column Config */
+        .column-config { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+        .column-config-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .column-config-title { font-weight: 700; font-size: 11px; color: #004080; }
+        .column-config-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
         
-        /* Info Box */
-        .info-box { background: #e8f4fc; border: 2px solid #004080; border-radius: 6px; padding: 10px; font-size: 11px; margin: 10px 0; }
-        .info-box h4 { color: #004080; margin-bottom: 5px; font-size: 11px; }
-        
-        /* QR Code Container */
+        /* QR Code */
         .qr-container { text-align: center; padding: 20px; }
-        .qr-box { display: inline-block; padding: 25px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,64,128,0.2); }
+        .qr-box { display: inline-block; padding: 25px; background: white; border: 4px solid #004080; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,64,128,0.2); }
         #qrCode { min-width: 200px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
         #qrCode canvas, #qrCode img { display: block !important; }
-        .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 11px; word-break: break-all; margin-top: 15px; max-height: 100px; overflow-y: auto; border: 2px solid #ddd; text-align: left; font-family: monospace; }
-        .qr-actions { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+        .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 10px; word-break: break-all; margin-top: 15px; max-height: 80px; overflow-y: auto; border: 2px solid #dee2e6; text-align: left; font-family: monospace; }
+        .qr-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         
         /* Notification */
-        .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; }
-        .notification.show { display: block; }
+        .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .notification.show { display: block; animation: slideIn 0.3s ease; }
         .notification.error { background: #dc3545; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Dynamic Table Builder */
-        .table-builder { border: 2px solid #ddd; border-radius: 6px; overflow: hidden; margin: 10px 0; }
-        .table-builder-header { background: #004080; color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
-        .table-builder-header span { font-size: 11px; font-weight: 700; }
-        .table-builder-body { max-height: 200px; overflow: auto; }
-        .table-builder table { width: 100%; border-collapse: collapse; font-size: 10px; }
-        .table-builder th, .table-builder td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-        .table-builder th { background: #f8f9fa; font-weight: 700; }
-        .table-builder input, .table-builder select { width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 9px; }
-        .add-row-btn, .add-col-btn { background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; margin: 2px; }
-        .remove-btn { background: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 9px; cursor: pointer; }
+        /* Info Box */
+        .info-box { background: #e8f4fc; border: 2px solid #004080; border-radius: 8px; padding: 12px; font-size: 11px; margin: 12px 0; }
+        .info-box h4 { color: #004080; margin-bottom: 6px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .info-box.warning { background: #fff3cd; border-color: #ffc107; }
+        .info-box.warning h4 { color: #856404; }
         
-        /* File Upload */
-        .file-upload-area { border: 3px dashed #ddd; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 12px; transition: all 0.2s; }
-        .file-upload-area:hover { border-color: #004080; background: #f8f9fa; }
-        .file-upload-area.has-file { border-color: #28a745; background: #d4edda; }
+        /* Toggle Switch */
+        .toggle-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .toggle-slider { width: 44px; height: 22px; background: #ccc; border-radius: 11px; position: relative; transition: background 0.3s; }
+        .toggle-slider::after { content: ''; position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .toggle-switch input { display: none; }
+        .toggle-switch input:checked + .toggle-slider { background: #28a745; }
+        .toggle-switch input:checked + .toggle-slider::after { left: 24px; }
         
-        /* Preview Iframe */
-        .preview-frame { width: 100%; height: 500px; border: none; background: white; }
-        
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .main-container { flex-direction: column; }
-            .sidebar, .properties-panel { width: 100%; max-height: 180px; }
+            .sidebar, .properties-panel { width: 100%; max-height: 200px; }
             .settings-grid { grid-template-columns: 1fr; }
             .settings-group.full-width { grid-column: span 1; }
+            .header { flex-wrap: wrap; padding: 10px 15px; }
+            .header h1 { font-size: 16px; }
         }
-        
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -213,9 +238,9 @@
     <div class="auth-container" id="authContainer">
         <div class="auth-box">
             <div class="auth-header">
-                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" style="width:70px;border-radius:10px;margin-bottom:12px;">
+                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL">
                 <h1>Form Builder Pro</h1>
-                <p>Create & Manage Data Collection Forms</p>
+                <p>Advanced Data Collection Forms</p>
             </div>
             <div class="auth-body">
                 <div class="auth-tabs">
@@ -236,9 +261,6 @@
                         <input type="password" class="auth-input" id="loginPassword" required placeholder="Enter password">
                     </div>
                     <button type="submit" class="auth-btn" id="loginBtn">Login</button>
-                    <div class="auth-link">
-                        <a onclick="showForgotPassword()">Forgot Password?</a>
-                    </div>
                 </form>
                 
                 <form class="auth-form" id="signupForm">
@@ -252,7 +274,7 @@
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Organization</label>
-                        <input type="text" class="auth-input" id="signupOrg" value="ICF-SL" placeholder="Your organization">
+                        <input type="text" class="auth-input" id="signupOrg" value="ICF-SL">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Password</label>
@@ -264,17 +286,6 @@
                     </div>
                     <button type="submit" class="auth-btn" id="signupBtn">Create Account</button>
                 </form>
-                
-                <form class="auth-form" id="forgotForm">
-                    <div class="auth-group">
-                        <label class="auth-label">Email Address</label>
-                        <input type="email" class="auth-input" id="forgotEmail" required placeholder="Enter your registered email">
-                    </div>
-                    <button type="submit" class="auth-btn" id="forgotBtn">Send Password</button>
-                    <div class="auth-link">
-                        <a onclick="showLogin()">Back to Login</a>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -283,23 +294,23 @@
     <header class="header">
         <div class="header-brand">
             <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" class="header-logo">
-            <h1>Form Builder Pro</h1>
+            <h1>📋 Form Builder Pro</h1>
         </div>
         <div class="header-actions">
-            <span id="headerUser" style="font-size:11px;margin-right:10px;"></span>
+            <span class="header-user" id="headerUser">👤 User</span>
             <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
             <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
-            <button class="header-btn" onclick="shareForm()">🔗 Share</button>
+            <button class="header-btn primary" onclick="shareForm()">🔗 Share</button>
             <button class="header-btn success" onclick="generateForm()">⬇️ Generate</button>
-            <button class="header-btn danger" onclick="logout()">Logout</button>
+            <button class="header-btn danger" onclick="logout()">🚪 Logout</button>
         </div>
     </header>
 
     <div class="main-container" id="mainContainer">
         <div class="sidebar">
             <div class="sidebar-section">
-                <h3 class="sidebar-title">📝 Basic</h3>
-                <div class="field-type" data-type="text"><span class="field-type-icon">📄</span>Text</div>
+                <h3 class="sidebar-title">📝 Basic Fields</h3>
+                <div class="field-type" data-type="text"><span class="field-type-icon">📄</span>Text Input</div>
                 <div class="field-type" data-type="number"><span class="field-type-icon">🔢</span>Number</div>
                 <div class="field-type" data-type="date"><span class="field-type-icon">📅</span>Date</div>
                 <div class="field-type" data-type="time"><span class="field-type-icon">🕐</span>Time</div>
@@ -308,25 +319,25 @@
                 <div class="field-type" data-type="textarea"><span class="field-type-icon">📝</span>Long Text</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">☑️ Selection</h3>
+                <h3 class="sidebar-title">☑️ Selection Fields</h3>
                 <div class="field-type" data-type="select"><span class="field-type-icon">📋</span>Dropdown</div>
-                <div class="field-type" data-type="radio"><span class="field-type-icon">🔘</span>Radio</div>
-                <div class="field-type" data-type="checkbox"><span class="field-type-icon">☑️</span>Checkbox</div>
-                <div class="field-type" data-type="yesno"><span class="field-type-icon">✅</span>Yes/No</div>
-                <div class="field-type" data-type="yesnona"><span class="field-type-icon">❓</span>Yes/No/NA</div>
+                <div class="field-type" data-type="radio"><span class="field-type-icon">🔘</span>Radio Buttons</div>
+                <div class="field-type" data-type="checkbox"><span class="field-type-icon">☑️</span>Checkboxes</div>
+                <div class="field-type" data-type="yesno"><span class="field-type-icon">✅</span>Yes / No</div>
+                <div class="field-type" data-type="yesnona"><span class="field-type-icon">❓</span>Yes / No / NA</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">📊 Tables</h3>
+                <h3 class="sidebar-title">📊 Table Fields</h3>
                 <div class="field-type" data-type="table"><span class="field-type-icon">📋</span>Static Table</div>
                 <div class="field-type" data-type="dynamicTable"><span class="field-type-icon">➕</span>Dynamic Table</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">🔗 Location</h3>
-                <div class="field-type" data-type="cascading"><span class="field-type-icon">🏢</span>Cascading</div>
-                <div class="field-type" data-type="gps"><span class="field-type-icon">📍</span>GPS</div>
+                <h3 class="sidebar-title">📍 Location</h3>
+                <div class="field-type" data-type="cascading"><span class="field-type-icon">🏢</span>Cascading Select</div>
+                <div class="field-type" data-type="gps"><span class="field-type-icon">📍</span>GPS Location</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">🎯 Special</h3>
+                <h3 class="sidebar-title">🎯 Special Fields</h3>
                 <div class="field-type" data-type="signature"><span class="field-type-icon">✍️</span>Signature</div>
                 <div class="field-type" data-type="rating"><span class="field-type-icon">⭐</span>Rating</div>
                 <div class="field-type" data-type="file"><span class="field-type-icon">📎</span>File Upload</div>
@@ -334,14 +345,14 @@
             </div>
             <div class="sidebar-section">
                 <h3 class="sidebar-title">📑 Structure</h3>
-                <div class="field-type" data-type="section"><span class="field-type-icon">📁</span>Section/Page</div>
+                <div class="field-type" data-type="section"><span class="field-type-icon">📁</span>Section / Page</div>
             </div>
         </div>
 
         <div class="canvas-container">
             <div class="canvas-header">
                 <input type="text" class="form-title-input" id="formTitle" value="My Data Collection Form" placeholder="Form Title...">
-                <span style="color:#666;font-size:11px;" id="fieldCount">0 fields | 1 page</span>
+                <span style="color:#666;font-size:12px;font-weight:600;" id="fieldCount">📊 0 fields | 1 page</span>
             </div>
             <div class="canvas">
                 <div class="form-preview">
@@ -351,27 +362,27 @@
                     </div>
                     <div class="form-preview-body">
                         <div class="drop-zone" id="dropZone">
-                            <p style="font-size:24px;margin-bottom:10px;">📥</p>
-                            <p>Click field types on the left to add them</p>
-                            <p style="margin-top:5px;font-size:10px;color:#aaa;">Or drag and drop here</p>
+                            <p style="font-size:36px;margin-bottom:12px;">📥</p>
+                            <p style="font-weight:600;">Click field types on the left to add them</p>
+                            <p style="margin-top:8px;font-size:11px;color:#adb5bd;">Or drag and drop here</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="properties-panel">
+        <div class="properties-panel" id="propertiesPanel">
             <h3 class="properties-title">⚙️ Field Properties</h3>
             <div id="propertiesContent">
                 <div class="no-selection">
-                    <p style="font-size:24px;margin-bottom:10px;">👆</p>
-                    <p>Select a field to edit</p>
+                    <p style="font-size:32px;margin-bottom:12px;">👆</p>
+                    <p>Select a field to edit its properties</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL)</footer>
+    <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | Form Builder Pro</footer>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
@@ -383,7 +394,6 @@
             <div class="modal-body">
                 <div class="tabs">
                     <div class="tab active" data-tab="general">General</div>
-                    <div class="tab" data-tab="pages">Pages</div>
                     <div class="tab" data-tab="cascading">Cascading</div>
                     <div class="tab" data-tab="google">Google Sheets</div>
                 </div>
@@ -410,36 +420,21 @@
                             <label class="toggle-switch">
                                 <input type="checkbox" id="settingsMultiPage" checked>
                                 <span class="toggle-slider"></span>
-                                <span style="font-size:11px;">Enable Multi-Page Navigation</span>
+                                <span style="font-size:12px;">Enable Multi-Page Navigation</span>
                             </label>
                             <div class="settings-hint">Each section becomes a separate page</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="tab-content" id="tab-pages">
-                    <div class="info-box">
-                        <h4>📄 Multi-Page Forms</h4>
-                        <p>Add "Section" fields to create page breaks. Each section becomes a separate page with navigation buttons.</p>
-                    </div>
-                    <div id="pagesList" style="margin-top:15px;"></div>
-                </div>
-
                 <div class="tab-content" id="tab-cascading">
-                    <p style="font-size:11px;color:#666;margin-bottom:12px;">Upload Excel/CSV with location hierarchy</p>
-                    <div class="file-upload-area" id="fileUploadArea">
-                        <div style="font-size:28px;margin-bottom:8px;">📁</div>
-                        <div id="fileUploadText" style="font-size:12px;">Click to upload Excel or CSV</div>
-                        <input type="file" id="cascadingFile" accept=".xlsx,.xls,.csv" style="display:none;">
-                    </div>
-                    <button class="modal-btn secondary" onclick="downloadSampleFile()" style="margin-bottom:10px;">⬇️ Download Template</button>
                     <div class="info-box">
-                        <h4>📋 Required Columns:</h4>
-                        <p>Region | District | Chiefdom | Facility | UID</p>
+                        <h4>🏢 Cascading Select Data</h4>
+                        <p>Enter location hierarchy data. Format: Parent||Child or Parent||Child||UID</p>
                     </div>
                     <div class="settings-group" style="margin-top:12px;">
-                        <label class="settings-label">Or Enter Manually</label>
-                        <textarea class="property-textarea" id="cascadingData" style="height:100px;font-family:monospace;font-size:9px;"></textarea>
+                        <label class="settings-label">Hierarchy Data (one per line)</label>
+                        <textarea class="property-textarea" id="cascadingData" style="height:150px;font-family:monospace;font-size:10px;" placeholder="Eastern Region||Kailahun District&#10;Kailahun District||Luawa Chiefdom&#10;Luawa Chiefdom||Kailahun Hospital||abc123"></textarea>
                     </div>
                 </div>
 
@@ -447,15 +442,15 @@
                     <div class="settings-group">
                         <label class="settings-label">Apps Script Web App URL</label>
                         <input type="text" class="settings-input" id="settingsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-                        <div class="settings-hint">For data submission and user authentication</div>
+                        <div class="settings-hint">For data submission</div>
                     </div>
-                    <div class="info-box" style="background:#fff3cd;border-color:#ffc107;">
-                        <h4 style="color:#856404;">📋 Setup Instructions:</h4>
-                        <ol style="margin-left:15px;font-size:10px;line-height:1.8;color:#856404;">
-                            <li>Create a Google Sheet with sheets: "Users", "Forms", "Submissions"</li>
+                    <div class="info-box warning">
+                        <h4>📋 Setup Instructions:</h4>
+                        <ol style="margin-left:15px;font-size:10px;line-height:1.8;">
+                            <li>Create a Google Sheet</li>
                             <li>Go to Extensions → Apps Script</li>
                             <li>Paste the generated Apps Script code</li>
-                            <li>Deploy as Web App (Anyone can access)</li>
+                            <li>Deploy as Web App</li>
                             <li>Copy the URL here</li>
                         </ol>
                     </div>
@@ -463,74 +458,25 @@
             </div>
             <div class="modal-footer">
                 <button class="modal-btn secondary" onclick="closeModal('settingsModal')">Cancel</button>
-                <button class="modal-btn primary" onclick="saveSettings()">Save</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Generate Modal -->
-    <div class="modal-overlay" id="generateModal">
-        <div class="modal" style="max-width:850px;">
-            <div class="modal-header">
-                <h3>📥 Generated Form</h3>
-                <button class="modal-close" onclick="closeModal('generateModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="tabs">
-                    <div class="tab active" data-tab="html-code">HTML Form</div>
-                    <div class="tab" data-tab="apps-script">Apps Script</div>
-                </div>
-                
-                <div class="tab-content active" id="tab-html-code">
-                    <div style="margin-bottom:10px;">
-                        <button class="modal-btn primary" onclick="downloadHTML()">⬇️ Download HTML</button>
-                        <button class="modal-btn secondary" onclick="copyCode('htmlCode')" style="margin-left:5px;">📋 Copy</button>
-                    </div>
-                    <div class="code-preview" id="htmlCode"></div>
-                </div>
-                
-                <div class="tab-content" id="tab-apps-script">
-                    <div style="margin-bottom:10px;">
-                        <button class="modal-btn primary" onclick="downloadScript()">⬇️ Download .gs</button>
-                        <button class="modal-btn secondary" onclick="copyCode('scriptCode')" style="margin-left:5px;">📋 Copy</button>
-                    </div>
-                    <div class="code-preview" id="scriptCode"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn secondary" onclick="closeModal('generateModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Preview Modal -->
-    <div class="modal-overlay" id="previewModal">
-        <div class="modal" style="max-width:700px;">
-            <div class="modal-header">
-                <h3>👁️ Form Preview</h3>
-                <button class="modal-close" onclick="closeModal('previewModal')">&times;</button>
-            </div>
-            <div class="modal-body" id="previewBody" style="padding:0;"></div>
-            <div class="modal-footer">
-                <button class="modal-btn secondary" onclick="closeModal('previewModal')">Close</button>
+                <button class="modal-btn primary" onclick="saveSettings()">💾 Save</button>
             </div>
         </div>
     </div>
 
     <!-- Share Modal -->
     <div class="modal-overlay" id="shareModal">
-        <div class="modal">
+        <div class="modal" style="max-width:500px;">
             <div class="modal-header">
-                <h3>📤 Share Form</h3>
+                <h3>🔗 Share Form</h3>
                 <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <div style="text-align:center;margin-bottom:15px;">
-                    <div style="font-size:18px;font-weight:700;color:#004080;" id="shareFormTitle">Form Title</div>
+                    <div style="font-size:20px;font-weight:700;color:#004080;" id="shareFormTitle">Form Title</div>
                     <div style="font-size:11px;color:#666;">Share this form with anyone</div>
                 </div>
                 <div class="qr-container">
-                    <div class="qr-box" id="qrBox">
+                    <div class="qr-box">
                         <div id="qrCode"></div>
                     </div>
                     <div style="margin-top:15px;font-weight:700;color:#004080;">📱 Scan to open form</div>
@@ -544,7 +490,42 @@
         </div>
     </div>
 
-    <!-- Dynamic Table Config Modal -->
+    <!-- Generate Modal -->
+    <div class="modal-overlay" id="generateModal">
+        <div class="modal" style="max-width:900px;">
+            <div class="modal-header">
+                <h3>📥 Generated Form</h3>
+                <button class="modal-close" onclick="closeModal('generateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <div class="tab active" data-tab="html-code">HTML Form</div>
+                    <div class="tab" data-tab="apps-script">Apps Script</div>
+                </div>
+                
+                <div class="tab-content active" id="tab-html-code">
+                    <div style="margin-bottom:12px;display:flex;gap:8px;">
+                        <button class="modal-btn primary" onclick="downloadHTML()">⬇️ Download HTML</button>
+                        <button class="modal-btn secondary" onclick="copyCode('htmlCode')">📋 Copy Code</button>
+                    </div>
+                    <pre id="htmlCode" style="background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:8px;font-size:10px;max-height:350px;overflow:auto;white-space:pre-wrap;"></pre>
+                </div>
+                
+                <div class="tab-content" id="tab-apps-script">
+                    <div style="margin-bottom:12px;display:flex;gap:8px;">
+                        <button class="modal-btn primary" onclick="downloadScript()">⬇️ Download .gs</button>
+                        <button class="modal-btn secondary" onclick="copyCode('scriptCode')">📋 Copy Code</button>
+                    </div>
+                    <pre id="scriptCode" style="background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:8px;font-size:10px;max-height:350px;overflow:auto;white-space:pre-wrap;"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" onclick="closeModal('generateModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Config Modal -->
     <div class="modal-overlay" id="tableConfigModal">
         <div class="modal" style="max-width:700px;">
             <div class="modal-header">
@@ -553,11 +534,11 @@
             </div>
             <div class="modal-body">
                 <div id="tableColumnsConfig"></div>
-                <button class="modal-btn success" onclick="addTableColumn()" style="margin-top:10px;">➕ Add Column</button>
+                <button class="table-action-btn" onclick="addTableColumn()" style="margin-top:12px;">➕ Add Column</button>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn secondary" onclick="closeModal('tableConfigModal')">Cancel</button>
-                <button class="modal-btn primary" onclick="saveTableConfig()">Save</button>
+                <button class="modal-btn primary" onclick="saveTableConfig()">💾 Save</button>
             </div>
         </div>
     </div>
@@ -565,7 +546,6 @@
     <div class="notification" id="notification"></div>
 
     <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -586,48 +566,36 @@
                 logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
                 scriptUrl: '',
                 multiPage: true,
-                cascadingData: 'Eastern Region||Kailahun District\nKailahun District||Luawa Chiefdom\nLuawa Chiefdom||Kailahun Hospital||abc123'
+                cascadingData: ''
             }
         };
 
+        // Field definitions with all options
         const fieldDefs = {
-            text: { label: 'Text', icon: '📄', defaultLabel: 'Text Field' },
-            number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field' },
-            date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field' },
-            time: { label: 'Time', icon: '🕐', defaultLabel: 'Time Field' },
-            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address' },
-            phone: { label: 'Phone', icon: '📱', defaultLabel: 'Phone Number' },
-            textarea: { label: 'Long Text', icon: '📝', defaultLabel: 'Long Text' },
-            select: { label: 'Dropdown', icon: '📋', defaultLabel: 'Dropdown', options: ['Option 1', 'Option 2', 'Option 3'] },
-            radio: { label: 'Radio', icon: '🔘', defaultLabel: 'Radio Choice', options: ['Option 1', 'Option 2', 'Option 3'] },
-            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', options: ['Option 1', 'Option 2', 'Option 3'] },
-            yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question' },
-            yesnona: { label: 'Yes/No/NA', icon: '❓', defaultLabel: 'Yes/No/NA' },
-            table: { label: 'Table', icon: '📋', defaultLabel: 'Data Table', columns: [{ name: 'Column 1', type: 'text' }, { name: 'Column 2', type: 'text' }], rows: 3 },
-            dynamicTable: { label: 'Dynamic Table', icon: '➕', defaultLabel: 'Dynamic Table', columns: [{ name: 'Item', type: 'text' }, { name: 'Quantity', type: 'number' }] },
-            cascading: { label: 'Cascading', icon: '🏢', defaultLabel: 'Location', levels: ['Region', 'District', 'Chiefdom', 'Facility'] },
-            gps: { label: 'GPS', icon: '📍', defaultLabel: 'GPS Location' },
-            signature: { label: 'Signature', icon: '✍️', defaultLabel: 'Signature' },
-            rating: { label: 'Rating', icon: '⭐', defaultLabel: 'Rating', max: 5 },
-            file: { label: 'File', icon: '📎', defaultLabel: 'File Upload', accept: '.pdf,.jpg,.png' },
+            text: { label: 'Text Input', icon: '📄', defaultLabel: 'Text Field', validations: ['required', 'minLength', 'maxLength', 'pattern', 'noSpaces', 'alphanumeric', 'uppercase', 'lowercase'] },
+            number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field', validations: ['required', 'min', 'max', 'integer', 'positive', 'negative', 'decimal'] },
+            date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field', validations: ['required', 'minDate', 'maxDate', 'notFuture', 'notPast', 'weekdaysOnly'] },
+            time: { label: 'Time', icon: '🕐', defaultLabel: 'Time Field', validations: ['required', 'minTime', 'maxTime'] },
+            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address', validations: ['required', 'domain'] },
+            phone: { label: 'Phone', icon: '📱', defaultLabel: 'Phone Number', validations: ['required', 'format'] },
+            textarea: { label: 'Long Text', icon: '📝', defaultLabel: 'Long Text', validations: ['required', 'minLength', 'maxLength', 'minWords', 'maxWords'] },
+            select: { label: 'Dropdown', icon: '📋', defaultLabel: 'Dropdown', options: ['Option 1', 'Option 2', 'Option 3'], validations: ['required'] },
+            radio: { label: 'Radio', icon: '🔘', defaultLabel: 'Radio Choice', options: ['Option 1', 'Option 2', 'Option 3'], validations: ['required'] },
+            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', options: ['Option 1', 'Option 2', 'Option 3'], validations: ['required', 'minSelect', 'maxSelect'] },
+            yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question', validations: ['required'] },
+            yesnona: { label: 'Yes/No/NA', icon: '❓', defaultLabel: 'Yes/No/NA', validations: ['required'] },
+            table: { label: 'Static Table', icon: '📋', defaultLabel: 'Data Table', columns: [{ name: 'Column 1', type: 'text', width: 'auto' }, { name: 'Column 2', type: 'text', width: 'auto' }], rows: 3 },
+            dynamicTable: { label: 'Dynamic Table', icon: '➕', defaultLabel: 'Dynamic Table', columns: [{ name: 'Item', type: 'text', width: 'auto' }, { name: 'Quantity', type: 'number', width: '80px' }, { name: 'Notes', type: 'text', width: 'auto' }], minRows: 1, maxRows: 20 },
+            cascading: { label: 'Cascading', icon: '🏢', defaultLabel: 'Location', levels: ['Region', 'District', 'Chiefdom', 'Facility'], validations: ['required'] },
+            gps: { label: 'GPS', icon: '📍', defaultLabel: 'GPS Location', validations: ['required', 'accuracy'] },
+            signature: { label: 'Signature', icon: '✍️', defaultLabel: 'Signature', validations: ['required'] },
+            rating: { label: 'Rating', icon: '⭐', defaultLabel: 'Rating', max: 5, validations: ['required', 'min'] },
+            file: { label: 'File', icon: '📎', defaultLabel: 'File Upload', accept: '.pdf,.jpg,.png,.doc,.docx', validations: ['required', 'maxSize', 'fileTypes'] },
             calculated: { label: 'Calculated', icon: '🔢', defaultLabel: 'Calculated Field', formula: '' },
             section: { label: 'Section', icon: '📁', defaultLabel: 'New Section' }
         };
 
-        const validationRules = {
-            text: ['required', 'minLength', 'maxLength', 'pattern', 'noSpaces'],
-            number: ['required', 'min', 'max', 'integer', 'positive'],
-            email: ['required'],
-            phone: ['required', 'pattern'],
-            date: ['required', 'minDate', 'maxDate', 'notFuture', 'notPast'],
-            time: ['required'],
-            textarea: ['required', 'minLength', 'maxLength'],
-            select: ['required'],
-            radio: ['required'],
-            checkbox: ['required', 'minSelect', 'maxSelect'],
-            yesno: ['required'],
-            yesnona: ['required']
-        };
+        let currentShareUrl = '';
 
         // ============================================
         // INITIALIZATION
@@ -636,7 +604,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('c');
             
-            // Check for compressed form data - direct approach like working version
             if (compressedData) {
                 try {
                     const decoded = atob(decodeURIComponent(compressedData));
@@ -660,7 +627,7 @@
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainContainer').classList.remove('show');
             
-            const formSettings = {
+            state.settings = {
                 title: data.t || 'Form',
                 subtitle: data.s || 'Data Collection',
                 organization: data.o || 'ICF-SL',
@@ -670,51 +637,38 @@
                 scriptUrl: ''
             };
             
-            const formFields = (data.f || []).map(f => ({
-                id: f.i,
-                type: f.y,
-                label: f.l,
-                name: f.n,
-                required: f.r || false,
-                options: f.o || [],
-                levels: f.v || [],
-                columns: f.c || [],
-                rows: 3,
-                max: 5,
-                accept: '',
-                formula: '',
+            state.fields = (data.f || []).map(f => ({
+                id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false,
+                options: f.o || [], levels: f.v || [], columns: f.c || [],
+                rows: 3, max: 5, accept: '', formula: '',
                 skipLogic: f.k || { enabled: false },
-                validation: { enabled: false }
+                validation: f.d || { enabled: false, rules: {} },
+                conditional: f.cn || { enabled: false }
             }));
             
-            state.settings = formSettings;
-            state.fields = formFields;
-            
             const html = generateHTMLCode();
+            document.body.innerHTML = html;
             
-            const viewerContainer = document.createElement('div');
-            viewerContainer.id = 'formViewer';
-            viewerContainer.innerHTML = html;
-            document.body.innerHTML = '';
-            document.body.appendChild(viewerContainer);
-            
-            const scripts = viewerContainer.querySelectorAll('script');
+            // Execute inline scripts
+            const scripts = document.querySelectorAll('script');
             scripts.forEach(script => {
-                const newScript = document.createElement('script');
-                newScript.textContent = script.textContent;
-                document.body.appendChild(newScript);
+                if (script.textContent && !script.src) {
+                    try { eval(script.textContent); } catch(e) { console.error(e); }
+                }
             });
         }
 
         function setupEventListeners() {
+            // Auth tabs
             document.querySelectorAll('.auth-tab').forEach(tab => {
                 tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
             });
 
+            // Auth forms
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
             document.getElementById('signupForm').addEventListener('submit', handleSignup);
-            document.getElementById('forgotForm').addEventListener('submit', handleForgotPassword);
 
+            // Field types - click to add
             document.querySelectorAll('.field-type').forEach(el => {
                 el.addEventListener('click', () => addField(el.dataset.type));
                 el.setAttribute('draggable', 'true');
@@ -725,6 +679,7 @@
                 el.addEventListener('dragend', () => el.style.opacity = '1');
             });
 
+            // Drop zone
             const dropZone = document.getElementById('dropZone');
             dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
             dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -735,6 +690,7 @@
                 if (type) addField(type);
             });
 
+            // Title sync
             const titleInput = document.getElementById('formTitle');
             titleInput.value = state.settings.title;
             titleInput.addEventListener('input', () => {
@@ -743,11 +699,10 @@
                 saveToStorage();
             });
 
+            // Setup tabs
             setupTabs();
 
-            document.getElementById('fileUploadArea').addEventListener('click', () => document.getElementById('cascadingFile').click());
-            document.getElementById('cascadingFile').addEventListener('change', handleFileUpload);
-
+            // Modal close on overlay click
             document.querySelectorAll('.modal-overlay').forEach(overlay => {
                 overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
             });
@@ -757,11 +712,12 @@
             document.querySelectorAll('.tabs').forEach(tabContainer => {
                 tabContainer.querySelectorAll('.tab').forEach(tab => {
                     tab.addEventListener('click', function() {
-                        const parent = this.closest('.modal-body') || document;
+                        const parent = this.closest('.modal-body') || this.closest('.modal');
                         parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                         parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                         this.classList.add('active');
-                        document.getElementById('tab-' + this.dataset.tab)?.classList.add('active');
+                        const tabContent = document.getElementById('tab-' + this.dataset.tab);
+                        if (tabContent) tabContent.classList.add('active');
                     });
                 });
             });
@@ -786,15 +742,6 @@
             hideAuthMessages();
         }
 
-        function showForgotPassword() {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            document.getElementById('forgotForm').classList.add('active');
-            hideAuthMessages();
-        }
-
-        function showLogin() { switchAuthTab('login'); }
-
         function hideAuthMessages() {
             document.getElementById('authError').style.display = 'none';
             document.getElementById('authSuccess').style.display = 'none';
@@ -812,41 +759,12 @@
             el.style.display = 'block';
         }
 
-        async function handleLogin(e) {
+        function handleLogin(e) {
             e.preventDefault();
             hideAuthMessages();
-            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const btn = document.getElementById('loginBtn');
             
-            btn.disabled = true;
-            btn.textContent = 'Logging in...';
-            
-            if (state.settings.scriptUrl) {
-                try {
-                    const response = await fetch(`${state.settings.scriptUrl}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        state.user = result.user;
-                        localStorage.setItem('formBuilderUser', JSON.stringify(result.user));
-                        showBuilder();
-                    } else {
-                        showAuthError(result.message || 'Invalid credentials');
-                    }
-                } catch (err) {
-                    loginLocal(email, password);
-                }
-            } else {
-                loginLocal(email, password);
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'Login';
-        }
-
-        function loginLocal(email, password) {
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
             const user = users.find(u => u.email === email && u.password === password);
             if (user) {
@@ -858,7 +776,7 @@
             }
         }
 
-        async function handleSignup(e) {
+        function handleSignup(e) {
             e.preventDefault();
             hideAuthMessages();
             
@@ -867,41 +785,18 @@
             const org = document.getElementById('signupOrg').value;
             const password = document.getElementById('signupPassword').value;
             const confirm = document.getElementById('signupConfirm').value;
-            const btn = document.getElementById('signupBtn');
             
             if (password !== confirm) { showAuthError('Passwords do not match'); return; }
             if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
             
-            btn.disabled = true;
-            btn.textContent = 'Creating...';
-            
-            signupLocal(name, email, org, password);
-            
-            btn.disabled = false;
-            btn.textContent = 'Create Account';
-        }
-
-        function signupLocal(name, email, org, password) {
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
             if (users.find(u => u.email === email)) { showAuthError('Email already registered'); return; }
+            
             const newUser = { id: Date.now().toString(), name, email, org, password, createdAt: new Date().toISOString() };
             users.push(newUser);
             localStorage.setItem('formBuilderUsers', JSON.stringify(users));
             showAuthSuccess('Account created! Please login.');
             setTimeout(() => switchAuthTab('login'), 1500);
-        }
-
-        async function handleForgotPassword(e) {
-            e.preventDefault();
-            hideAuthMessages();
-            const email = document.getElementById('forgotEmail').value;
-            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
-            const user = users.find(u => u.email === email);
-            if (user) {
-                showAuthSuccess(`Password reminder: ${user.password.substring(0, 2)}${'*'.repeat(user.password.length - 2)}`);
-            } else {
-                showAuthError('Email not found');
-            }
         }
 
         function showBuilder() {
@@ -936,22 +831,41 @@
                 levels: def.levels ? [...def.levels] : [],
                 columns: def.columns ? JSON.parse(JSON.stringify(def.columns)) : [],
                 rows: def.rows || 3,
+                minRows: def.minRows || 1,
+                maxRows: def.maxRows || 20,
                 max: def.max || 5,
                 accept: def.accept || '',
                 formula: def.formula || '',
-                validation: { enabled: false, rules: {} },
-                skipLogic: { enabled: false, action: 'show', sourceField: '', condition: 'equals', sourceValue: '' }
+                placeholder: '',
+                helpText: '',
+                defaultValue: '',
+                validation: { 
+                    enabled: false, 
+                    rules: {},
+                    customMessage: ''
+                },
+                skipLogic: { 
+                    enabled: false, 
+                    action: 'show', 
+                    conditions: [{ field: '', operator: 'equals', value: '' }],
+                    logic: 'all'
+                },
+                conditional: {
+                    enabled: false,
+                    statements: [{ if: '', operator: 'equals', value: '', then: '', result: '' }]
+                }
             };
 
             state.fields.push(field);
             renderFields();
             selectField(field.id);
             saveToStorage();
-            notify('Field added!');
+            notify('✅ Field added!');
         }
 
         function removeField(id) {
             event?.stopPropagation();
+            if (!confirm('Delete this field?')) return;
             state.fields = state.fields.filter(f => f.id !== id);
             if (state.selectedFieldId === id) {
                 state.selectedFieldId = null;
@@ -959,6 +873,7 @@
             }
             renderFields();
             saveToStorage();
+            notify('🗑️ Field deleted');
         }
 
         function moveField(id, direction) {
@@ -981,13 +896,13 @@
         function updateField(prop, value) {
             const field = state.fields.find(f => f.id === state.selectedFieldId);
             if (field) {
-                if (prop.includes('.')) {
-                    const [parent, child] = prop.split('.');
-                    if (!field[parent]) field[parent] = {};
-                    field[parent][child] = value;
-                } else {
-                    field[prop] = value;
+                const parts = prop.split('.');
+                let obj = field;
+                for (let i = 0; i < parts.length - 1; i++) {
+                    if (!obj[parts[i]]) obj[parts[i]] = {};
+                    obj = obj[parts[i]];
                 }
+                obj[parts[parts.length - 1]] = value;
                 renderFields();
                 saveToStorage();
             }
@@ -1001,11 +916,11 @@
             const sectionCount = state.fields.filter(f => f.type === 'section').length;
             const pageCount = sectionCount + 1;
             
-            document.getElementById('fieldCount').textContent = `${state.fields.length} fields | ${pageCount} page${pageCount > 1 ? 's' : ''}`;
+            document.getElementById('fieldCount').textContent = `📊 ${state.fields.length} fields | ${pageCount} page${pageCount > 1 ? 's' : ''}`;
             
             if (state.fields.length === 0) {
                 dropZone.classList.remove('has-fields');
-                dropZone.innerHTML = '<p style="font-size:24px;margin-bottom:10px;">📥</p><p>Click field types on the left to add them</p>';
+                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types on the left to add them</p><p style="margin-top:8px;font-size:11px;color:#adb5bd;">Or drag and drop here</p>';
                 return;
             }
             
@@ -1017,6 +932,7 @@
                 return renderFieldHTML(f);
             }).join('');
             
+            // Attach click handlers
             dropZone.querySelectorAll('.form-field, .section-divider').forEach(el => {
                 el.addEventListener('click', (e) => {
                     if (!e.target.closest('.field-action-btn')) selectField(el.dataset.id);
@@ -1028,12 +944,12 @@
             const selected = field.id === state.selectedFieldId;
             return `<div class="section-divider ${selected ? 'selected' : ''}" data-id="${field.id}">
                 <span>📁 ${field.label.toUpperCase()}</span>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="page-badge">Page ${pageNum}</span>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="page-badge">PAGE ${pageNum}</span>
                     <div class="form-field-actions">
-                        <button class="field-action-btn" onclick="moveField('${field.id}','up')" style="background:rgba(255,255,255,0.2);color:white;">⬆</button>
-                        <button class="field-action-btn" onclick="moveField('${field.id}','down')" style="background:rgba(255,255,255,0.2);color:white;">⬇</button>
-                        <button class="field-action-btn delete" onclick="removeField('${field.id}')" style="background:rgba(255,255,255,0.2);color:white;">🗑</button>
+                        <button class="field-action-btn move-up" onclick="moveField('${field.id}','up')" title="Move Up">▲</button>
+                        <button class="field-action-btn move-down" onclick="moveField('${field.id}','down')" title="Move Down">▼</button>
+                        <button class="field-action-btn delete" onclick="removeField('${field.id}')" title="Delete">🗑️</button>
                     </div>
                 </div>
             </div>`;
@@ -1046,14 +962,15 @@
             if (field.required) badges += '<span class="field-badge required">Required</span>';
             if (field.skipLogic?.enabled) badges += '<span class="field-badge skip">Skip Logic</span>';
             if (field.validation?.enabled) badges += '<span class="field-badge validation">Validation</span>';
+            if (field.conditional?.enabled) badges += '<span class="field-badge conditional">Conditional</span>';
             
             return `<div class="form-field ${selected ? 'selected' : ''}" data-id="${field.id}">
                 <div class="form-field-header">
-                    <span class="form-field-label">${def?.icon || ''} ${field.label}</span>
+                    <span class="form-field-label"><span class="field-icon">${def?.icon || '📄'}</span> ${field.label}</span>
                     <div class="form-field-actions">
-                        <button class="field-action-btn" onclick="moveField('${field.id}','up')">⬆</button>
-                        <button class="field-action-btn" onclick="moveField('${field.id}','down')">⬇</button>
-                        <button class="field-action-btn delete" onclick="removeField('${field.id}')">🗑</button>
+                        <button class="field-action-btn move-up" onclick="moveField('${field.id}','up')" title="Move Up">▲</button>
+                        <button class="field-action-btn move-down" onclick="moveField('${field.id}','down')" title="Move Down">▼</button>
+                        <button class="field-action-btn delete" onclick="removeField('${field.id}')" title="Delete">🗑️</button>
                     </div>
                 </div>
                 <div class="form-field-preview">${renderFieldPreview(field)}</div>
@@ -1062,57 +979,610 @@
         }
 
         function renderFieldPreview(field) {
-            const inputStyle = 'width:100%;padding:5px;border:1px solid #ddd;border-radius:3px;font-size:10px;';
+            const inputStyle = 'width:100%;padding:6px;border:1px solid #dee2e6;border-radius:4px;font-size:11px;';
             switch (field.type) {
-                case 'text': case 'email': case 'phone': return `<input type="text" style="${inputStyle}" placeholder="${field.label}" disabled>`;
-                case 'number': return `<input type="number" style="${inputStyle}" placeholder="0" disabled>`;
-                case 'date': return `<input type="date" style="${inputStyle}" disabled>`;
-                case 'time': return `<input type="time" style="${inputStyle}" disabled>`;
-                case 'textarea': return `<textarea style="${inputStyle}height:40px;" disabled></textarea>`;
-                case 'select': return `<select style="${inputStyle}" disabled><option>-- Select --</option></select>`;
+                case 'text': case 'email': case 'phone': 
+                    return `<input type="text" style="${inputStyle}" placeholder="${field.placeholder || field.label}" disabled>`;
+                case 'number': 
+                    return `<input type="number" style="${inputStyle}" placeholder="0" disabled>`;
+                case 'date': 
+                    return `<input type="date" style="${inputStyle}" disabled>`;
+                case 'time': 
+                    return `<input type="time" style="${inputStyle}" disabled>`;
+                case 'textarea': 
+                    return `<textarea style="${inputStyle}height:50px;" disabled></textarea>`;
+                case 'select': 
+                    return `<select style="${inputStyle}" disabled><option>-- Select ${field.label} --</option></select>`;
                 case 'radio': case 'yesno': case 'yesnona':
                     const opts = field.type === 'yesno' ? ['Yes', 'No'] : field.type === 'yesnona' ? ['Yes', 'No', 'N/A'] : field.options;
-                    return opts.slice(0, 3).map(o => `<label style="margin-right:8px;font-size:9px;"><input type="radio" disabled> ${o}</label>`).join('');
-                case 'checkbox': return field.options.slice(0, 3).map(o => `<label style="display:inline;margin-right:8px;font-size:9px;"><input type="checkbox" disabled> ${o}</label>`).join('');
-                case 'gps': return `<button style="padding:5px 10px;background:#004080;color:white;border:none;border-radius:3px;font-size:9px;" disabled>📍 Capture GPS</button>`;
-                case 'signature': return `<div style="border:2px dashed #ddd;height:40px;display:flex;align-items:center;justify-content:center;color:#999;font-size:9px;">✍️ Signature Pad</div>`;
-                case 'rating': return '⭐'.repeat(field.max || 5);
-                case 'file': return `<input type="file" style="${inputStyle}" disabled>`;
-                case 'calculated': return `<div style="background:#e9ecef;padding:5px;border-radius:3px;font-size:9px;">🔢 = ${field.formula || 'formula'}</div>`;
+                    return opts.slice(0, 4).map(o => `<label style="margin-right:10px;font-size:10px;"><input type="radio" disabled> ${o}</label>`).join('') + (opts.length > 4 ? '...' : '');
+                case 'checkbox':
+                    return field.options.slice(0, 3).map(o => `<label style="display:inline;margin-right:10px;font-size:10px;"><input type="checkbox" disabled> ${o}</label>`).join('') + (field.options.length > 3 ? '...' : '');
+                case 'table':
+                    return `<div style="border:1px solid #dee2e6;border-radius:4px;padding:6px;font-size:9px;background:#f8f9fa;">📋 Static Table: ${field.columns.length} columns × ${field.rows} rows</div>`;
+                case 'dynamicTable':
+                    return `<div style="border:1px solid #dee2e6;border-radius:4px;padding:6px;font-size:9px;background:#e8f5e9;">➕ Dynamic Table: ${field.columns.length} columns (${field.minRows}-${field.maxRows} rows)</div>`;
+                case 'cascading':
+                    return field.levels.map(l => `<select style="width:auto;padding:3px;font-size:9px;margin-right:4px;" disabled><option>${l}</option></select>`).join('');
+                case 'gps': 
+                    return `<button style="padding:6px 12px;background:#004080;color:white;border:none;border-radius:4px;font-size:10px;" disabled>📍 Capture GPS</button>`;
+                case 'signature': 
+                    return `<div style="border:2px dashed #dee2e6;height:50px;display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:10px;border-radius:4px;">✍️ Signature Pad</div>`;
+                case 'rating': 
+                    return '<span style="font-size:16px;">' + '⭐'.repeat(field.max || 5) + '</span>';
+                case 'file': 
+                    return `<input type="file" style="${inputStyle}" disabled>`;
+                case 'calculated': 
+                    return `<div style="background:#e9ecef;padding:6px;border-radius:4px;font-size:10px;">🔢 = ${field.formula || 'formula'}</div>`;
                 default: return '';
             }
         }
 
+        // ============================================
+        // PROPERTIES PANEL - FULL FEATURES
+        // ============================================
         function renderProperties() {
             const container = document.getElementById('propertiesContent');
             if (!state.selectedFieldId) {
-                container.innerHTML = '<div class="no-selection"><p style="font-size:24px;margin-bottom:10px;">👆</p><p>Select a field to edit</p></div>';
+                container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;">👆</p><p>Select a field to edit its properties</p></div>';
                 return;
             }
             const field = state.fields.find(f => f.id === state.selectedFieldId);
             if (!field) return;
             
-            let html = `<div class="property-group"><label class="property-label">Label</label><input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}"></div>
-                <div class="property-group"><label class="property-label">Field Name</label><input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}"></div>`;
+            const def = fieldDefs[field.type];
             
-            if (field.type !== 'section') {
-                html += `<div class="property-group"><label class="property-checkbox"><input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}><span>Required Field</span></label></div>`;
+            let html = `
+                <!-- Basic Properties -->
+                <div class="prop-section">
+                    <div class="prop-section-title">📝 Basic Properties</div>
+                    <div class="property-group">
+                        <label class="property-label">Label</label>
+                        <input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}">
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">Field Name (ID)</label>
+                        <input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}">
+                    </div>
+                    ${field.type !== 'section' ? `
+                    <div class="property-group">
+                        <label class="property-label">Placeholder</label>
+                        <input type="text" class="property-input" id="propPlaceholder" value="${escapeHtml(field.placeholder || '')}">
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">Help Text</label>
+                        <input type="text" class="property-input" id="propHelpText" value="${escapeHtml(field.helpText || '')}">
+                    </div>
+                    <div class="property-group">
+                        <label class="property-checkbox">
+                            <input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}>
+                            <span>Required Field</span>
+                        </label>
+                    </div>
+                    ` : ''}
+                </div>`;
+            
+            // Options for select/radio/checkbox
+            if (['select', 'radio', 'checkbox'].includes(field.type)) {
+                html += `
+                <div class="prop-section">
+                    <div class="prop-section-title">📋 Options</div>
+                    <div class="property-group">
+                        <label class="property-label">Options (one per line)</label>
+                        <textarea class="property-textarea" id="propOptions" style="height:100px;">${(field.options || []).join('\n')}</textarea>
+                    </div>
+                </div>`;
             }
             
-            if (['select', 'radio', 'checkbox'].includes(field.type)) {
-                html += `<div class="property-group"><label class="property-label">Options (one per line)</label><textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea></div>`;
+            // Table configuration
+            if (field.type === 'table' || field.type === 'dynamicTable') {
+                html += `
+                <div class="prop-section">
+                    <div class="prop-section-title">📊 Table Configuration</div>
+                    <button class="modal-btn primary" onclick="openTableConfig('${field.id}')" style="width:100%;">⚙️ Configure Columns</button>
+                    ${field.type === 'table' ? `
+                    <div class="property-group" style="margin-top:10px;">
+                        <label class="property-label">Number of Rows</label>
+                        <input type="number" class="property-input" id="propRows" value="${field.rows}" min="1" max="50">
+                    </div>
+                    ` : `
+                    <div class="prop-row" style="margin-top:10px;">
+                        <div class="property-group" style="flex:1;">
+                            <label class="property-label">Min Rows</label>
+                            <input type="number" class="property-input" id="propMinRows" value="${field.minRows}" min="0">
+                        </div>
+                        <div class="property-group" style="flex:1;">
+                            <label class="property-label">Max Rows</label>
+                            <input type="number" class="property-input" id="propMaxRows" value="${field.maxRows}" min="1">
+                        </div>
+                    </div>
+                    `}
+                </div>`;
+            }
+            
+            // Rating max
+            if (field.type === 'rating') {
+                html += `
+                <div class="prop-section">
+                    <div class="prop-section-title">⭐ Rating Options</div>
+                    <div class="property-group">
+                        <label class="property-label">Maximum Stars</label>
+                        <select class="property-select" id="propMax">
+                            ${[3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${field.max === n ? 'selected' : ''}>${n} Stars</option>`).join('')}
+                        </select>
+                    </div>
+                </div>`;
+            }
+            
+            // Cascading levels
+            if (field.type === 'cascading') {
+                html += `
+                <div class="prop-section">
+                    <div class="prop-section-title">🏢 Cascading Levels</div>
+                    <div class="property-group">
+                        <label class="property-label">Level Names (one per line)</label>
+                        <textarea class="property-textarea" id="propLevels">${(field.levels || []).join('\n')}</textarea>
+                    </div>
+                </div>`;
+            }
+            
+            // Calculated formula
+            if (field.type === 'calculated') {
+                html += `
+                <div class="prop-section">
+                    <div class="prop-section-title">🔢 Calculation</div>
+                    <div class="property-group">
+                        <label class="property-label">Formula</label>
+                        <input type="text" class="property-input" id="propFormula" value="${escapeHtml(field.formula || '')}" placeholder="e.g., {field1} + {field2}">
+                    </div>
+                    <div style="font-size:9px;color:#868e96;margin-top:4px;">Use {fieldname} to reference other fields</div>
+                </div>`;
+            }
+            
+            // File accept
+            if (field.type === 'file') {
+                html += `
+                <div class="prop-section">
+                    <div class="prop-section-title">📎 File Options</div>
+                    <div class="property-group">
+                        <label class="property-label">Accepted File Types</label>
+                        <input type="text" class="property-input" id="propAccept" value="${escapeHtml(field.accept || '')}" placeholder=".pdf,.jpg,.png">
+                    </div>
+                </div>`;
+            }
+            
+            // VALIDATION SECTION
+            if (field.type !== 'section' && def?.validations) {
+                html += `
+                <div class="prop-section validation">
+                    <div class="prop-section-title" onclick="toggleSection(this)">
+                        <span class="toggle-icon">▼</span> ✓ Validation Rules
+                    </div>
+                    <div class="prop-section-content">
+                        <div class="property-group">
+                            <label class="property-checkbox">
+                                <input type="checkbox" id="propValidationEnabled" ${field.validation?.enabled ? 'checked' : ''}>
+                                <span>Enable Validation</span>
+                            </label>
+                        </div>
+                        <div id="validationRules" style="${field.validation?.enabled ? '' : 'display:none;'}">
+                            ${renderValidationRules(field, def.validations)}
+                        </div>
+                    </div>
+                </div>`;
+            }
+            
+            // SKIP LOGIC SECTION
+            if (field.type !== 'section') {
+                html += `
+                <div class="prop-section skip-logic">
+                    <div class="prop-section-title" onclick="toggleSection(this)">
+                        <span class="toggle-icon">▼</span> 🔀 Skip Logic
+                    </div>
+                    <div class="prop-section-content">
+                        <div class="property-group">
+                            <label class="property-checkbox">
+                                <input type="checkbox" id="propSkipEnabled" ${field.skipLogic?.enabled ? 'checked' : ''}>
+                                <span>Enable Skip Logic</span>
+                            </label>
+                        </div>
+                        <div id="skipLogicConfig" style="${field.skipLogic?.enabled ? '' : 'display:none;'}">
+                            <div class="property-group">
+                                <label class="property-label">Action</label>
+                                <select class="property-select" id="propSkipAction">
+                                    <option value="show" ${field.skipLogic?.action === 'show' ? 'selected' : ''}>Show this field when...</option>
+                                    <option value="hide" ${field.skipLogic?.action === 'hide' ? 'selected' : ''}>Hide this field when...</option>
+                                    <option value="require" ${field.skipLogic?.action === 'require' ? 'selected' : ''}>Require this field when...</option>
+                                </select>
+                            </div>
+                            <div class="property-group">
+                                <label class="property-label">Match</label>
+                                <select class="property-select" id="propSkipLogic">
+                                    <option value="all" ${field.skipLogic?.logic === 'all' ? 'selected' : ''}>ALL conditions (AND)</option>
+                                    <option value="any" ${field.skipLogic?.logic === 'any' ? 'selected' : ''}>ANY condition (OR)</option>
+                                </select>
+                            </div>
+                            <div id="skipConditions">
+                                ${renderSkipConditions(field)}
+                            </div>
+                            <button class="table-action-btn" onclick="addSkipCondition()" style="margin-top:8px;">➕ Add Condition</button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            
+            // CONDITIONAL/IF STATEMENTS
+            if (field.type !== 'section') {
+                html += `
+                <div class="prop-section conditional">
+                    <div class="prop-section-title" onclick="toggleSection(this)">
+                        <span class="toggle-icon">▼</span> 🔄 IF Statements
+                    </div>
+                    <div class="prop-section-content">
+                        <div class="property-group">
+                            <label class="property-checkbox">
+                                <input type="checkbox" id="propConditionalEnabled" ${field.conditional?.enabled ? 'checked' : ''}>
+                                <span>Enable Conditional Logic</span>
+                            </label>
+                        </div>
+                        <div id="conditionalConfig" style="${field.conditional?.enabled ? '' : 'display:none;'}">
+                            <div id="conditionalStatements">
+                                ${renderConditionalStatements(field)}
+                            </div>
+                            <button class="table-action-btn" onclick="addConditionalStatement()" style="margin-top:8px;">➕ Add IF Statement</button>
+                        </div>
+                    </div>
+                </div>`;
             }
             
             container.innerHTML = html;
             attachPropertyListeners(field);
         }
 
+        function renderValidationRules(field, availableRules) {
+            const rules = field.validation?.rules || {};
+            let html = '<div class="validation-grid">';
+            
+            const ruleLabels = {
+                required: 'Required',
+                minLength: 'Min Length',
+                maxLength: 'Max Length',
+                min: 'Min Value',
+                max: 'Max Value',
+                pattern: 'Pattern (Regex)',
+                noSpaces: 'No Spaces',
+                alphanumeric: 'Alphanumeric Only',
+                uppercase: 'Uppercase Only',
+                lowercase: 'Lowercase Only',
+                integer: 'Integer Only',
+                positive: 'Positive Only',
+                negative: 'Negative Only',
+                decimal: 'Allow Decimals',
+                minDate: 'Min Date',
+                maxDate: 'Max Date',
+                notFuture: 'Not Future',
+                notPast: 'Not Past',
+                weekdaysOnly: 'Weekdays Only',
+                minTime: 'Min Time',
+                maxTime: 'Max Time',
+                domain: 'Domain',
+                format: 'Format',
+                minSelect: 'Min Select',
+                maxSelect: 'Max Select',
+                minWords: 'Min Words',
+                maxWords: 'Max Words',
+                maxSize: 'Max Size (MB)',
+                fileTypes: 'File Types',
+                accuracy: 'GPS Accuracy (m)'
+            };
+            
+            const needsValue = ['minLength', 'maxLength', 'min', 'max', 'pattern', 'minDate', 'maxDate', 'minTime', 'maxTime', 'domain', 'format', 'minSelect', 'maxSelect', 'minWords', 'maxWords', 'maxSize', 'fileTypes', 'accuracy'];
+            
+            availableRules.forEach(rule => {
+                if (needsValue.includes(rule)) {
+                    html += `
+                    <div class="validation-item" style="grid-column: span 2;">
+                        <input type="checkbox" id="valRule_${rule}" ${rules[rule] !== undefined ? 'checked' : ''} onchange="updateValidationRule('${rule}', this.checked, document.getElementById('valValue_${rule}').value)">
+                        <span style="min-width:80px;">${ruleLabels[rule] || rule}</span>
+                        <input type="${rule.includes('Date') ? 'date' : rule.includes('Time') ? 'time' : 'text'}" id="valValue_${rule}" value="${rules[rule] || ''}" placeholder="Value" onchange="updateValidationRule('${rule}', document.getElementById('valRule_${rule}').checked, this.value)">
+                    </div>`;
+                } else {
+                    html += `
+                    <div class="validation-item">
+                        <input type="checkbox" id="valRule_${rule}" ${rules[rule] ? 'checked' : ''} onchange="updateValidationRule('${rule}', this.checked)">
+                        <span>${ruleLabels[rule] || rule}</span>
+                    </div>`;
+                }
+            });
+            
+            html += '</div>';
+            html += `
+            <div class="property-group" style="margin-top:10px;">
+                <label class="property-label">Custom Error Message</label>
+                <input type="text" class="property-input" id="propValidationMessage" value="${escapeHtml(field.validation?.customMessage || '')}" placeholder="Please enter a valid value">
+            </div>`;
+            
+            return html;
+        }
+
+        function renderSkipConditions(field) {
+            const conditions = field.skipLogic?.conditions || [{ field: '', operator: 'equals', value: '' }];
+            const otherFields = state.fields.filter(f => f.id !== field.id && f.type !== 'section');
+            
+            return conditions.map((cond, i) => `
+                <div class="prop-row" style="background:#fff;padding:8px;border-radius:4px;margin-bottom:6px;">
+                    <select class="property-select" onchange="updateSkipCondition(${i}, 'field', this.value)" style="flex:2;">
+                        <option value="">Select Field</option>
+                        ${otherFields.map(f => `<option value="${f.id}" ${cond.field === f.id ? 'selected' : ''}>${f.label}</option>`).join('')}
+                    </select>
+                    <select class="property-select" onchange="updateSkipCondition(${i}, 'operator', this.value)" style="flex:1;">
+                        <option value="equals" ${cond.operator === 'equals' ? 'selected' : ''}>=</option>
+                        <option value="not_equals" ${cond.operator === 'not_equals' ? 'selected' : ''}>≠</option>
+                        <option value="contains" ${cond.operator === 'contains' ? 'selected' : ''}>contains</option>
+                        <option value="not_contains" ${cond.operator === 'not_contains' ? 'selected' : ''}>!contains</option>
+                        <option value="greater" ${cond.operator === 'greater' ? 'selected' : ''}>></option>
+                        <option value="less" ${cond.operator === 'less' ? 'selected' : ''}><</option>
+                        <option value="empty" ${cond.operator === 'empty' ? 'selected' : ''}>empty</option>
+                        <option value="not_empty" ${cond.operator === 'not_empty' ? 'selected' : ''}>!empty</option>
+                    </select>
+                    <input type="text" class="property-input" value="${escapeHtml(cond.value)}" placeholder="Value" onchange="updateSkipCondition(${i}, 'value', this.value)" style="flex:2;">
+                    ${conditions.length > 1 ? `<button class="table-action-btn remove" onclick="removeSkipCondition(${i})" style="padding:4px 8px;">✕</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderConditionalStatements(field) {
+            const statements = field.conditional?.statements || [{ if: '', operator: 'equals', value: '', then: '', result: '' }];
+            const otherFields = state.fields.filter(f => f.id !== field.id && f.type !== 'section');
+            
+            return statements.map((stmt, i) => `
+                <div style="background:#fff;padding:10px;border-radius:6px;margin-bottom:8px;border:1px solid #e9ecef;">
+                    <div style="font-size:10px;font-weight:700;color:#6f42c1;margin-bottom:6px;">IF Statement ${i + 1}</div>
+                    <div class="prop-row">
+                        <span style="font-weight:700;">IF</span>
+                        <select class="property-select" onchange="updateConditional(${i}, 'if', this.value)">
+                            <option value="">Select Field</option>
+                            ${otherFields.map(f => `<option value="${f.id}" ${stmt.if === f.id ? 'selected' : ''}>${f.label}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="prop-row">
+                        <select class="property-select" onchange="updateConditional(${i}, 'operator', this.value)">
+                            <option value="equals" ${stmt.operator === 'equals' ? 'selected' : ''}>equals</option>
+                            <option value="not_equals" ${stmt.operator === 'not_equals' ? 'selected' : ''}>not equals</option>
+                            <option value="contains" ${stmt.operator === 'contains' ? 'selected' : ''}>contains</option>
+                            <option value="greater" ${stmt.operator === 'greater' ? 'selected' : ''}>greater than</option>
+                            <option value="less" ${stmt.operator === 'less' ? 'selected' : ''}>less than</option>
+                        </select>
+                        <input type="text" class="property-input" value="${escapeHtml(stmt.value)}" placeholder="Value" onchange="updateConditional(${i}, 'value', this.value)">
+                    </div>
+                    <div class="prop-row">
+                        <span style="font-weight:700;">THEN</span>
+                        <select class="property-select" onchange="updateConditional(${i}, 'then', this.value)">
+                            <option value="setValue" ${stmt.then === 'setValue' ? 'selected' : ''}>Set Value</option>
+                            <option value="showMessage" ${stmt.then === 'showMessage' ? 'selected' : ''}>Show Message</option>
+                            <option value="setRequired" ${stmt.then === 'setRequired' ? 'selected' : ''}>Make Required</option>
+                            <option value="setOptional" ${stmt.then === 'setOptional' ? 'selected' : ''}>Make Optional</option>
+                        </select>
+                        <input type="text" class="property-input" value="${escapeHtml(stmt.result)}" placeholder="Result" onchange="updateConditional(${i}, 'result', this.value)">
+                    </div>
+                    ${statements.length > 1 ? `<button class="table-action-btn remove" onclick="removeConditional(${i})" style="margin-top:6px;">🗑️ Remove</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function toggleSection(el) {
+            el.classList.toggle('collapsed');
+            const content = el.nextElementSibling;
+            content.classList.toggle('hidden');
+        }
+
         function attachPropertyListeners(field) {
+            // Basic
             document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
             document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
+            document.getElementById('propPlaceholder')?.addEventListener('change', (e) => updateField('placeholder', e.target.value));
+            document.getElementById('propHelpText')?.addEventListener('change', (e) => updateField('helpText', e.target.value));
             document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
+            
+            // Options
             document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
+            
+            // Table
+            document.getElementById('propRows')?.addEventListener('change', (e) => updateField('rows', parseInt(e.target.value) || 3));
+            document.getElementById('propMinRows')?.addEventListener('change', (e) => updateField('minRows', parseInt(e.target.value) || 1));
+            document.getElementById('propMaxRows')?.addEventListener('change', (e) => updateField('maxRows', parseInt(e.target.value) || 20));
+            
+            // Rating
+            document.getElementById('propMax')?.addEventListener('change', (e) => updateField('max', parseInt(e.target.value) || 5));
+            
+            // Cascading
+            document.getElementById('propLevels')?.addEventListener('change', (e) => updateField('levels', e.target.value.split('\n').filter(l => l.trim())));
+            
+            // Calculated
+            document.getElementById('propFormula')?.addEventListener('change', (e) => updateField('formula', e.target.value));
+            
+            // File
+            document.getElementById('propAccept')?.addEventListener('change', (e) => updateField('accept', e.target.value));
+            
+            // Validation
+            document.getElementById('propValidationEnabled')?.addEventListener('change', (e) => {
+                updateField('validation.enabled', e.target.checked);
+                document.getElementById('validationRules').style.display = e.target.checked ? '' : 'none';
+            });
+            document.getElementById('propValidationMessage')?.addEventListener('change', (e) => updateField('validation.customMessage', e.target.value));
+            
+            // Skip Logic
+            document.getElementById('propSkipEnabled')?.addEventListener('change', (e) => {
+                updateField('skipLogic.enabled', e.target.checked);
+                document.getElementById('skipLogicConfig').style.display = e.target.checked ? '' : 'none';
+            });
+            document.getElementById('propSkipAction')?.addEventListener('change', (e) => updateField('skipLogic.action', e.target.value));
+            document.getElementById('propSkipLogic')?.addEventListener('change', (e) => updateField('skipLogic.logic', e.target.value));
+            
+            // Conditional
+            document.getElementById('propConditionalEnabled')?.addEventListener('change', (e) => {
+                updateField('conditional.enabled', e.target.checked);
+                document.getElementById('conditionalConfig').style.display = e.target.checked ? '' : 'none';
+            });
         }
+
+        // Skip Logic functions
+        window.updateSkipCondition = function(index, prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field && field.skipLogic?.conditions) {
+                field.skipLogic.conditions[index][prop] = value;
+                saveToStorage();
+            }
+        };
+
+        window.addSkipCondition = function() {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field) {
+                if (!field.skipLogic.conditions) field.skipLogic.conditions = [];
+                field.skipLogic.conditions.push({ field: '', operator: 'equals', value: '' });
+                saveToStorage();
+                renderProperties();
+            }
+        };
+
+        window.removeSkipCondition = function(index) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field && field.skipLogic?.conditions?.length > 1) {
+                field.skipLogic.conditions.splice(index, 1);
+                saveToStorage();
+                renderProperties();
+            }
+        };
+
+        // Conditional functions
+        window.updateConditional = function(index, prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field && field.conditional?.statements) {
+                field.conditional.statements[index][prop] = value;
+                saveToStorage();
+            }
+        };
+
+        window.addConditionalStatement = function() {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field) {
+                if (!field.conditional.statements) field.conditional.statements = [];
+                field.conditional.statements.push({ if: '', operator: 'equals', value: '', then: '', result: '' });
+                saveToStorage();
+                renderProperties();
+            }
+        };
+
+        window.removeConditional = function(index) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field && field.conditional?.statements?.length > 1) {
+                field.conditional.statements.splice(index, 1);
+                saveToStorage();
+                renderProperties();
+            }
+        };
+
+        // Validation rule update
+        window.updateValidationRule = function(rule, enabled, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field) {
+                if (!field.validation.rules) field.validation.rules = {};
+                if (enabled) {
+                    field.validation.rules[rule] = value !== undefined ? value : true;
+                } else {
+                    delete field.validation.rules[rule];
+                }
+                saveToStorage();
+            }
+        };
+
+        // ============================================
+        // TABLE CONFIGURATION
+        // ============================================
+        window.openTableConfig = function(fieldId) {
+            state.editingTableFieldId = fieldId;
+            const field = state.fields.find(f => f.id === fieldId);
+            if (!field) return;
+            
+            renderTableColumnsConfig(field);
+            document.getElementById('tableConfigModal').classList.add('show');
+        };
+
+        function renderTableColumnsConfig(field) {
+            const container = document.getElementById('tableColumnsConfig');
+            const colTypes = [
+                { value: 'text', label: 'Text' },
+                { value: 'number', label: 'Number' },
+                { value: 'date', label: 'Date' },
+                { value: 'select', label: 'Dropdown' },
+                { value: 'checkbox', label: 'Checkbox' }
+            ];
+            
+            container.innerHTML = field.columns.map((col, i) => `
+                <div class="column-config">
+                    <div class="column-config-header">
+                        <span class="column-config-title">Column ${i + 1}</span>
+                        ${field.columns.length > 1 ? `<button class="table-action-btn remove" onclick="removeTableColumn(${i})">🗑️ Remove</button>` : ''}
+                    </div>
+                    <div class="column-config-grid">
+                        <div class="property-group">
+                            <label class="property-label">Name</label>
+                            <input type="text" class="property-input" value="${escapeHtml(col.name)}" onchange="updateTableColumn(${i}, 'name', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label class="property-label">Type</label>
+                            <select class="property-select" onchange="updateTableColumn(${i}, 'type', this.value)">
+                                ${colTypes.map(t => `<option value="${t.value}" ${col.type === t.value ? 'selected' : ''}>${t.label}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="property-group">
+                            <label class="property-label">Width</label>
+                            <input type="text" class="property-input" value="${col.width || 'auto'}" placeholder="auto, 100px, 20%" onchange="updateTableColumn(${i}, 'width', this.value)">
+                        </div>
+                    </div>
+                    ${col.type === 'select' ? `
+                    <div class="property-group" style="margin-top:8px;">
+                        <label class="property-label">Options (comma separated)</label>
+                        <input type="text" class="property-input" value="${(col.options || []).join(', ')}" onchange="updateTableColumn(${i}, 'options', this.value.split(',').map(s=>s.trim()).filter(s=>s))">
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.updateTableColumn = function(index, prop, value) {
+            const field = state.fields.find(f => f.id === state.editingTableFieldId);
+            if (field && field.columns[index]) {
+                field.columns[index][prop] = value;
+                renderTableColumnsConfig(field);
+                saveToStorage();
+            }
+        };
+
+        window.addTableColumn = function() {
+            const field = state.fields.find(f => f.id === state.editingTableFieldId);
+            if (field) {
+                field.columns.push({ name: `Column ${field.columns.length + 1}`, type: 'text', width: 'auto' });
+                renderTableColumnsConfig(field);
+                saveToStorage();
+            }
+        };
+
+        window.removeTableColumn = function(index) {
+            const field = state.fields.find(f => f.id === state.editingTableFieldId);
+            if (field && field.columns.length > 1) {
+                field.columns.splice(index, 1);
+                renderTableColumnsConfig(field);
+                saveToStorage();
+            }
+        };
+
+        window.saveTableConfig = function() {
+            closeModal('tableConfigModal');
+            renderFields();
+            renderProperties();
+            notify('✅ Table configuration saved!');
+        };
 
         // ============================================
         // SETTINGS
@@ -1123,8 +1593,8 @@
             document.getElementById('settingsOrg').value = state.settings.organization;
             document.getElementById('settingsLogo').value = state.settings.logo;
             document.getElementById('settingsMultiPage').checked = state.settings.multiPage;
-            document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl;
-            document.getElementById('cascadingData').value = state.settings.cascadingData;
+            document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl || '';
+            document.getElementById('cascadingData').value = state.settings.cascadingData || '';
             document.getElementById('settingsModal').classList.add('show');
         }
 
@@ -1143,92 +1613,33 @@
             
             saveToStorage();
             closeModal('settingsModal');
-            notify('Settings saved!');
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    const lines = [];
-                    json.forEach(row => {
-                        const reg = row.Region || row.region || '';
-                        const dis = row.District || row.district || '';
-                        const chi = row.Chiefdom || row.chiefdom || '';
-                        const fac = row.Facility || row.facility || '';
-                        const uid = row.UID || row.uid || '';
-                        if (reg && dis) lines.push(`${reg}||${dis}`);
-                        if (dis && chi) lines.push(`${dis}||${chi}`);
-                        if (chi && fac) lines.push(uid ? `${chi}||${fac}||${uid}` : `${chi}||${fac}`);
-                    });
-                    document.getElementById('cascadingData').value = [...new Set(lines)].join('\n');
-                    document.getElementById('fileUploadArea').classList.add('has-file');
-                    document.getElementById('fileUploadText').textContent = `✅ Loaded ${json.length} rows`;
-                    notify('File loaded successfully!');
-                } catch (err) { notify('Error reading file: ' + err.message, 'error'); }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function downloadSampleFile() {
-            const data = [
-                { Region: 'Eastern Region', District: 'Kailahun District', Chiefdom: 'Luawa Chiefdom', Facility: 'Kailahun Hospital', UID: 'abc123' },
-                { Region: 'Southern Region', District: 'Bo District', Chiefdom: 'Badjia Chiefdom', Facility: 'Ngelehun CHC', UID: 'def456' }
-            ];
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Locations');
-            XLSX.writeFile(wb, 'cascading-template.xlsx');
-            notify('Template downloaded!');
+            notify('✅ Settings saved!');
         }
 
         // ============================================
-        // PREVIEW
+        // PREVIEW & GENERATE
         // ============================================
         function previewForm() {
             if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
             const html = generateHTMLCode();
-            const previewBody = document.getElementById('previewBody');
-            previewBody.innerHTML = '<iframe class="preview-frame"></iframe>';
-            const iframe = previewBody.querySelector('iframe');
-            const doc = iframe.contentDocument;
-            doc.open();
-            doc.write(html);
-            doc.close();
-            document.getElementById('previewModal').classList.add('show');
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
         }
 
-        // ============================================
-        // GENERATE FORM
-        // ============================================
         function generateForm() {
             if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
-            const htmlCode = generateHTMLCode();
-            const scriptCode = generateAppsScriptCode();
-            document.getElementById('htmlCode').textContent = htmlCode;
-            document.getElementById('scriptCode').textContent = scriptCode;
+            document.getElementById('htmlCode').textContent = generateHTMLCode();
+            document.getElementById('scriptCode').textContent = generateAppsScriptCode();
             document.getElementById('generateModal').classList.add('show');
         }
 
         function generateHTMLCode() {
             const s = state.settings;
-            const fields = state.fields;
-            
-            let fieldsHTML = '';
-            fields.forEach(f => {
-                if (f.type === 'section') {
-                    fieldsHTML += `<div class="section-header">${f.label.toUpperCase()}</div>`;
-                } else {
-                    fieldsHTML += generateFieldHTML(f);
-                }
-            });
-            
-            fieldsHTML += `<button type="submit" class="btn-submit">SUBMIT</button>`;
+            let fieldsHTML = state.fields.map(f => {
+                if (f.type === 'section') return `<div class="section-header">${f.label.toUpperCase()}</div>`;
+                return generateFieldHTML(f);
+            }).join('\n');
             
             return `<!DOCTYPE html>
 <html lang="en">
@@ -1240,29 +1651,26 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Oswald',sans-serif;background:#f5f5f5;padding:20px}
-        .container{max-width:650px;margin:0 auto}
-        .header{background:#004080;color:#fff;padding:20px;text-align:center;border-radius:12px 12px 0 0}
-        .header img{width:70px;border-radius:8px;margin-bottom:10px}
-        .header h1{font-size:18px;margin-bottom:3px}
-        .header p{font-size:11px;opacity:0.9}
-        .form-card{border:4px double #004080;border-radius:12px;background:#fff}
-        .form-body{padding:20px}
-        .form-group{margin-bottom:16px}
-        .form-label{display:block;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase}
-        .required{color:red}
-        .form-input,.form-select,.form-textarea{width:100%;padding:10px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:12px}
+        .container{max-width:700px;margin:0 auto}
+        .form-card{border:4px double #004080;border-radius:12px;background:#fff;overflow:hidden}
+        .header{background:linear-gradient(135deg,#004080 0%,#002855 100%);color:#fff;padding:25px;text-align:center}
+        .header img{width:80px;border-radius:10px;margin-bottom:12px}
+        .header h1{font-size:22px;margin-bottom:5px}
+        .header p{font-size:12px;opacity:0.9}
+        .form-body{padding:25px}
+        .form-group{margin-bottom:20px}
+        .form-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase}
+        .required{color:#dc3545}
+        .form-input,.form-select,.form-textarea{width:100%;padding:12px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px}
         .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(0,64,128,0.2)}
-        .radio-group{display:flex;flex-wrap:wrap;gap:10px}
-        .radio-option{display:flex;align-items:center;gap:5px;padding:8px 12px;border:2px solid #ddd;border-radius:6px;cursor:pointer;font-size:11px}
-        .radio-option:hover{border-color:#004080}
-        .section-header{background:#004080;color:#fff;padding:12px 15px;margin:20px -20px;font-size:13px;font-weight:700}
-        .btn-submit{width:100%;padding:14px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase}
+        .radio-group,.checkbox-group{display:flex;flex-wrap:wrap;gap:10px}
+        .radio-option,.checkbox-option{display:flex;align-items:center;gap:6px;padding:10px 14px;border:2px solid #dee2e6;border-radius:6px;cursor:pointer;font-size:12px;transition:all 0.2s}
+        .radio-option:hover,.checkbox-option:hover{border-color:#004080}
+        .section-header{background:#004080;color:#fff;padding:14px 18px;margin:25px -25px;font-size:14px;font-weight:700}
+        .btn-submit{width:100%;padding:16px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-transform:uppercase;margin-top:10px}
         .btn-submit:hover{background:#218838}
-        .footer{text-align:center;padding:15px;font-size:10px;color:#666;margin-top:15px}
-        .notification{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:6px;color:#fff;font-weight:700;font-size:12px;z-index:1000;display:none}
-        .notification.show{display:block}
-        .notification.success{background:#28a745}
-        .notification.error{background:#dc3545}
+        .help-text{font-size:10px;color:#868e96;margin-top:4px}
+        .footer{text-align:center;padding:20px;font-size:11px;color:#868e96}
     </style>
 </head>
 <body>
@@ -1276,12 +1684,12 @@
             <div class="form-body">
                 <form id="dataForm">
 ${fieldsHTML}
+                    <button type="submit" class="btn-submit">✅ SUBMIT</button>
                 </form>
             </div>
         </div>
         <div class="footer">© 2025 ${s.organization}</div>
     </div>
-    <div class="notification" id="notification"></div>
     <script>
         document.getElementById('dataForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1289,15 +1697,9 @@ ${fieldsHTML}
             new FormData(this).forEach((v, k) => data[k] = v);
             data._timestamp = new Date().toISOString();
             console.log('Form data:', data);
-            showNotification('Submitted successfully!', 'success');
+            alert('✅ Form submitted successfully!');
             this.reset();
         });
-        function showNotification(msg, type) {
-            const n = document.getElementById('notification');
-            n.textContent = msg;
-            n.className = 'notification show ' + type;
-            setTimeout(() => n.classList.remove('show'), 3000);
-        }
     <\/script>
 </body>
 </html>`;
@@ -1306,58 +1708,89 @@ ${fieldsHTML}
         function generateFieldHTML(field) {
             const req = field.required ? '<span class="required">*</span>' : '';
             const reqAttr = field.required ? 'required' : '';
+            const help = field.helpText ? `<div class="help-text">${escapeHtml(field.helpText)}</div>` : '';
             let inner = '';
+            
             switch (field.type) {
-                case 'text': inner = `<input type="text" class="form-input" name="${field.name}" ${reqAttr}>`; break;
-                case 'email': inner = `<input type="email" class="form-input" name="${field.name}" ${reqAttr}>`; break;
-                case 'phone': inner = `<input type="tel" class="form-input" name="${field.name}" ${reqAttr}>`; break;
-                case 'number': inner = `<input type="number" class="form-input" name="${field.name}" ${reqAttr}>`; break;
+                case 'text': inner = `<input type="text" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
+                case 'email': inner = `<input type="email" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
+                case 'phone': inner = `<input type="tel" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
+                case 'number': inner = `<input type="number" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
                 case 'date': inner = `<input type="date" class="form-input" name="${field.name}" ${reqAttr}>`; break;
                 case 'time': inner = `<input type="time" class="form-input" name="${field.name}" ${reqAttr}>`; break;
-                case 'textarea': inner = `<textarea class="form-textarea" name="${field.name}" rows="3" ${reqAttr}></textarea>`; break;
-                case 'select': inner = `<select class="form-select" name="${field.name}" ${reqAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
-                case 'radio': inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
-                case 'yesno': inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label></div>`; break;
-                case 'yesnona': inner = `<div class="radio-group"><label class="radio-option"><input type="radio" name="${field.name}" value="Yes" ${reqAttr}><span>Yes</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="No" ${reqAttr}><span>No</span></label><label class="radio-option"><input type="radio" name="${field.name}" value="N/A" ${reqAttr}><span>N/A</span></label></div>`; break;
-                case 'checkbox': inner = `<div class="radio-group">${(field.options || []).map(o => `<label class="radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                case 'textarea': inner = `<textarea class="form-textarea" name="${field.name}" rows="4" placeholder="${field.placeholder || ''}" ${reqAttr}></textarea>`; break;
+                case 'select': 
+                    inner = `<select class="form-select" name="${field.name}" ${reqAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; 
+                    break;
+                case 'radio': case 'yesno': case 'yesnona':
+                    const opts = field.type === 'yesno' ? ['Yes', 'No'] : field.type === 'yesnona' ? ['Yes', 'No', 'N/A'] : (field.options || []);
+                    inner = `<div class="radio-group">${opts.map(o => `<label class="radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; 
+                    break;
+                case 'checkbox':
+                    inner = `<div class="checkbox-group">${(field.options || []).map(o => `<label class="checkbox-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; 
+                    break;
                 default: return '';
             }
-            return `                        <div class="form-group"><label class="form-label">${escapeHtml(field.label)} ${req}</label>${inner}</div>\n`;
+            
+            return `                    <div class="form-group"><label class="form-label">${escapeHtml(field.label)} ${req}</label>${inner}${help}</div>`;
         }
 
         function generateAppsScriptCode() {
-            return `// Apps Script for ${state.settings.title}
+            return `// Google Apps Script for ${state.settings.title}
+// Deploy as Web App with "Anyone" access
+
 function doPost(e) {
-    const data = JSON.parse(e.postData.contents);
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    sheet.appendRow(Object.values(data));
-    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
+    try {
+        const data = JSON.parse(e.postData.contents);
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        
+        // Get headers or create them
+        let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].filter(h => h);
+        if (headers.length === 0) {
+            headers = Object.keys(data);
+            sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        }
+        
+        // Add data row
+        const row = headers.map(h => data[h] || '');
+        sheet.appendRow(row);
+        
+        return ContentService.createTextOutput(JSON.stringify({success: true}))
+            .setMimeType(ContentService.MimeType.JSON);
+    } catch (error) {
+        return ContentService.createTextOutput(JSON.stringify({success: false, error: error.message}))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+function doGet(e) {
+    return ContentService.createTextOutput('Form submission endpoint ready.')
+        .setMimeType(ContentService.MimeType.TEXT);
 }`;
         }
 
         // ============================================
-        // SHARE - FIXED QR CODE GENERATION
+        // SHARE & QR CODE
         // ============================================
-        let currentShareUrl = '';
-
         function shareForm() {
             if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
             
             document.getElementById('shareFormTitle').textContent = state.settings.title;
             
-            // Simplified field mapping for smaller URL
+            // Simplified data for smaller URL
             const formData = {
-                id: 'form_' + Date.now(),
                 t: state.settings.title,
                 s: state.settings.subtitle,
                 o: state.settings.organization,
                 l: state.settings.logo,
                 f: state.fields.map(f => {
                     const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
-                    if (f.options && f.options.length) field.o = f.options;
-                    if (f.levels && f.levels.length) field.v = f.levels;
-                    if (f.columns && f.columns.length) field.c = f.columns;
-                    if (f.skipLogic && f.skipLogic.enabled) field.k = f.skipLogic;
+                    if (f.options?.length) field.o = f.options;
+                    if (f.levels?.length) field.v = f.levels;
+                    if (f.columns?.length) field.c = f.columns;
+                    if (f.skipLogic?.enabled) field.k = f.skipLogic;
+                    if (f.validation?.enabled) field.d = f.validation;
+                    if (f.conditional?.enabled) field.cn = f.conditional;
                     return field;
                 })
             };
@@ -1368,16 +1801,15 @@ function doPost(e) {
                 const encoded = btoa(String.fromCharCode.apply(null, compressed));
                 
                 const baseUrl = window.location.protocol === 'file:' 
-                    ? 'https://yourdomain.com/' + state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html'
+                    ? 'https://yourdomain.com/form.html'
                     : window.location.origin + window.location.pathname;
                 
                 currentShareUrl = baseUrl + '?c=' + encodeURIComponent(encoded);
                 document.getElementById('shareUrl').textContent = currentShareUrl;
                 
-                // Clear and generate QR code
+                // Generate QR code
                 const qrContainer = document.getElementById('qrCode');
                 qrContainer.innerHTML = '';
-                
                 new QRCode(qrContainer, {
                     text: currentShareUrl,
                     width: 200,
@@ -1395,12 +1827,12 @@ function doPost(e) {
         }
 
         function copyShareUrl() {
-            navigator.clipboard.writeText(currentShareUrl).then(() => notify('URL copied!'));
+            navigator.clipboard.writeText(currentShareUrl).then(() => notify('📋 URL copied!'));
         }
 
         function downloadQR() {
             const qrContainer = document.getElementById('qrCode');
-            let canvas = qrContainer.querySelector('canvas');
+            const canvas = qrContainer.querySelector('canvas');
             const img = qrContainer.querySelector('img');
             
             if (!canvas && !img) { notify('No QR code to download', 'error'); return; }
@@ -1444,7 +1876,7 @@ function doPost(e) {
                 link.download = state.settings.title.replace(/[^a-z0-9]/gi, '-') + '-QR.png';
                 link.href = newCanvas.toDataURL('image/png');
                 link.click();
-                notify('QR Code downloaded!');
+                notify('⬇️ QR Code downloaded!');
             }
         }
 
@@ -1458,7 +1890,7 @@ function doPost(e) {
             a.href = URL.createObjectURL(blob);
             a.download = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
             a.click();
-            notify('HTML downloaded!');
+            notify('⬇️ HTML downloaded!');
         }
 
         function downloadScript() {
@@ -1468,13 +1900,13 @@ function doPost(e) {
             a.href = URL.createObjectURL(blob);
             a.download = 'apps-script.gs';
             a.click();
-            notify('Script downloaded!');
+            notify('⬇️ Script downloaded!');
         }
 
         function copyCode(id) {
             const code = document.getElementById(id).textContent;
             navigator.clipboard.writeText(code);
-            notify('Copied to clipboard!');
+            notify('📋 Code copied!');
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -1492,7 +1924,7 @@ function doPost(e) {
         }
 
         function saveToStorage() {
-            localStorage.setItem('formBuilderPro', JSON.stringify({
+            localStorage.setItem('formBuilderProEnhanced', JSON.stringify({
                 fields: state.fields,
                 settings: state.settings,
                 fieldCounter: state.fieldCounter
@@ -1500,7 +1932,7 @@ function doPost(e) {
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('formBuilderPro');
+            const saved = localStorage.getItem('formBuilderProEnhanced');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
