@@ -223,6 +223,52 @@
         .toggle-switch input:checked + .toggle-slider { background: #28a745; }
         .toggle-switch input:checked + .toggle-slider::after { left: 24px; }
         
+        /* Viewer Container */
+        .viewer-container { display: none; min-height: 100vh; background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%); }
+        .viewer-container.show { display: block; }
+        .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-decoration: none; text-transform: uppercase; transition: all 0.2s; cursor: pointer; border: none; }
+        .viewer-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        .viewer-nav-btn.active { box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
+        .viewer-tab { display: none; padding: 20px; }
+        .viewer-tab.active { display: block; }
+        .viewer-form { max-width: 650px; margin: 0 auto; }
+        .viewer-form-box { background: white; border: 4px double #004080; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,64,128,0.15); }
+        .viewer-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 25px; text-align: center; }
+        .viewer-header img { width: 70px; border-radius: 10px; margin-bottom: 10px; border: 2px solid rgba(255,255,255,0.3); }
+        .viewer-header h1 { font-size: 20px; margin-bottom: 5px; }
+        .viewer-header p { font-size: 12px; opacity: 0.9; }
+        .viewer-body { padding: 25px; }
+        .viewer-field { margin-bottom: 18px; }
+        .viewer-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; color: #333; }
+        .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; transition: all 0.2s; }
+        .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
+        .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .viewer-radio-option:hover { border-color: #004080; background: #f8f9fa; }
+        .viewer-section { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 14px 18px; margin: 20px -25px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+        .viewer-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 15px; transition: all 0.2s; }
+        .viewer-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(40,167,69,0.4); }
+        .viewer-draft-btn { width: 100%; padding: 12px; background: #ffc107; color: #000; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .viewer-draft-btn:hover { background: #e0a800; }
+        .viewer-back-btn { position: fixed; top: 15px; left: 20px; background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; z-index: 200; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
+        .viewer-back-btn:hover { background: #c82333; transform: translateY(-2px); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
+        .data-table th, .data-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
+        .data-table th { background: #004080; color: white; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+        .data-table tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tr:hover { background: #e8f4fc; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-card .stat-value { font-size: 32px; font-weight: 700; }
+        .stat-card .stat-label { font-size: 11px; opacity: 0.9; text-transform: uppercase; margin-top: 5px; }
+        .draft-item { background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .draft-item:hover { border-color: #ffc107; }
+        .gps-container { text-align: center; }
+        .gps-status { font-size: 11px; color: #28a745; margin-top: 6px; }
+        .sig-container { text-align: center; }
+        .sig-canvas { display: block; margin: 0 auto; cursor: crosshair; }
+
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
@@ -230,6 +276,8 @@
             .settings-group.full-width { grid-column: span 1; }
             .header { flex-wrap: wrap; padding: 10px 15px; }
             .header h1 { font-size: 16px; }
+            .viewer-nav { padding: 10px; }
+            .viewer-nav-btn { padding: 8px 12px; font-size: 10px; }
         }
     </style>
 </head>
@@ -381,6 +429,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Viewer Container -->
+    <div class="viewer-container" id="viewerContainer"></div>
 
     <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | Form Builder Pro</footer>
 
@@ -1617,23 +1668,33 @@
         }
 
         // ============================================
-        // PREVIEW - OPENS IN NEW WINDOW (OLD FORMAT)
+        // PREVIEW - OPENS WITHIN PAGE
         // ============================================
         function previewForm() {
             if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
-            const html = generatePreviewHTML();
-            const win = window.open('', '_blank');
-            win.document.write(html);
-            win.document.close();
+            
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.footer').style.display = 'none';
+            document.getElementById('viewerContainer').classList.add('show');
+            
+            renderFormViewer();
         }
         
-        function generatePreviewHTML() {
+        function closeViewer() {
+            document.getElementById('viewerContainer').classList.remove('show');
+            document.querySelector('.header').style.display = '';
+            document.getElementById('mainContainer').classList.add('show');
+            document.querySelector('.footer').style.display = '';
+        }
+        
+        function renderFormViewer() {
             const s = state.settings;
             
             let fieldsHtml = state.fields.map(field => {
                 if (field.type === 'section') return `<div class="viewer-section">📁 ${escapeHtml(field.label)}</div>`;
                 
-                const req = field.required ? '<span class="required">*</span>' : '';
+                const req = field.required ? '<span class="required" style="color:#dc3545;">*</span>' : '';
                 const reqAttr = field.required ? 'required' : '';
                 let input = '';
                 
@@ -1653,9 +1714,9 @@
                     case 'checkbox':
                         input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
                     case 'gps':
-                        input = `<div class="gps-container"><input type="hidden" name="${field.name}_lat" class="gps-lat"><input type="hidden" name="${field.name}_lng" class="gps-lng"><button type="button" class="viewer-draft-btn" onclick="captureGPS(this)">📍 Capture GPS</button><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`; break;
+                        input = `<div class="gps-container"><button type="button" class="viewer-draft-btn" onclick="captureGPS(this)" style="width:auto;padding:10px 20px;">📍 Capture GPS</button><input type="hidden" name="${field.name}_lat"><input type="hidden" name="${field.name}_lng"><div class="gps-status"></div></div>`; break;
                     case 'signature':
-                        input = `<div class="sig-container"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:5px 10px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button></div>`; break;
+                        input = `<div class="sig-container"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button></div>`; break;
                     case 'rating':
                         input = `<div class="rating-container">${Array(field.max || 5).fill().map((_, i) => `<span class="rating-star" onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`; break;
                     case 'file':
@@ -1663,293 +1724,285 @@
                     default: input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
                 }
                 
-                return `<div class="viewer-field" data-field-id="${field.id}" ${field.skipLogic?.enabled ? `data-skip='${JSON.stringify(field.skipLogic)}'` : ''}><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
+                return `<div class="viewer-field" data-field-id="${field.id}"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
             }).join('');
             
-            return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${escapeHtml(s.title)} - Preview</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Oswald',sans-serif;background:linear-gradient(135deg,#e9ecef 0%,#dee2e6 100%);min-height:100vh}
-        .viewer-nav{background:linear-gradient(135deg,#004080 0%,#002855 100%);padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
-        .viewer-nav-btn{padding:10px 18px;border-radius:6px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;text-decoration:none;text-transform:uppercase;transition:all 0.2s;cursor:pointer;border:none}
-        .viewer-nav-btn:hover{transform:translateY(-2px);box-shadow:0 3px 10px rgba(0,0,0,0.2)}
-        .viewer-nav-btn.active{box-shadow:inset 0 2px 5px rgba(0,0,0,0.3)}
-        .viewer-tab{display:none;padding:20px}
-        .viewer-tab.active{display:block}
-        .viewer-form{max-width:650px;margin:0 auto}
-        .viewer-form-box{background:white;border:4px double #004080;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,64,128,0.15)}
-        .viewer-header{background:linear-gradient(135deg,#004080 0%,#002855 100%);color:white;padding:25px;text-align:center}
-        .viewer-header img{width:70px;border-radius:10px;margin-bottom:10px;border:2px solid rgba(255,255,255,0.3)}
-        .viewer-header h1{font-size:20px;margin-bottom:5px}
-        .viewer-header p{font-size:12px;opacity:0.9}
-        .viewer-body{padding:25px}
-        .viewer-field{margin-bottom:18px}
-        .viewer-field-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase;color:#333}
-        .required{color:#dc3545}
-        .viewer-input{width:100%;padding:12px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px;transition:all 0.2s}
-        .viewer-input:focus{outline:none;box-shadow:0 0 0 3px rgba(0,64,128,0.2)}
-        .viewer-radio-group{display:flex;flex-wrap:wrap;gap:10px}
-        .viewer-radio-option{display:flex;align-items:center;gap:6px;padding:10px 14px;border:2px solid #dee2e6;border-radius:6px;cursor:pointer;font-size:12px;transition:all 0.2s}
-        .viewer-radio-option:hover{border-color:#004080;background:#f8f9fa}
-        .viewer-section{background:linear-gradient(135deg,#004080 0%,#002855 100%);color:white;padding:14px 18px;margin:20px -25px;font-size:13px;font-weight:700;text-transform:uppercase}
-        .viewer-submit{width:100%;padding:16px;background:linear-gradient(135deg,#28a745 0%,#218838 100%);color:white;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-transform:uppercase;margin-top:15px;transition:all 0.2s}
-        .viewer-submit:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(40,167,69,0.4)}
-        .viewer-draft-btn{width:100%;padding:12px;background:#ffc107;color:#000;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase;margin-top:10px}
-        .viewer-draft-btn:hover{background:#e0a800}
-        .data-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:15px}
-        .data-table th,.data-table td{border:1px solid #dee2e6;padding:10px;text-align:left}
-        .data-table th{background:#004080;color:white;font-weight:700;text-transform:uppercase;font-size:10px}
-        .data-table tr:nth-child(even){background:#f8f9fa}
-        .dashboard-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px}
-        .stat-card{background:linear-gradient(135deg,#004080 0%,#002855 100%);color:white;padding:20px;border-radius:10px;text-align:center}
-        .stat-card .stat-value{font-size:32px;font-weight:700}
-        .stat-card .stat-label{font-size:11px;opacity:0.9;text-transform:uppercase;margin-top:5px}
-        .gps-container{text-align:center}
-        .gps-status{color:#28a745}
-        .sig-container{text-align:center}
-        .draft-item{background:#f8f9fa;border:2px solid #dee2e6;border-radius:6px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-        .draft-item button{padding:6px 12px;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;margin-left:5px}
-    </style>
-</head>
-<body>
-    <div class="viewer-nav">
-        <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form')">📝 Form</button>
-        <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data')">📊 Data</button>
-        <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard')">📈 Dashboard</button>
-        <button class="viewer-nav-btn" style="background:#6c757d;color:#fff;" onclick="showTab('report')">📄 Report</button>
-        <button class="viewer-nav-btn" style="background:#ffc107;color:#000;" onclick="showTab('drafts')">💾 Drafts</button>
-    </div>
-    
-    <div id="tabForm" class="viewer-tab active">
-        <div class="viewer-form">
-            <div class="viewer-form-box">
-                <div class="viewer-header">
-                    <img src="${s.logo}" alt="Logo">
-                    <h1>${escapeHtml(s.title)}</h1>
-                    <p>${escapeHtml(s.subtitle)}</p>
+            document.getElementById('viewerContainer').innerHTML = `
+                <button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back to Builder</button>
+                
+                <div class="viewer-nav">
+                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showViewerTab('form',this)">📝 Form</button>
+                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showViewerTab('data',this)">📊 Data</button>
+                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard',this)">📈 Dashboard</button>
+                    <button class="viewer-nav-btn" style="background:#6c757d;color:#fff;" onclick="showViewerTab('report',this)">📄 Report</button>
+                    <button class="viewer-nav-btn" style="background:#ffc107;color:#000;" onclick="showViewerTab('drafts',this)">💾 Drafts</button>
                 </div>
-                <div class="viewer-body">
-                    <form id="viewerForm">
-                        ${fieldsHtml}
-                        <button type="button" class="viewer-draft-btn" onclick="saveDraft()">💾 Save Draft</button>
-                        <button type="submit" class="viewer-submit">✅ Submit</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="tabData" class="viewer-tab">
-        <div class="viewer-form">
-            <div class="viewer-form-box">
-                <div class="viewer-header" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);">
-                    <h1>📊 Submitted Data</h1>
-                    <p>${escapeHtml(s.title)}</p>
-                </div>
-                <div class="viewer-body" id="dataContainer">
-                    <p style="text-align:center;color:#868e96;">📭 No submissions yet</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="tabDashboard" class="viewer-tab">
-        <div class="viewer-form">
-            <div class="viewer-form-box">
-                <div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);">
-                    <h1>📈 Dashboard</h1>
-                    <p>${escapeHtml(s.title)}</p>
-                </div>
-                <div class="viewer-body" id="dashContainer">
-                    <div class="dashboard-stats" id="dashStats"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="tabReport" class="viewer-tab">
-        <div class="viewer-form">
-            <div class="viewer-form-box">
-                <div class="viewer-header" style="background:linear-gradient(135deg,#6c757d 0%,#5a6268 100%);">
-                    <h1>📄 Report</h1>
-                    <button onclick="window.print()" style="background:#fff;color:#6c757d;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:700;margin-top:10px;font-family:Oswald;">🖨️ Print Report</button>
-                </div>
-                <div class="viewer-body" id="reportContainer">
-                    <div style="text-align:center;margin-bottom:20px;">
-                        <img src="${s.logo}" style="width:60px;border-radius:8px;margin-bottom:10px;">
-                        <h2 style="color:#004080;">${escapeHtml(s.title)}</h2>
-                        <p style="color:#868e96;">Generated: <span id="reportDate"></span></p>
+                
+                <div id="tabForm" class="viewer-tab active">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header">
+                                <img src="${s.logo}" alt="Logo">
+                                <h1>${escapeHtml(s.title)}</h1>
+                                <p>${escapeHtml(s.subtitle)}</p>
+                            </div>
+                            <div class="viewer-body">
+                                <form id="viewerForm">
+                                    ${fieldsHtml}
+                                    <button type="button" class="viewer-draft-btn" onclick="saveDraft()">💾 Save Draft</button>
+                                    <button type="submit" class="viewer-submit">✅ Submit</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div id="reportContent"></div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="tabDrafts" class="viewer-tab">
-        <div class="viewer-form">
-            <div class="viewer-form-box">
-                <div class="viewer-header" style="background:linear-gradient(135deg,#ffc107 0%,#e0a800 100%);color:#000;">
-                    <h1>💾 Saved Drafts</h1>
-                    <p>${escapeHtml(s.title)}</p>
+                
+                <div id="tabData" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);">
+                                <h1>📊 Submitted Data</h1>
+                                <p>${escapeHtml(s.title)}</p>
+                            </div>
+                            <div class="viewer-body" id="dataContainer">
+                                <p style="text-align:center;color:#868e96;">📭 No submissions yet</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="viewer-body" id="draftsContainer">
-                    <p style="text-align:center;color:#868e96;">No drafts saved</p>
+                
+                <div id="tabDashboard" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);">
+                                <h1>📈 Dashboard</h1>
+                                <p>${escapeHtml(s.title)}</p>
+                            </div>
+                            <div class="viewer-body" id="dashboardContainer">
+                                <div class="dashboard-stats" id="dashboardStats"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const FORM_KEY = 'form_${s.title.replace(/[^a-z0-9]/gi, '_')}';
-        let submissions = JSON.parse(localStorage.getItem(FORM_KEY + '_data') || '[]');
-        let drafts = JSON.parse(localStorage.getItem(FORM_KEY + '_drafts') || '[]');
+                
+                <div id="tabReport" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#6c757d 0%,#5a6268 100%);">
+                                <h1>📄 Report</h1>
+                                <button onclick="window.print()" style="background:#fff;color:#6c757d;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:700;margin-top:10px;font-family:Oswald;">🖨️ Print</button>
+                            </div>
+                            <div class="viewer-body" id="reportContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabDrafts" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#ffc107 0%,#e0a800 100%);color:#000;">
+                                <h1>💾 Saved Drafts</h1>
+                                <p>${escapeHtml(s.title)}</p>
+                            </div>
+                            <div class="viewer-body" id="draftsContainer">
+                                <p style="text-align:center;color:#868e96;">No drafts saved</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Initialize signature pads
+            document.querySelectorAll('.sig-canvas').forEach(canvas => {
+                const ctx = canvas.getContext('2d');
+                let drawing = false;
+                ctx.strokeStyle = '#004080';
+                ctx.lineWidth = 2;
+                canvas.onmousedown = e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+                canvas.onmousemove = e => { if (drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+                canvas.onmouseup = () => { drawing = false; const dataInput = canvas.parentElement.querySelector('.sig-data'); if (dataInput) dataInput.value = canvas.toDataURL(); };
+                canvas.onmouseleave = () => drawing = false;
+                // Touch
+                canvas.ontouchstart = e => { e.preventDefault(); drawing = true; const t = e.touches[0]; const r = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(t.clientX - r.left, t.clientY - r.top); };
+                canvas.ontouchmove = e => { e.preventDefault(); if (drawing) { const t = e.touches[0]; const r = canvas.getBoundingClientRect(); ctx.lineTo(t.clientX - r.left, t.clientY - r.top); ctx.stroke(); } };
+                canvas.ontouchend = () => { drawing = false; const dataInput = canvas.parentElement.querySelector('.sig-data'); if (dataInput) dataInput.value = canvas.toDataURL(); };
+            });
+            
+            // Form submit
+            document.getElementById('viewerForm').onsubmit = function(e) {
+                e.preventDefault();
+                const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
+                new FormData(this).forEach((v, k) => data[k] = v);
+                const key = getStorageKey();
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                existing.push(data);
+                localStorage.setItem(key, JSON.stringify(existing));
+                this.reset();
+                notify('✅ Submitted successfully!');
+            };
+            
+            // Load initial data
+            loadViewerData();
+            loadViewerDashboard();
+            loadViewerReport();
+            loadViewerDrafts();
+        }
         
-        function showTab(tab) {
+        function showViewerTab(tab, btn) {
             document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-            event.target.classList.add('active');
+            if (btn) btn.classList.add('active');
             
-            if (tab === 'data') loadData();
-            if (tab === 'dashboard') loadDashboard();
-            if (tab === 'report') loadReport();
-            if (tab === 'drafts') loadDrafts();
+            if (tab === 'data') loadViewerData();
+            if (tab === 'dashboard') loadViewerDashboard();
+            if (tab === 'report') loadViewerReport();
+            if (tab === 'drafts') loadViewerDrafts();
         }
         
-        document.getElementById('viewerForm').onsubmit = function(e) {
-            e.preventDefault();
-            const data = {_id: Date.now(), _timestamp: new Date().toISOString()};
-            new FormData(this).forEach((v, k) => data[k] = v);
-            submissions.push(data);
-            localStorage.setItem(FORM_KEY + '_data', JSON.stringify(submissions));
-            alert('✅ Submitted successfully!');
-            this.reset();
-        };
+        function getStorageKey() { return 'formData_' + state.settings.title.replace(/\s+/g, '_'); }
         
-        function saveDraft() {
-            const data = {_id: Date.now(), _timestamp: new Date().toISOString()};
-            new FormData(document.getElementById('viewerForm')).forEach((v, k) => data[k] = v);
-            drafts.push(data);
-            localStorage.setItem(FORM_KEY + '_drafts', JSON.stringify(drafts));
-            alert('💾 Draft saved!');
-        }
-        
-        function loadData() {
+        function loadViewerData() {
+            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
             const container = document.getElementById('dataContainer');
-            if (submissions.length === 0) {
+            if (!container) return;
+            
+            if (data.length === 0) {
                 container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">📭 No submissions yet</p>';
                 return;
             }
-            const keys = Object.keys(submissions[0]).filter(k => !k.startsWith('_'));
-            let html = '<div style="overflow-x:auto;"><table class="data-table"><tr><th>#</th><th>Timestamp</th>' + keys.slice(0,5).map(k => '<th>'+k+'</th>').join('') + '</tr>';
-            submissions.forEach((row, i) => {
-                html += '<tr><td>'+(i+1)+'</td><td>'+new Date(row._timestamp).toLocaleString()+'</td>' + keys.slice(0,5).map(k => '<td>'+(row[k]||'-')+'</td>').join('') + '</tr>';
+            
+            const fields = state.fields.filter(f => f.type !== 'section');
+            let html = `<p style="margin-bottom:15px;font-weight:600;">📊 ${data.length} submission(s)</p>`;
+            html += `<div style="overflow-x:auto;"><table class="data-table"><tr><th>#</th><th>Time</th>${fields.slice(0,5).map(f => `<th>${escapeHtml(f.label)}</th>`).join('')}</tr>`;
+            data.forEach((row, i) => {
+                html += `<tr><td>${i+1}</td><td>${new Date(row._timestamp).toLocaleString()}</td>${fields.slice(0,5).map(f => `<td>${row[f.name] || '-'}</td>`).join('')}</tr>`;
             });
-            html += '</table></div>';
-            container.innerHTML = '<p style="margin-bottom:15px;font-weight:600;">📊 ' + submissions.length + ' submission(s)</p>' + html;
+            html += `</table></div>`;
+            container.innerHTML = html;
         }
         
-        function loadDashboard() {
-            const today = submissions.filter(s => new Date(s._timestamp).toDateString() === new Date().toDateString()).length;
-            document.getElementById('dashStats').innerHTML = 
-                '<div class="stat-card"><div class="stat-value">'+submissions.length+'</div><div class="stat-label">Total Submissions</div></div>' +
-                '<div class="stat-card" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><div class="stat-value">'+today+'</div><div class="stat-label">Today</div></div>' +
-                '<div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">'+drafts.length+'</div><div class="stat-label">Drafts</div></div>';
+        function loadViewerDashboard() {
+            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+            const container = document.getElementById('dashboardStats');
+            if (!container) return;
+            
+            const today = data.filter(d => new Date(d._timestamp).toDateString() === new Date().toDateString()).length;
+            container.innerHTML = `
+                <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Total</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><div class="stat-value">${today}</div><div class="stat-label">Today</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">${state.fields.length}</div><div class="stat-label">Fields</div></div>
+            `;
         }
         
-        function loadReport() {
-            document.getElementById('reportDate').textContent = new Date().toLocaleString();
-            document.getElementById('reportContent').innerHTML = 
-                '<div style="background:#f8f9fa;padding:15px;border-radius:8px;"><h3 style="font-size:14px;margin-bottom:10px;">📊 Summary</h3>' +
-                '<p>Total Submissions: <strong>'+submissions.length+'</strong></p>' +
-                '<p>Saved Drafts: <strong>'+drafts.length+'</strong></p></div>';
+        function loadViewerReport() {
+            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+            const container = document.getElementById('reportContainer');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div style="text-align:center;margin-bottom:20px;">
+                    <img src="${state.settings.logo}" style="width:60px;border-radius:8px;margin-bottom:10px;">
+                    <h2 style="color:#004080;">${escapeHtml(state.settings.title)}</h2>
+                    <p style="color:#868e96;">Generated: ${new Date().toLocaleString()}</p>
+                </div>
+                <div style="background:#f8f9fa;padding:15px;border-radius:8px;">
+                    <h3 style="font-size:14px;margin-bottom:10px;">📊 Summary</h3>
+                    <p>Total Submissions: <strong>${data.length}</strong></p>
+                    <p>Total Fields: <strong>${state.fields.length}</strong></p>
+                </div>
+            `;
         }
         
-        function loadDrafts() {
+        function loadViewerDrafts() {
+            const drafts = JSON.parse(localStorage.getItem(getStorageKey() + '_drafts') || '[]');
             const container = document.getElementById('draftsContainer');
+            if (!container) return;
+            
             if (drafts.length === 0) {
                 container.innerHTML = '<p style="text-align:center;color:#868e96;">No drafts saved</p>';
                 return;
             }
-            container.innerHTML = drafts.map((d, i) => 
-                '<div class="draft-item"><div><strong>Draft '+(i+1)+'</strong><br><small style="color:#868e96;">'+new Date(d._timestamp).toLocaleString()+'</small></div>' +
-                '<div><button onclick="loadDraft('+i+')" style="background:#28a745;color:#fff;">Load</button>' +
-                '<button onclick="deleteDraft('+i+')" style="background:#dc3545;color:#fff;">Delete</button></div></div>'
-            ).join('');
+            
+            container.innerHTML = drafts.map((d, i) => `
+                <div class="draft-item">
+                    <div><strong>Draft ${i+1}</strong><br><small style="color:#868e96;">${new Date(d._timestamp).toLocaleString()}</small></div>
+                    <div>
+                        <button onclick="loadDraft(${i})" style="padding:6px 12px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;margin-right:5px;">Load</button>
+                        <button onclick="deleteDraft(${i})" style="padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Delete</button>
+                    </div>
+                </div>
+            `).join('');
         }
         
-        function loadDraft(i) {
-            const d = drafts[i];
+        function saveDraft() {
             const form = document.getElementById('viewerForm');
-            Object.keys(d).forEach(k => {
+            const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
+            new FormData(form).forEach((v, k) => data[k] = v);
+            const key = getStorageKey() + '_drafts';
+            const drafts = JSON.parse(localStorage.getItem(key) || '[]');
+            drafts.push(data);
+            localStorage.setItem(key, JSON.stringify(drafts));
+            notify('💾 Draft saved!');
+            loadViewerDrafts();
+        }
+        
+        window.loadDraft = function(i) {
+            const drafts = JSON.parse(localStorage.getItem(getStorageKey() + '_drafts') || '[]');
+            const draft = drafts[i];
+            if (!draft) return;
+            const form = document.getElementById('viewerForm');
+            Object.keys(draft).forEach(k => {
                 if (k.startsWith('_')) return;
-                const el = form.querySelector('[name="'+k+'"]');
-                if (el) el.value = d[k];
+                const el = form.querySelector(`[name="${k}"]`);
+                if (el) el.value = draft[k];
             });
-            showTab('form');
-        }
+            showViewerTab('form', document.querySelector('.viewer-nav-btn'));
+            notify('📂 Draft loaded!');
+        };
         
-        function deleteDraft(i) {
+        window.deleteDraft = function(i) {
             if (!confirm('Delete this draft?')) return;
+            const key = getStorageKey() + '_drafts';
+            const drafts = JSON.parse(localStorage.getItem(key) || '[]');
             drafts.splice(i, 1);
-            localStorage.setItem(FORM_KEY + '_drafts', JSON.stringify(drafts));
-            loadDrafts();
-        }
+            localStorage.setItem(key, JSON.stringify(drafts));
+            loadViewerDrafts();
+            notify('🗑️ Draft deleted');
+        };
         
-        // GPS
-        function captureGPS(btn) {
+        window.captureGPS = function(btn) {
             const container = btn.closest('.gps-container');
             const status = container.querySelector('.gps-status');
-            status.innerHTML = '📍 Getting location...';
+            status.textContent = '📍 Getting location...';
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
                         const lat = pos.coords.latitude.toFixed(6);
                         const lng = pos.coords.longitude.toFixed(6);
-                        container.querySelector('.gps-lat').value = lat;
-                        container.querySelector('.gps-lng').value = lng;
-                        status.innerHTML = '✅ ' + lat + ', ' + lng;
+                        container.querySelector('[name$="_lat"]').value = lat;
+                        container.querySelector('[name$="_lng"]').value = lng;
+                        status.textContent = '✅ ' + lat + ', ' + lng;
                     },
-                    err => status.innerHTML = '❌ ' + err.message
+                    err => { status.textContent = '❌ ' + err.message; }
                 );
-            } else status.innerHTML = '❌ Not supported';
-        }
+            } else { status.textContent = '❌ Not supported'; }
+        };
         
-        // Signature
-        document.querySelectorAll('.sig-canvas').forEach(canvas => {
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
-            ctx.strokeStyle = '#004080';
-            ctx.lineWidth = 2;
-            canvas.onmousedown = e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-            canvas.onmousemove = e => { if (drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
-            canvas.onmouseup = () => { drawing = false; canvas.nextElementSibling.value = canvas.toDataURL(); };
-            canvas.onmouseleave = () => drawing = false;
-        });
+        window.clearSig = function(btn) {
+            const canvas = btn.parentElement.querySelector('.sig-canvas');
+            if (canvas) {
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                const dataInput = btn.parentElement.querySelector('.sig-data');
+                if (dataInput) dataInput.value = '';
+            }
+        };
         
-        function clearSig(btn) {
-            const canvas = btn.closest('.sig-container').querySelector('.sig-canvas');
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-            canvas.nextElementSibling.value = '';
-        }
-        
-        // Rating
-        function setRating(star, val) {
+        window.setRating = function(star, val) {
             const container = star.parentElement;
             container.querySelectorAll('.rating-star').forEach((s, i) => s.style.opacity = i < val ? '1' : '0.3');
             container.querySelector('input').value = val;
-        }
-    <\/script>
-</body>
-</html>`;
-        }
+        };
 
         // ============================================
         // GENERATE FORM
