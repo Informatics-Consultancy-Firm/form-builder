@@ -249,6 +249,12 @@
         .viewer-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; color: #333; }
         .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; transition: all 0.2s; }
         .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
+        .viewer-input.error, .viewer-input:invalid:not(:placeholder-shown) { border-color: #dc3545 !important; background: #fff5f5 !important; }
+        .viewer-input.valid { border-color: #28a745 !important; background: #f8fff8 !important; }
+        .field-error-msg { color: #dc3545; font-size: 11px; margin-top: 6px; font-weight: 600; padding: 6px 10px; background: #fff5f5; border-radius: 4px; border-left: 3px solid #dc3545; animation: shake 0.3s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .viewer-field.has-error .viewer-field-label { color: #dc3545; }
+        .viewer-radio-group.has-error { border: 2px solid #dc3545; border-radius: 6px; padding: 8px; background: #fff5f5; }
         .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
         .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
         .viewer-radio-option:hover { border-color: #004080; background: #f8f9fa; }
@@ -334,7 +340,30 @@
                         <label class="auth-label">Password</label>
                         <input type="password" class="auth-input" id="loginPassword" required placeholder="Enter password">
                     </div>
-                    <button type="submit" class="auth-btn" id="loginBtn">Login</button>
+                    <button type="submit" class="auth-btn" id="loginBtn">🔓 Login</button>
+                    
+                    <!-- Google Sheets Config Toggle -->
+                    <div style="margin-top:15px;text-align:center;">
+                        <button type="button" onclick="toggleAuthConfig()" style="background:none;border:none;color:#004080;font-size:11px;cursor:pointer;text-decoration:underline;">
+                            ⚙️ Configure Google Sheets Connection
+                        </button>
+                    </div>
+                    <div id="authConfigPanel" style="display:none;margin-top:15px;padding:15px;background:#f8f9fa;border-radius:8px;border:1px solid #dee2e6;">
+                        <div class="auth-group" style="margin-bottom:10px;">
+                            <label class="auth-label" style="font-size:11px;">Apps Script URL</label>
+                            <input type="text" class="auth-input" id="authScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:11px;">
+                        </div>
+                        <div class="auth-group" style="margin-bottom:10px;">
+                            <label class="auth-label" style="font-size:11px;">Google Sheet ID</label>
+                            <input type="text" class="auth-input" id="authSheetId" placeholder="Your Google Sheet ID" style="font-size:11px;">
+                        </div>
+                        <button type="button" onclick="saveAuthConfig()" style="width:100%;padding:8px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;font-weight:bold;">
+                            💾 Save Configuration
+                        </button>
+                        <p style="font-size:9px;color:#868e96;margin-top:8px;text-align:center;">
+                            Users will be stored in "_Users" sheet. Leave empty to use local storage only.
+                        </p>
+                    </div>
                 </form>
                 
                 <form class="auth-form" id="signupForm">
@@ -358,7 +387,7 @@
                         <label class="auth-label">Confirm Password</label>
                         <input type="password" class="auth-input" id="signupConfirm" required placeholder="Confirm password">
                     </div>
-                    <button type="submit" class="auth-btn" id="signupBtn">Create Account</button>
+                    <button type="submit" class="auth-btn" id="signupBtn">📝 Create Account</button>
                 </form>
             </div>
         </div>
@@ -959,7 +988,12 @@
                         <div class="page-navigation">
                             ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
                             ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}
-                            ${isLast ? `<button type="button" class="viewer-draft-btn" onclick="saveDraft()" style="width:auto;margin:0 10px;">💾 Save Draft</button><button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}
+                            ${isLast ? `
+                                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;">
+                                    <button type="button" class="nav-btn submit-btn" onclick="saveDraft()" style="flex:1;min-width:140px;">💾 Save Draft</button>
+                                    <button type="submit" class="nav-btn submit-btn" style="flex:1;min-width:140px;">✅ Submit</button>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -1201,11 +1235,45 @@
         // AUTHENTICATION
         // ============================================
         function checkAuth() {
+            // Load saved config
+            const savedScriptUrl = localStorage.getItem('formBuilderScriptUrl');
+            const savedSheetId = localStorage.getItem('formBuilderSheetId');
+            if (savedScriptUrl) {
+                document.getElementById('authScriptUrl').value = savedScriptUrl;
+                state.settings.scriptUrl = savedScriptUrl;
+            }
+            if (savedSheetId) {
+                document.getElementById('authSheetId').value = savedSheetId;
+                state.settings.sheetId = savedSheetId;
+            }
+            
             const saved = localStorage.getItem('formBuilderUser');
             if (saved) {
                 state.user = JSON.parse(saved);
                 showBuilder();
             }
+        }
+        
+        function toggleAuthConfig() {
+            const panel = document.getElementById('authConfigPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function saveAuthConfig() {
+            const scriptUrl = document.getElementById('authScriptUrl').value.trim();
+            const sheetId = document.getElementById('authSheetId').value.trim();
+            
+            if (scriptUrl) {
+                localStorage.setItem('formBuilderScriptUrl', scriptUrl);
+                state.settings.scriptUrl = scriptUrl;
+            }
+            if (sheetId) {
+                localStorage.setItem('formBuilderSheetId', sheetId);
+                state.settings.sheetId = sheetId;
+            }
+            
+            notify('✅ Configuration saved!');
+            document.getElementById('authConfigPanel').style.display = 'none';
         }
 
         function switchAuthTab(tab) {
@@ -1233,14 +1301,59 @@
             el.style.display = 'block';
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             hideAuthMessages();
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            const loginBtn = e.target.querySelector('button[type="submit"]');
             
+            // Get script URL from localStorage or settings
+            const scriptUrl = localStorage.getItem('formBuilderScriptUrl') || state.settings.scriptUrl;
+            
+            if (scriptUrl) {
+                // Use Google Sheets authentication
+                loginBtn.disabled = true;
+                loginBtn.textContent = '⏳ Logging in...';
+                
+                try {
+                    const response = await fetch(scriptUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'login',
+                            username: email,
+                            password: password
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        state.user = result.user;
+                        localStorage.setItem('formBuilderUser', JSON.stringify(result.user));
+                        showBuilder();
+                    } else {
+                        showAuthError(result.error || 'Invalid email or password');
+                    }
+                } catch (err) {
+                    // Fallback to localStorage if offline
+                    console.log('Online auth failed, trying offline:', err);
+                    loginOffline(email, password);
+                }
+                
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔓 Login';
+            } else {
+                // Fallback to localStorage
+                loginOffline(email, password);
+            }
+        }
+        
+        function loginOffline(email, password) {
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
-            const user = users.find(u => u.email === email && u.password === password);
+            const user = users.find(u => (u.email === email || u.username === email) && u.password === password);
             if (user) {
                 state.user = user;
                 localStorage.setItem('formBuilderUser', JSON.stringify(user));
@@ -1250,7 +1363,7 @@
             }
         }
 
-        function handleSignup(e) {
+        async function handleSignup(e) {
             e.preventDefault();
             hideAuthMessages();
             
@@ -1259,18 +1372,73 @@
             const org = document.getElementById('signupOrg').value;
             const password = document.getElementById('signupPassword').value;
             const confirm = document.getElementById('signupConfirm').value;
+            const signupBtn = e.target.querySelector('button[type="submit"]');
             
             if (password !== confirm) { showAuthError('Passwords do not match'); return; }
             if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
             
-            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
-            if (users.find(u => u.email === email)) { showAuthError('Email already registered'); return; }
+            // Get script URL from localStorage or settings
+            const scriptUrl = localStorage.getItem('formBuilderScriptUrl') || state.settings.scriptUrl;
             
-            const newUser = { id: Date.now().toString(), name, email, org, password, createdAt: new Date().toISOString() };
-            users.push(newUser);
-            localStorage.setItem('formBuilderUsers', JSON.stringify(users));
+            if (scriptUrl) {
+                // Use Google Sheets registration
+                signupBtn.disabled = true;
+                signupBtn.textContent = '⏳ Creating account...';
+                
+                try {
+                    const response = await fetch(scriptUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'register',
+                            username: email.split('@')[0], // Use email prefix as username
+                            email: email,
+                            password: password,
+                            fullName: name,
+                            organization: org
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Also save locally for offline access
+                        saveUserLocally({ id: result.user.id, name, email, org, password });
+                        showAuthSuccess('Account created! Please login.');
+                        setTimeout(() => switchAuthTab('login'), 1500);
+                    } else {
+                        showAuthError(result.error || 'Registration failed');
+                    }
+                } catch (err) {
+                    console.log('Online registration failed, saving locally:', err);
+                    // Fallback to localStorage
+                    registerOffline(name, email, org, password);
+                }
+                
+                signupBtn.disabled = false;
+                signupBtn.textContent = '📝 Create Account';
+            } else {
+                // Fallback to localStorage
+                registerOffline(name, email, org, password);
+            }
+        }
+        
+        function registerOffline(name, email, org, password) {
+            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
+            if (users.find(u => u.email === email)) { 
+                showAuthError('Email already registered'); 
+                return; 
+            }
+            
+            saveUserLocally({ id: Date.now().toString(), name, email, org, password });
             showAuthSuccess('Account created! Please login.');
             setTimeout(() => switchAuthTab('login'), 1500);
+        }
+        
+        function saveUserLocally(user) {
+            const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
+            users.push({ ...user, createdAt: new Date().toISOString() });
+            localStorage.setItem('formBuilderUsers', JSON.stringify(users));
         }
 
         function showBuilder() {
@@ -2217,7 +2385,12 @@
                         <div class="page-navigation">
                             ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
                             ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}
-                            ${isLast ? `<button type="button" class="viewer-draft-btn" onclick="saveDraft()" style="width:auto;margin:0 10px;">💾 Save Draft</button><button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}
+                            ${isLast ? `
+                                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;">
+                                    <button type="button" class="nav-btn submit-btn" onclick="saveDraft()" style="flex:1;min-width:140px;">💾 Save Draft</button>
+                                    <button type="submit" class="nav-btn submit-btn" style="flex:1;min-width:140px;">✅ Submit</button>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -2396,20 +2569,122 @@
             // Validate current page before moving forward
             if (pageIndex > window.currentPageIndex) {
                 const currentPageEl = document.querySelector(`.form-page[data-page="${window.currentPageIndex}"]`);
-                const requiredFields = currentPageEl.querySelectorAll('[required]');
+                const allFields = currentPageEl.querySelectorAll('input, select, textarea');
                 let valid = true;
+                let firstInvalid = null;
                 
-                requiredFields.forEach(field => {
-                    if (!field.value) {
-                        field.style.borderColor = '#dc3545';
+                // Clear previous error messages and reset classes
+                currentPageEl.querySelectorAll('.field-error-msg').forEach(el => el.remove());
+                currentPageEl.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+                currentPageEl.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+                currentPageEl.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
+                
+                allFields.forEach(field => {
+                    const fieldContainer = field.closest('.viewer-field');
+                    let errorMsg = '';
+                    
+                    // Reset inline styling
+                    field.style.borderColor = '';
+                    field.style.background = '';
+                    
+                    // Check required
+                    if (field.hasAttribute('required') && !field.value.trim()) {
+                        errorMsg = 'This field is required';
                         valid = false;
+                    }
+                    
+                    // Check pattern (phone - 9 digits)
+                    if (field.value && field.pattern) {
+                        const regex = new RegExp('^' + field.pattern + '$');
+                        if (!regex.test(field.value)) {
+                            errorMsg = field.title || 'Invalid format';
+                            valid = false;
+                        }
+                    }
+                    
+                    // Check minlength
+                    if (field.value && field.minLength > 0 && field.value.length < field.minLength) {
+                        errorMsg = `Minimum ${field.minLength} characters required`;
+                        valid = false;
+                    }
+                    
+                    // Check maxlength
+                    if (field.value && field.maxLength > 0 && field.value.length > field.maxLength) {
+                        errorMsg = `Maximum ${field.maxLength} characters allowed`;
+                        valid = false;
+                    }
+                    
+                    // Check number min/max
+                    if (field.type === 'number' && field.value) {
+                        const val = parseFloat(field.value);
+                        if (field.min && val < parseFloat(field.min)) {
+                            errorMsg = `Minimum value is ${field.min}`;
+                            valid = false;
+                        }
+                        if (field.max && val > parseFloat(field.max)) {
+                            errorMsg = `Maximum value is ${field.max}`;
+                            valid = false;
+                        }
+                    }
+                    
+                    // Check email format
+                    if (field.type === 'email' && field.value) {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(field.value)) {
+                            errorMsg = 'Please enter a valid email address';
+                            valid = false;
+                        }
+                    }
+                    
+                    // Show error if any
+                    if (errorMsg && fieldContainer) {
+                        field.classList.add('error');
+                        field.classList.remove('valid');
+                        fieldContainer.classList.add('has-error');
+                        
+                        const errorEl = document.createElement('div');
+                        errorEl.className = 'field-error-msg';
+                        errorEl.innerHTML = '⚠️ ' + errorMsg;
+                        fieldContainer.appendChild(errorEl);
+                        
+                        if (!firstInvalid) firstInvalid = field;
+                    } else if (field.value) {
+                        field.classList.add('valid');
+                        field.classList.remove('error');
+                        fieldContainer?.classList.remove('has-error');
+                    }
+                });
+                
+                // Check radio groups (at least one selected if required)
+                currentPageEl.querySelectorAll('.viewer-radio-group').forEach(group => {
+                    const radios = group.querySelectorAll('input[type="radio"]');
+                    const isRequired = radios[0]?.hasAttribute('required');
+                    const hasSelected = Array.from(radios).some(r => r.checked);
+                    
+                    if (isRequired && !hasSelected) {
+                        valid = false;
+                        group.classList.add('has-error');
+                        const fieldContainer = group.closest('.viewer-field');
+                        if (fieldContainer) {
+                            fieldContainer.classList.add('has-error');
+                            if (!fieldContainer.querySelector('.field-error-msg')) {
+                                const errorEl = document.createElement('div');
+                                errorEl.className = 'field-error-msg';
+                                errorEl.innerHTML = '⚠️ Please select an option';
+                                fieldContainer.appendChild(errorEl);
+                            }
+                        }
                     } else {
-                        field.style.borderColor = '#004080';
+                        group.classList.remove('has-error');
                     }
                 });
                 
                 if (!valid) {
-                    notify('Please fill all required fields', 'error');
+                    notify('⚠️ Please fix the errors before continuing', 'error');
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                     return;
                 }
             }
@@ -2428,7 +2703,7 @@
                 document.getElementById('formProgress').style.width = progress + '%';
                 
                 // Scroll to top of form
-                document.querySelector('.viewer-form-box').scrollIntoView({ behavior: 'smooth' });
+                document.querySelector('.viewer-form-box')?.scrollIntoView({ behavior: 'smooth' });
             }
         }
         
@@ -2573,30 +2848,49 @@
             if (!container) return;
             
             if (drafts.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#868e96;">No drafts saved</p>';
+                container.innerHTML = '<p style="text-align:center;color:#868e96;padding:20px;">📭 No drafts saved yet</p>';
                 return;
             }
             
-            container.innerHTML = drafts.map((d, i) => `
-                <div class="draft-item">
-                    <div><strong>Draft ${i+1}</strong><br><small style="color:#868e96;">${new Date(d._timestamp).toLocaleString()}</small></div>
-                    <div>
-                        <button onclick="loadDraft(${i})" style="padding:6px 12px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;margin-right:5px;">Load</button>
-                        <button onclick="deleteDraft(${i})" style="padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Delete</button>
+            container.innerHTML = `
+                <div style="margin-bottom:15px;font-weight:600;color:#004080;">📋 Saved Drafts (${drafts.length})</div>
+                ${drafts.map((d, i) => `
+                <div class="draft-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f8f9fa;border-radius:8px;margin-bottom:10px;border-left:4px solid #004080;">
+                    <div style="flex:1;">
+                        <strong style="color:#004080;font-size:14px;">📄 ${escapeHtml(d._draftName || 'Draft ' + (i+1))}</strong>
+                        <br><small style="color:#868e96;font-size:10px;">🕐 ${new Date(d._timestamp).toLocaleString()}</small>
+                        <br><small style="color:#6c757d;font-size:10px;">📊 ${Object.keys(d).filter(k => !k.startsWith('_')).length} fields filled</small>
+                    </div>
+                    <div style="display:flex;gap:5px;">
+                        <button onclick="loadDraft(${i})" style="padding:8px 14px;background:linear-gradient(135deg,#28a745,#218838);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">📂 Load</button>
+                        <button onclick="renameDraft(${i})" style="padding:8px 14px;background:linear-gradient(135deg,#17a2b8,#138496);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">✏️ Rename</button>
+                        <button onclick="deleteDraft(${i})" style="padding:8px 14px;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">🗑️ Delete</button>
                     </div>
                 </div>
-            `).join('');
+            `).join('')}
+            `;
         }
         
         function saveDraft() {
+            // Prompt for draft name
+            const defaultName = 'Draft ' + new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const draftName = prompt('Enter a name for this draft:', defaultName);
+            
+            if (draftName === null) return; // User cancelled
+            
             const form = document.getElementById('viewerForm');
-            const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
+            const data = { 
+                _id: Date.now(), 
+                _timestamp: new Date().toISOString(),
+                _draftName: draftName.trim() || defaultName
+            };
             new FormData(form).forEach((v, k) => data[k] = v);
+            
             const key = getStorageKey() + '_drafts';
             const drafts = JSON.parse(localStorage.getItem(key) || '[]');
             drafts.push(data);
             localStorage.setItem(key, JSON.stringify(drafts));
-            notify('💾 Draft saved!');
+            notify('💾 Draft "' + data._draftName + '" saved!');
             loadViewerDrafts();
         }
         
@@ -2604,20 +2898,52 @@
             const drafts = JSON.parse(localStorage.getItem(getStorageKey() + '_drafts') || '[]');
             const draft = drafts[i];
             if (!draft) return;
+            
             const form = document.getElementById('viewerForm');
             Object.keys(draft).forEach(k => {
                 if (k.startsWith('_')) return;
                 const el = form.querySelector(`[name="${k}"]`);
-                if (el) el.value = draft[k];
+                if (el) {
+                    if (el.type === 'radio') {
+                        const radio = form.querySelector(`[name="${k}"][value="${draft[k]}"]`);
+                        if (radio) radio.checked = true;
+                    } else if (el.type === 'checkbox') {
+                        el.checked = draft[k] === el.value;
+                    } else {
+                        el.value = draft[k];
+                    }
+                }
             });
+            
+            // Go to form tab and first page
             showViewerTab('form', document.querySelector('.viewer-nav-btn'));
-            notify('📂 Draft loaded!');
+            window.currentPageIndex = 0;
+            goToPage(0);
+            notify('📂 Draft "' + (draft._draftName || 'Draft') + '" loaded!');
+        };
+        
+        window.renameDraft = function(i) {
+            const key = getStorageKey() + '_drafts';
+            const drafts = JSON.parse(localStorage.getItem(key) || '[]');
+            const draft = drafts[i];
+            if (!draft) return;
+            
+            const newName = prompt('Enter new name for this draft:', draft._draftName || 'Draft ' + (i+1));
+            if (newName === null) return;
+            
+            draft._draftName = newName.trim() || 'Draft ' + (i+1);
+            localStorage.setItem(key, JSON.stringify(drafts));
+            loadViewerDrafts();
+            notify('✏️ Draft renamed!');
         };
         
         window.deleteDraft = function(i) {
-            if (!confirm('Delete this draft?')) return;
             const key = getStorageKey() + '_drafts';
             const drafts = JSON.parse(localStorage.getItem(key) || '[]');
+            const draftName = drafts[i]?._draftName || 'Draft ' + (i+1);
+            
+            if (!confirm(`Delete draft "${draftName}"?`)) return;
+            
             drafts.splice(i, 1);
             localStorage.setItem(key, JSON.stringify(drafts));
             loadViewerDrafts();
