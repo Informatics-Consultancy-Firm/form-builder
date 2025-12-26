@@ -226,7 +226,7 @@
         /* Viewer Container */
         .viewer-container { display: none; min-height: 100vh; background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%); }
         .viewer-container.show { display: block; }
-        .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); align-items: center; }
+        .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; padding-left: 180px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); align-items: center; }
         .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-decoration: none; text-transform: uppercase; transition: all 0.2s; cursor: pointer; border: none; }
         .viewer-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
         .viewer-nav-btn.active { box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
@@ -306,8 +306,9 @@
             .settings-group.full-width { grid-column: span 1; }
             .header { flex-wrap: wrap; padding: 10px 15px; }
             .header h1 { font-size: 16px; }
-            .viewer-nav { padding: 10px; }
+            .viewer-nav { padding: 10px; padding-top: 60px; padding-left: 10px; }
             .viewer-nav-btn { padding: 8px 12px; font-size: 10px; }
+            .viewer-back-btn { top: 10px; left: 10px; padding: 8px 12px; font-size: 10px; }
             .page-navigation { flex-direction: column; }
             .nav-btn { width: 100%; }
         }
@@ -378,7 +379,7 @@
         </div>
         <div class="header-actions">
             <span class="header-user" id="headerUser">👤 User</span>
-            <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
+            <button class="header-btn success" onclick="newForm()">📄 New Form</button>
             <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
             <button class="header-btn primary" onclick="shareForm()">🔗 Share</button>
             <button class="header-btn danger" onclick="logout()">🚪 Logout</button>
@@ -468,66 +469,6 @@
 
     <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | Form Builder Pro</footer>
 
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>⚙️ Form Settings</h3>
-                <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="tabs">
-                    <div class="tab active" data-tab="general">General</div>
-                    <div class="tab" data-tab="cascading">Cascading</div>
-                </div>
-
-                <div class="tab-content active" id="tab-general">
-                    <div class="settings-grid">
-                        <div class="settings-group">
-                            <label class="settings-label">Form Title</label>
-                            <input type="text" class="settings-input" id="settingsTitle">
-                        </div>
-                        <div class="settings-group">
-                            <label class="settings-label">Subtitle</label>
-                            <input type="text" class="settings-input" id="settingsSubtitle">
-                        </div>
-                        <div class="settings-group full-width">
-                            <label class="settings-label">Organization</label>
-                            <input type="text" class="settings-input" id="settingsOrg">
-                        </div>
-                        <div class="settings-group full-width">
-                            <label class="settings-label">Logo URL</label>
-                            <input type="text" class="settings-input" id="settingsLogo">
-                        </div>
-                        <div class="settings-group full-width">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="settingsMultiPage" checked>
-                                <span class="toggle-slider"></span>
-                                <span style="font-size:12px;">Enable Multi-Page Navigation</span>
-                            </label>
-                            <div class="settings-hint">Each section becomes a separate page</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-cascading">
-                    <div class="info-box">
-                        <h4>🏢 Cascading Select Data</h4>
-                        <p>Enter location hierarchy data. Format: Parent||Child or Parent||Child||UID</p>
-                    </div>
-                    <div class="settings-group" style="margin-top:12px;">
-                        <label class="settings-label">Hierarchy Data (one per line)</label>
-                        <textarea class="property-textarea" id="cascadingData" style="height:150px;font-family:monospace;font-size:10px;" placeholder="Eastern Region||Kailahun District&#10;Kailahun District||Luawa Chiefdom&#10;Luawa Chiefdom||Kailahun Hospital||abc123"></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn secondary" onclick="closeModal('settingsModal')">Cancel</button>
-                <button class="modal-btn primary" onclick="saveSettings()">💾 Save</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Share Modal -->
     <div class="modal-overlay" id="shareModal">
         <div class="modal" style="max-width:500px;">
@@ -588,7 +529,7 @@
             SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwC64Hy4GSaDPuRACNC57Qwdw58yt6F_pnXLrf0mp-hzEyyCDGq3SWHLrK1VS8kPlKFzQ/exec',
             
             // Your Google Sheet ID (from the URL: https://docs.google.com/spreadsheets/d/SHEET_ID_HERE/edit)
-            SHEET_ID: 'https://docs.google.com/spreadsheets/d/1tmvx7x3Z4ZYNxeaCLHsxtZrpECLqNRE6rCxk3QiFCZ8/edit?gid=0#gid=0'
+            SHEET_ID: '1tmvx7x3Z4ZYNxeaCLHsxtZrpECLqNRE6rCxk3QiFCZ8'
         };
 
         // ============================================
@@ -2126,34 +2067,33 @@
         };
 
         // ============================================
-        // SETTINGS
+        // NEW FORM
         // ============================================
-        function openSettings() {
-            document.getElementById('settingsTitle').value = state.settings.title;
-            document.getElementById('settingsSubtitle').value = state.settings.subtitle;
-            document.getElementById('settingsOrg').value = state.settings.organization;
-            document.getElementById('settingsLogo').value = state.settings.logo;
-            document.getElementById('settingsMultiPage').checked = state.settings.multiPage;
-            document.getElementById('cascadingData').value = state.settings.cascadingData || '';
+        function newForm() {
+            if (state.fields.length > 0) {
+                if (!confirm('⚠️ Create a new form? This will clear all current fields.\n\nMake sure you have shared/saved your current form first!')) {
+                    return;
+                }
+            }
             
-            document.getElementById('settingsModal').classList.add('show');
-        }
-
-        function saveSettings() {
-            state.settings.title = document.getElementById('settingsTitle').value;
-            state.settings.subtitle = document.getElementById('settingsSubtitle').value;
-            state.settings.organization = document.getElementById('settingsOrg').value;
-            state.settings.logo = document.getElementById('settingsLogo').value;
-            state.settings.multiPage = document.getElementById('settingsMultiPage').checked;
-            state.settings.cascadingData = document.getElementById('cascadingData').value;
+            // Clear fields
+            state.fields = [];
+            state.selectedFieldId = null;
+            state.fieldCounter = 0;
             
-            document.getElementById('formTitle').value = state.settings.title;
-            document.getElementById('previewTitle').textContent = state.settings.title;
-            document.getElementById('previewSubtitle').textContent = state.settings.subtitle;
+            // Reset title
+            const newTitle = prompt('Enter form title:', 'New Data Collection Form');
+            if (newTitle) {
+                state.settings.title = newTitle;
+                document.getElementById('formTitle').value = newTitle;
+                document.getElementById('previewTitle').textContent = newTitle;
+            }
             
+            // Clear storage and re-render
             saveToStorage();
-            closeModal('settingsModal');
-            notify('✅ Settings saved!');
+            renderFields();
+            renderProperties();
+            notify('📄 New form created!');
         }
 
         // ============================================
@@ -3000,11 +2940,12 @@
         // GOOGLE SHEETS INTEGRATION
         // ============================================
         async function submitToGoogleSheets(data) {
-            const scriptUrl = state.settings.scriptUrl;
-            const sheetId = state.settings.sheetId;
+            const scriptUrl = CONFIG.SCRIPT_URL;
+            const sheetId = CONFIG.SHEET_ID;
             
-            if (!scriptUrl) {
-                // Save locally if no script URL
+            // Check if CONFIG is still placeholder values
+            if (!scriptUrl || scriptUrl === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                console.log('No valid Apps Script URL configured - saving locally only');
                 saveLocally(data);
                 return { success: true, offline: true };
             }
@@ -3012,17 +2953,27 @@
             try {
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         action: 'submit',
                         formTitle: state.settings.title,
                         sheetId: sheetId,
-                        data: data
+                        data: data,
+                        submittedBy: state.user?.username || state.user?.email || 'anonymous'
                     })
                 });
-                return { success: true };
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    return { success: true };
+                } else {
+                    console.error('Submission error:', result.error);
+                    saveOffline(data);
+                    return { success: false, offline: true, error: result.error };
+                }
             } catch (err) {
+                console.error('Network error:', err);
                 // Save offline if network fails
                 saveOffline(data);
                 return { success: false, offline: true, error: err.message };
@@ -3030,11 +2981,11 @@
         }
         
         async function checkDuplicate(fieldName, value) {
-            const scriptUrl = state.settings.scriptUrl;
-            if (!scriptUrl || !fieldName || !value) return false;
+            const scriptUrl = CONFIG.SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'YOUR_APPS_SCRIPT_URL_HERE' || !fieldName || !value) return false;
             
             try {
-                const response = await fetch(`${scriptUrl}?action=checkDuplicate&formTitle=${encodeURIComponent(state.settings.title)}&field=${encodeURIComponent(fieldName)}&value=${encodeURIComponent(value)}`);
+                const response = await fetch(`${scriptUrl}?action=checkDuplicate&formTitle=${encodeURIComponent(state.settings.title)}&field=${encodeURIComponent(fieldName)}&value=${encodeURIComponent(value)}&sheetId=${encodeURIComponent(CONFIG.SHEET_ID)}`);
                 const result = await response.json();
                 return result.isDuplicate;
             } catch (err) {
@@ -3046,11 +2997,11 @@
         }
         
         async function fetchDataFromGoogleSheets() {
-            const scriptUrl = state.settings.scriptUrl;
-            if (!scriptUrl) return null;
+            const scriptUrl = CONFIG.SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'YOUR_APPS_SCRIPT_URL_HERE') return null;
             
             try {
-                const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=200`);
+                const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=200&sheetId=${encodeURIComponent(CONFIG.SHEET_ID)}`);
                 const result = await response.json();
                 return result.data || [];
             } catch (err) {
@@ -3078,24 +3029,28 @@
             const offlineData = JSON.parse(localStorage.getItem('offlineSubmissions') || '[]');
             if (offlineData.length === 0) return;
             
-            const scriptUrl = state.settings.scriptUrl;
-            if (!scriptUrl) return;
+            const scriptUrl = CONFIG.SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'YOUR_APPS_SCRIPT_URL_HERE') return;
             
             const synced = [];
             for (const item of offlineData) {
                 try {
-                    await fetch(scriptUrl, {
+                    const response = await fetch(scriptUrl, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'text/plain' },
                         body: JSON.stringify({
                             action: 'submit',
                             formTitle: item.formTitle,
+                            sheetId: CONFIG.SHEET_ID,
                             data: item.data
                         })
                     });
-                    synced.push(item);
+                    const result = await response.json();
+                    if (result.success) {
+                        synced.push(item);
+                    }
                 } catch (err) {
+                    console.error('Sync error:', err);
                     break;
                 }
             }
