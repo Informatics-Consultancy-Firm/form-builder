@@ -858,6 +858,7 @@
             state.fields = (data.f || []).map(f => ({
                 id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false,
                 placeholder: f.p || '', helpText: f.h || '',
+                duplicateCheck: f.dc || false,
                 options: f.o || [], levels: f.v || [], columns: f.c || [],
                 rows: f.rw || 3, max: f.mx || 5, accept: f.a || '', formula: f.fm || '',
                 skipLogic: f.k || { enabled: false },
@@ -1086,12 +1087,12 @@
                 const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
                 new FormData(form).forEach((v, k) => data[k] = v);
                 
-                // Check for duplicates
-                const dupField = state.settings.duplicateCheckField;
-                if (dupField && data[dupField]) {
-                    const isDuplicate = await checkDuplicate(dupField, data[dupField]);
+                // Check for duplicates on all fields with duplicateCheck enabled
+                const dupFields = state.fields.filter(f => f.duplicateCheck && data[f.name]);
+                for (const field of dupFields) {
+                    const isDuplicate = await checkDuplicate(field.name, data[field.name]);
                     if (isDuplicate) {
-                        notify(`❌ Duplicate entry! "${data[dupField]}" already exists.`, 'error');
+                        notify(`❌ Duplicate! "${field.label}" value "${data[field.name]}" already exists.`, 'error');
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.textContent = '✅ Submit';
@@ -1536,6 +1537,13 @@
                             <span>Required Field</span>
                         </label>
                     </div>
+                    <div class="property-group">
+                        <label class="property-checkbox">
+                            <input type="checkbox" id="propDuplicateCheck" ${field.duplicateCheck ? 'checked' : ''}>
+                            <span>🚫 Check for Duplicates</span>
+                        </label>
+                        <div style="font-size:9px;color:#868e96;margin-top:4px;">Prevent submitting if this value already exists</div>
+                    </div>
                     ` : ''}
                 </div>`;
             
@@ -1860,6 +1868,7 @@
             document.getElementById('propPlaceholder')?.addEventListener('change', (e) => updateField('placeholder', e.target.value));
             document.getElementById('propHelpText')?.addEventListener('change', (e) => updateField('helpText', e.target.value));
             document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
+            document.getElementById('propDuplicateCheck')?.addEventListener('change', (e) => updateField('duplicateCheck', e.target.checked));
             
             // Options
             document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
@@ -2338,12 +2347,12 @@
                 const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
                 new FormData(form).forEach((v, k) => data[k] = v);
                 
-                // Check for duplicates
-                const dupField = state.settings.duplicateCheckField;
-                if (dupField && data[dupField]) {
-                    const isDuplicate = await checkDuplicate(dupField, data[dupField]);
+                // Check for duplicates on all fields with duplicateCheck enabled
+                const dupFields = state.fields.filter(f => f.duplicateCheck && data[f.name]);
+                for (const field of dupFields) {
+                    const isDuplicate = await checkDuplicate(field.name, data[field.name]);
                     if (isDuplicate) {
-                        notify(`❌ Duplicate entry! "${data[dupField]}" already exists.`, 'error');
+                        notify(`❌ Duplicate! "${field.label}" value "${data[field.name]}" already exists.`, 'error');
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.textContent = '✅ Submit';
@@ -3213,6 +3222,7 @@ function testScript() {
                     const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
                     if (f.placeholder) field.p = f.placeholder;
                     if (f.helpText) field.h = f.helpText;
+                    if (f.duplicateCheck) field.dc = true;
                     if (f.options?.length) field.o = f.options;
                     if (f.levels?.length) field.v = f.levels;
                     if (f.columns?.length) field.c = f.columns;
