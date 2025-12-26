@@ -268,6 +268,24 @@
         .gps-status { font-size: 11px; color: #28a745; margin-top: 6px; }
         .sig-container { text-align: center; }
         .sig-canvas { display: block; margin: 0 auto; cursor: crosshair; }
+        
+        /* Multi-Page Form Styles */
+        .progress-bar-container { width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(135deg, #28a745 0%, #218838 100%); border-radius: 4px; transition: width 0.3s ease; }
+        .form-page { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .page-header { background: linear-gradient(135deg, #e8f4fc 0%, #d4edfc 100%); margin: -25px -25px 20px -25px; padding: 15px 25px; border-bottom: 2px solid #004080; }
+        .page-indicator { display: inline-block; background: #004080; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .page-title { font-size: 16px; color: #004080; font-weight: 700; text-transform: uppercase; margin: 0; }
+        .page-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e9ecef; gap: 10px; flex-wrap: wrap; }
+        .nav-btn { padding: 14px 28px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .back-btn { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; }
+        .back-btn:hover { background: linear-gradient(135deg, #5a6268 0%, #495057 100%); }
+        .next-btn { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; }
+        .next-btn:hover { background: linear-gradient(135deg, #002855 0%, #001a3d 100%); }
+        .submit-btn { background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; }
+        .submit-btn:hover { background: linear-gradient(135deg, #218838 0%, #1e7e34 100%); }
 
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
@@ -278,6 +296,8 @@
             .header h1 { font-size: 16px; }
             .viewer-nav { padding: 10px; }
             .viewer-nav-btn { padding: 8px 12px; font-size: 10px; }
+            .page-navigation { flex-direction: column; }
+            .nav-btn { width: 100%; }
         }
     </style>
 </head>
@@ -386,6 +406,8 @@
             </div>
             <div class="sidebar-section">
                 <h3 class="sidebar-title">🎯 Special Fields</h3>
+                <div class="field-type" data-type="camera"><span class="field-type-icon">📷</span>Camera</div>
+                <div class="field-type" data-type="qrscanner"><span class="field-type-icon">📱</span>QR Scanner</div>
                 <div class="field-type" data-type="signature"><span class="field-type-icon">✍️</span>Signature</div>
                 <div class="field-type" data-type="rating"><span class="field-type-icon">⭐</span>Rating</div>
                 <div class="field-type" data-type="file"><span class="field-type-icon">📎</span>File Upload</div>
@@ -493,16 +515,30 @@
                     <div class="settings-group">
                         <label class="settings-label">Apps Script Web App URL</label>
                         <input type="text" class="settings-input" id="settingsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-                        <div class="settings-hint">For data submission</div>
+                        <div class="settings-hint">Deploy your Apps Script and paste the URL here</div>
+                    </div>
+                    <div class="settings-group">
+                        <label class="settings-label">Google Sheet ID</label>
+                        <input type="text" class="settings-input" id="settingsSheetId" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
+                        <div class="settings-hint">From your Google Sheet URL (between /d/ and /edit)</div>
+                    </div>
+                    <div class="settings-group">
+                        <label class="settings-label">Duplicate Check Field</label>
+                        <select class="settings-input" id="settingsDuplicateField">
+                            <option value="">-- No duplicate check --</option>
+                        </select>
+                        <div class="settings-hint">Prevent duplicate submissions based on this field</div>
                     </div>
                     <div class="info-box warning">
                         <h4>📋 Setup Instructions:</h4>
                         <ol style="margin-left:15px;font-size:10px;line-height:1.8;">
                             <li>Create a Google Sheet</li>
                             <li>Go to Extensions → Apps Script</li>
-                            <li>Paste the generated Apps Script code</li>
-                            <li>Deploy as Web App</li>
-                            <li>Copy the URL here</li>
+                            <li>Click "Generate" button to get the Apps Script code</li>
+                            <li>Paste the code in Apps Script editor</li>
+                            <li>Deploy → New deployment → Web app</li>
+                            <li>Set "Who has access" to "Anyone"</li>
+                            <li>Copy the Web App URL and paste above</li>
                         </ol>
                     </div>
                 </div>
@@ -616,8 +652,10 @@
                 organization: 'ICF-SL',
                 logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
                 scriptUrl: '',
+                sheetId: '',
                 multiPage: true,
-                cascadingData: ''
+                cascadingData: '',
+                duplicateCheckField: ''
             }
         };
 
@@ -635,6 +673,8 @@
             checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', options: ['Option 1', 'Option 2', 'Option 3'], validations: ['required', 'minSelect', 'maxSelect'] },
             yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question', validations: ['required'] },
             yesnona: { label: 'Yes/No/NA', icon: '❓', defaultLabel: 'Yes/No/NA', validations: ['required'] },
+            camera: { label: 'Camera', icon: '📷', defaultLabel: 'Take Photo', validations: ['required'] },
+            qrscanner: { label: 'QR Scanner', icon: '📱', defaultLabel: 'Scan QR Code', validations: ['required'] },
             table: { label: 'Static Table', icon: '📋', defaultLabel: 'Data Table', columns: [{ name: 'Column 1', type: 'text', width: 'auto' }, { name: 'Column 2', type: 'text', width: 'auto' }], rows: 3 },
             dynamicTable: { label: 'Dynamic Table', icon: '➕', defaultLabel: 'Dynamic Table', columns: [{ name: 'Item', type: 'text', width: 'auto' }, { name: 'Quantity', type: 'number', width: '80px' }, { name: 'Notes', type: 'text', width: 'auto' }], minRows: 1, maxRows: 20 },
             cascading: { label: 'Cascading', icon: '🏢', defaultLabel: 'Location', levels: ['Region', 'District', 'Chiefdom', 'Facility'], validations: ['required'] },
@@ -647,6 +687,7 @@
         };
 
         let currentShareUrl = '';
+        let offlineSubmissions = JSON.parse(localStorage.getItem('offlineSubmissions') || '[]');
 
         // ============================================
         // INITIALIZATION
@@ -654,6 +695,13 @@
         function init() {
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('c');
+            
+            // Show offline indicator if needed
+            if (!navigator.onLine) {
+                showOfflineIndicator();
+            }
+            window.addEventListener('online', hideOfflineIndicator);
+            window.addEventListener('offline', showOfflineIndicator);
             
             if (compressedData) {
                 try {
@@ -666,18 +714,113 @@
                     return;
                 } catch (err) {
                     console.error('Error decoding shared form:', err);
+                    // Try to load from cache if offline
+                    if (!navigator.onLine) {
+                        loadCachedForm();
+                        return;
+                    }
                 }
+            }
+            
+            // Check for cached form parameter
+            const cachedFormName = urlParams.get('form');
+            if (cachedFormName && !navigator.onLine) {
+                loadCachedForm(cachedFormName);
+                return;
             }
             
             loadFromStorage();
             setupEventListeners();
             checkAuth();
+            
+            // Try to sync offline data when online
+            if (navigator.onLine) {
+                syncOfflineData();
+            }
+        }
+        
+        function showOfflineIndicator() {
+            let indicator = document.getElementById('offlineIndicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'offlineIndicator';
+                indicator.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ffc107;color:#000;padding:8px;text-align:center;font-size:12px;font-weight:bold;z-index:9999;';
+                indicator.innerHTML = '📴 You are offline. Data will be saved locally and synced when online.';
+                document.body.prepend(indicator);
+            }
+            indicator.style.display = 'block';
+        }
+        
+        function hideOfflineIndicator() {
+            const indicator = document.getElementById('offlineIndicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+            // Try to sync when back online
+            syncOfflineData();
+        }
+        
+        function loadCachedForm(formName) {
+            // Find cached forms
+            const cacheKeys = Object.keys(localStorage).filter(k => k.startsWith('cachedForm_'));
+            
+            if (cacheKeys.length === 0) {
+                notify('No cached forms available offline', 'error');
+                return;
+            }
+            
+            // If specific form requested
+            if (formName) {
+                const cached = localStorage.getItem('cachedForm_' + formName);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    state.settings = data.settings;
+                    state.fields = data.fields;
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.getElementById('mainContainer').classList.remove('show');
+                    document.querySelector('.header').style.display = 'none';
+                    document.querySelector('.footer').style.display = 'none';
+                    document.getElementById('viewerContainer').classList.add('show');
+                    renderSharedFormViewer();
+                    return;
+                }
+            }
+            
+            // Load most recent cached form
+            let mostRecent = null;
+            let mostRecentTime = 0;
+            cacheKeys.forEach(key => {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    const cachedTime = new Date(data.cachedAt).getTime();
+                    if (cachedTime > mostRecentTime) {
+                        mostRecentTime = cachedTime;
+                        mostRecent = data;
+                    }
+                } catch(e) {}
+            });
+            
+            if (mostRecent) {
+                state.settings = mostRecent.settings;
+                state.fields = mostRecent.fields;
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('mainContainer').classList.remove('show');
+                document.querySelector('.header').style.display = 'none';
+                document.querySelector('.footer').style.display = 'none';
+                document.getElementById('viewerContainer').classList.add('show');
+                renderSharedFormViewer();
+                notify('📴 Loaded cached form (offline mode)');
+            }
         }
         
         function renderSharedForm(data) {
+            // Hide auth and main containers
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.header').style.display = 'none';
+            document.querySelector('.footer').style.display = 'none';
             
+            // Set state from shared data
             state.settings = {
                 title: data.t || 'Form',
                 subtitle: data.s || 'Data Collection',
@@ -685,28 +828,280 @@
                 logo: data.l || 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
                 multiPage: true,
                 cascadingData: '',
-                scriptUrl: ''
+                scriptUrl: data.u || '',           // Apps Script URL
+                sheetId: data.g || '',             // Google Sheet ID
+                duplicateCheckField: data.df || '' // Duplicate check field
             };
             
             state.fields = (data.f || []).map(f => ({
                 id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false,
+                placeholder: f.p || '', helpText: f.h || '',
                 options: f.o || [], levels: f.v || [], columns: f.c || [],
-                rows: 3, max: 5, accept: '', formula: '',
+                rows: f.rw || 3, max: f.mx || 5, accept: f.a || '', formula: f.fm || '',
                 skipLogic: f.k || { enabled: false },
                 validation: f.d || { enabled: false, rules: {} },
                 conditional: f.cn || { enabled: false }
             }));
             
-            const html = generateHTMLCode();
-            document.body.innerHTML = html;
+            // Cache form data for offline use
+            try {
+                localStorage.setItem('cachedForm_' + state.settings.title, JSON.stringify({
+                    settings: state.settings,
+                    fields: state.fields,
+                    cachedAt: new Date().toISOString()
+                }));
+            } catch(e) { console.log('Cache error:', e); }
             
-            // Execute inline scripts
-            const scripts = document.querySelectorAll('script');
-            scripts.forEach(script => {
-                if (script.textContent && !script.src) {
-                    try { eval(script.textContent); } catch(e) { console.error(e); }
+            // Show viewer container and render form
+            document.getElementById('viewerContainer').classList.add('show');
+            renderSharedFormViewer();
+        }
+        
+        function renderSharedFormViewer() {
+            const s = state.settings;
+            
+            // Group fields by sections (pages)
+            let pages = [];
+            let currentPage = { title: 'Page 1', fields: [] };
+            
+            state.fields.forEach(field => {
+                if (field.type === 'section') {
+                    if (currentPage.fields.length > 0) {
+                        pages.push(currentPage);
+                    }
+                    currentPage = { title: field.label, fields: [] };
+                } else {
+                    currentPage.fields.push(field);
                 }
             });
+            if (currentPage.fields.length > 0) {
+                pages.push(currentPage);
+            }
+            
+            // If no sections, put all fields on one page
+            if (pages.length === 0) {
+                pages = [{ title: s.title, fields: state.fields.filter(f => f.type !== 'section') }];
+            }
+            
+            // Generate pages HTML
+            let pagesHtml = pages.map((page, pageIndex) => {
+                let fieldsHtml = page.fields.map(field => {
+                    const req = field.required ? '<span class="required" style="color:#dc3545;">*</span>' : '';
+                    const reqAttr = field.required ? 'required' : '';
+                    let input = '';
+                    
+                    switch (field.type) {
+                        case 'text': input = `<input type="text" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'email': input = `<input type="email" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'phone': input = `<input type="tel" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'number': input = `<input type="number" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'date': input = `<input type="date" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
+                        case 'time': input = `<input type="time" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
+                        case 'textarea': input = `<textarea name="${field.name}" class="viewer-input" rows="3" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}></textarea>`; break;
+                        case 'select':
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}><option value="">-- Select --</option>${(field.options||[]).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
+                        case 'radio': case 'yesno': case 'yesnona':
+                            const opts = field.type === 'yesno' ? ['Yes','No'] : field.type === 'yesnona' ? ['Yes','No','N/A'] : (field.options||[]);
+                            input = `<div class="viewer-radio-group">${opts.map(o => `<label class="viewer-radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                        case 'checkbox':
+                            input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                        case 'gps':
+                            input = `<div class="gps-container"><button type="button" class="viewer-draft-btn" onclick="captureGPS(this)" style="width:auto;padding:10px 20px;">📍 Capture GPS</button><input type="hidden" name="${field.name}_lat"><input type="hidden" name="${field.name}_lng"><div class="gps-status"></div></div>`; break;
+                        case 'camera':
+                            input = `<div class="camera-container"><button type="button" class="viewer-draft-btn" onclick="openCamera(this, '${field.name}')" style="width:auto;padding:10px 20px;background:#17a2b8;">📷 Take Photo</button><input type="hidden" name="${field.name}" class="camera-data"><div class="camera-preview" style="margin-top:10px;"></div></div>`; break;
+                        case 'qrscanner':
+                            input = `<div class="qr-container"><button type="button" class="viewer-draft-btn" onclick="openQRScanner(this, '${field.name}')" style="width:auto;padding:10px 20px;background:#6f42c1;">📱 Scan QR Code</button><input type="text" name="${field.name}" class="viewer-input qr-result" placeholder="QR code value will appear here" readonly style="margin-top:10px;"></div>`; break;
+                        case 'signature':
+                            input = `<div class="sig-container"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button></div>`; break;
+                        case 'rating':
+                            input = `<div class="rating-container">${Array(field.max || 5).fill().map((_, i) => `<span class="rating-star" onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`; break;
+                        case 'file':
+                            input = `<input type="file" name="${field.name}" class="viewer-input" accept="${field.accept || ''}" ${reqAttr}>`; break;
+                        default: input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                    }
+                    
+                    return `<div class="viewer-field" data-field-id="${field.id}"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
+                }).join('');
+                
+                const isFirst = pageIndex === 0;
+                const isLast = pageIndex === pages.length - 1;
+                
+                return `
+                    <div class="form-page" data-page="${pageIndex}" style="${pageIndex === 0 ? '' : 'display:none;'}">
+                        <div class="page-header">
+                            <span class="page-indicator">Page ${pageIndex + 1} of ${pages.length}</span>
+                            <h3 class="page-title">${escapeHtml(page.title)}</h3>
+                        </div>
+                        ${fieldsHtml}
+                        <div class="page-navigation">
+                            ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
+                            ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}
+                            ${isLast ? `<button type="button" class="viewer-draft-btn" onclick="saveDraft()" style="width:auto;margin:0 10px;">💾 Save Draft</button><button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('viewerContainer').innerHTML = `
+                <div class="viewer-nav">
+                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showViewerTab('form',this)">📝 Form</button>
+                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showViewerTab('data',this)">📊 Data</button>
+                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard',this)">📈 Dashboard</button>
+                    <button class="viewer-nav-btn" style="background:#6c757d;color:#fff;" onclick="showViewerTab('report',this)">📄 Report</button>
+                    <button class="viewer-nav-btn" style="background:#ffc107;color:#000;" onclick="showViewerTab('drafts',this)">💾 Drafts</button>
+                </div>
+                
+                <div id="tabForm" class="viewer-tab active">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header">
+                                <img src="${s.logo}" alt="Logo">
+                                <h1>${escapeHtml(s.title)}</h1>
+                                <p>${escapeHtml(s.subtitle)}</p>
+                            </div>
+                            <div class="viewer-body">
+                                <form id="viewerForm">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" id="formProgress" style="width: ${100/pages.length}%"></div>
+                                    </div>
+                                    ${pagesHtml}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabData" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);">
+                                <h1>📊 Submitted Data</h1>
+                                <p>${escapeHtml(s.title)}</p>
+                            </div>
+                            <div class="viewer-body" id="dataContainer">
+                                <p style="text-align:center;color:#868e96;">📭 No submissions yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabDashboard" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);">
+                                <h1>📈 Dashboard</h1>
+                                <p>${escapeHtml(s.title)}</p>
+                            </div>
+                            <div class="viewer-body" id="dashboardContainer">
+                                <div class="dashboard-stats" id="dashboardStats"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabReport" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#6c757d 0%,#5a6268 100%);">
+                                <h1>📄 Report</h1>
+                                <button onclick="window.print()" style="background:#fff;color:#6c757d;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:700;margin-top:10px;font-family:Oswald;">🖨️ Print</button>
+                            </div>
+                            <div class="viewer-body" id="reportContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabDrafts" class="viewer-tab">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header" style="background:linear-gradient(135deg,#ffc107 0%,#e0a800 100%);color:#000;">
+                                <h1>💾 Saved Drafts</h1>
+                                <p>${escapeHtml(s.title)}</p>
+                            </div>
+                            <div class="viewer-body" id="draftsContainer">
+                                <p style="text-align:center;color:#868e96;">No drafts saved</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Store total pages
+            window.totalPages = pages.length;
+            window.currentPageIndex = 0;
+            
+            // Initialize signature pads
+            document.querySelectorAll('.sig-canvas').forEach(canvas => {
+                const ctx = canvas.getContext('2d');
+                let drawing = false;
+                ctx.strokeStyle = '#004080';
+                ctx.lineWidth = 2;
+                canvas.onmousedown = e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+                canvas.onmousemove = e => { if (drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+                canvas.onmouseup = () => { drawing = false; const dataInput = canvas.parentElement.querySelector('.sig-data'); if (dataInput) dataInput.value = canvas.toDataURL(); };
+                canvas.onmouseleave = () => drawing = false;
+                // Touch
+                canvas.ontouchstart = e => { e.preventDefault(); drawing = true; const t = e.touches[0]; const r = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(t.clientX - r.left, t.clientY - r.top); };
+                canvas.ontouchmove = e => { e.preventDefault(); if (drawing) { const t = e.touches[0]; const r = canvas.getBoundingClientRect(); ctx.lineTo(t.clientX - r.left, t.clientY - r.top); ctx.stroke(); } };
+                canvas.ontouchend = () => { drawing = false; const dataInput = canvas.parentElement.querySelector('.sig-data'); if (dataInput) dataInput.value = canvas.toDataURL(); };
+            });
+            
+            // Form submit
+            document.getElementById('viewerForm').onsubmit = async function(e) {
+                e.preventDefault();
+                const form = this;
+                const submitBtn = form.querySelector('.submit-btn, .viewer-submit');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '⏳ Submitting...';
+                }
+                
+                const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
+                new FormData(form).forEach((v, k) => data[k] = v);
+                
+                // Check for duplicates
+                const dupField = state.settings.duplicateCheckField;
+                if (dupField && data[dupField]) {
+                    const isDuplicate = await checkDuplicate(dupField, data[dupField]);
+                    if (isDuplicate) {
+                        notify(`❌ Duplicate entry! "${data[dupField]}" already exists.`, 'error');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = '✅ Submit';
+                        }
+                        return;
+                    }
+                }
+                
+                // Submit to Google Sheets
+                const result = await submitToGoogleSheets(data);
+                
+                if (result.success) {
+                    saveLocally(data);
+                    form.reset();
+                    window.currentPageIndex = 0;
+                    goToPage(0);
+                    
+                    if (result.offline) {
+                        notify('💾 Saved offline. Will sync when online.');
+                    } else {
+                        notify('✅ Submitted successfully!');
+                    }
+                } else {
+                    notify('⚠️ Saved offline. Will sync when online.');
+                }
+                
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✅ Submit';
+                }
+            };
+            
+            // Load initial data
+            loadViewerData();
+            loadViewerDashboard();
+            loadViewerReport();
+            loadViewerDrafts();
         }
 
         function setupEventListeners() {
@@ -1057,6 +1452,10 @@
                     return field.levels.map(l => `<select style="width:auto;padding:3px;font-size:9px;margin-right:4px;" disabled><option>${l}</option></select>`).join('');
                 case 'gps': 
                     return `<button style="padding:6px 12px;background:#004080;color:white;border:none;border-radius:4px;font-size:10px;" disabled>📍 Capture GPS</button>`;
+                case 'camera': 
+                    return `<button style="padding:6px 12px;background:#17a2b8;color:white;border:none;border-radius:4px;font-size:10px;" disabled>📷 Take Photo</button>`;
+                case 'qrscanner': 
+                    return `<button style="padding:6px 12px;background:#6f42c1;color:white;border:none;border-radius:4px;font-size:10px;" disabled>📱 Scan QR Code</button>`;
                 case 'signature': 
                     return `<div style="border:2px dashed #dee2e6;height:50px;display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:10px;border-radius:4px;">✍️ Signature Pad</div>`;
                 case 'rating': 
@@ -1645,7 +2044,20 @@
             document.getElementById('settingsLogo').value = state.settings.logo;
             document.getElementById('settingsMultiPage').checked = state.settings.multiPage;
             document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl || '';
+            document.getElementById('settingsSheetId').value = state.settings.sheetId || '';
             document.getElementById('cascadingData').value = state.settings.cascadingData || '';
+            
+            // Populate duplicate check field dropdown
+            const dupSelect = document.getElementById('settingsDuplicateField');
+            dupSelect.innerHTML = '<option value="">-- No duplicate check --</option>';
+            state.fields.filter(f => f.type !== 'section').forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.name;
+                opt.textContent = f.label;
+                if (state.settings.duplicateCheckField === f.name) opt.selected = true;
+                dupSelect.appendChild(opt);
+            });
+            
             document.getElementById('settingsModal').classList.add('show');
         }
 
@@ -1656,6 +2068,8 @@
             state.settings.logo = document.getElementById('settingsLogo').value;
             state.settings.multiPage = document.getElementById('settingsMultiPage').checked;
             state.settings.scriptUrl = document.getElementById('settingsScriptUrl').value;
+            state.settings.sheetId = document.getElementById('settingsSheetId').value;
+            state.settings.duplicateCheckField = document.getElementById('settingsDuplicateField').value;
             state.settings.cascadingData = document.getElementById('cascadingData').value;
             
             document.getElementById('formTitle').value = state.settings.title;
@@ -1691,40 +2105,86 @@
         function renderFormViewer() {
             const s = state.settings;
             
-            let fieldsHtml = state.fields.map(field => {
-                if (field.type === 'section') return `<div class="viewer-section">📁 ${escapeHtml(field.label)}</div>`;
-                
-                const req = field.required ? '<span class="required" style="color:#dc3545;">*</span>' : '';
-                const reqAttr = field.required ? 'required' : '';
-                let input = '';
-                
-                switch (field.type) {
-                    case 'text': input = `<input type="text" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
-                    case 'email': input = `<input type="email" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
-                    case 'phone': input = `<input type="tel" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
-                    case 'number': input = `<input type="number" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
-                    case 'date': input = `<input type="date" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
-                    case 'time': input = `<input type="time" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
-                    case 'textarea': input = `<textarea name="${field.name}" class="viewer-input" rows="3" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}></textarea>`; break;
-                    case 'select':
-                        input = `<select name="${field.name}" class="viewer-input" ${reqAttr}><option value="">-- Select --</option>${(field.options||[]).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
-                    case 'radio': case 'yesno': case 'yesnona':
-                        const opts = field.type === 'yesno' ? ['Yes','No'] : field.type === 'yesnona' ? ['Yes','No','N/A'] : (field.options||[]);
-                        input = `<div class="viewer-radio-group">${opts.map(o => `<label class="viewer-radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
-                    case 'checkbox':
-                        input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
-                    case 'gps':
-                        input = `<div class="gps-container"><button type="button" class="viewer-draft-btn" onclick="captureGPS(this)" style="width:auto;padding:10px 20px;">📍 Capture GPS</button><input type="hidden" name="${field.name}_lat"><input type="hidden" name="${field.name}_lng"><div class="gps-status"></div></div>`; break;
-                    case 'signature':
-                        input = `<div class="sig-container"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button></div>`; break;
-                    case 'rating':
-                        input = `<div class="rating-container">${Array(field.max || 5).fill().map((_, i) => `<span class="rating-star" onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`; break;
-                    case 'file':
-                        input = `<input type="file" name="${field.name}" class="viewer-input" accept="${field.accept || ''}" ${reqAttr}>`; break;
-                    default: input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+            // Group fields by sections (pages)
+            let pages = [];
+            let currentPage = { title: 'Page 1', fields: [] };
+            
+            state.fields.forEach(field => {
+                if (field.type === 'section') {
+                    if (currentPage.fields.length > 0) {
+                        pages.push(currentPage);
+                    }
+                    currentPage = { title: field.label, fields: [] };
+                } else {
+                    currentPage.fields.push(field);
                 }
+            });
+            if (currentPage.fields.length > 0) {
+                pages.push(currentPage);
+            }
+            
+            // If no sections, put all fields on one page
+            if (pages.length === 0) {
+                pages = [{ title: s.title, fields: state.fields.filter(f => f.type !== 'section') }];
+            }
+            
+            // Generate pages HTML
+            let pagesHtml = pages.map((page, pageIndex) => {
+                let fieldsHtml = page.fields.map(field => {
+                    const req = field.required ? '<span class="required" style="color:#dc3545;">*</span>' : '';
+                    const reqAttr = field.required ? 'required' : '';
+                    let input = '';
+                    
+                    switch (field.type) {
+                        case 'text': input = `<input type="text" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'email': input = `<input type="email" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'phone': input = `<input type="tel" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'number': input = `<input type="number" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`; break;
+                        case 'date': input = `<input type="date" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
+                        case 'time': input = `<input type="time" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
+                        case 'textarea': input = `<textarea name="${field.name}" class="viewer-input" rows="3" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}></textarea>`; break;
+                        case 'select':
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}><option value="">-- Select --</option>${(field.options||[]).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
+                        case 'radio': case 'yesno': case 'yesnona':
+                            const opts = field.type === 'yesno' ? ['Yes','No'] : field.type === 'yesnona' ? ['Yes','No','N/A'] : (field.options||[]);
+                            input = `<div class="viewer-radio-group">${opts.map(o => `<label class="viewer-radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                        case 'checkbox':
+                            input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
+                        case 'gps':
+                            input = `<div class="gps-container"><button type="button" class="viewer-draft-btn" onclick="captureGPS(this)" style="width:auto;padding:10px 20px;">📍 Capture GPS</button><input type="hidden" name="${field.name}_lat"><input type="hidden" name="${field.name}_lng"><div class="gps-status"></div></div>`; break;
+                        case 'camera':
+                            input = `<div class="camera-container"><button type="button" class="viewer-draft-btn" onclick="openCamera(this, '${field.name}')" style="width:auto;padding:10px 20px;background:#17a2b8;">📷 Take Photo</button><input type="hidden" name="${field.name}" class="camera-data"><div class="camera-preview" style="margin-top:10px;"></div></div>`; break;
+                        case 'qrscanner':
+                            input = `<div class="qr-container"><button type="button" class="viewer-draft-btn" onclick="openQRScanner(this, '${field.name}')" style="width:auto;padding:10px 20px;background:#6f42c1;">📱 Scan QR Code</button><input type="text" name="${field.name}" class="viewer-input qr-result" placeholder="QR code value will appear here" readonly style="margin-top:10px;"></div>`; break;
+                        case 'signature':
+                            input = `<div class="sig-container"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button></div>`; break;
+                        case 'rating':
+                            input = `<div class="rating-container">${Array(field.max || 5).fill().map((_, i) => `<span class="rating-star" onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`; break;
+                        case 'file':
+                            input = `<input type="file" name="${field.name}" class="viewer-input" accept="${field.accept || ''}" ${reqAttr}>`; break;
+                        default: input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                    }
+                    
+                    return `<div class="viewer-field" data-field-id="${field.id}"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
+                }).join('');
                 
-                return `<div class="viewer-field" data-field-id="${field.id}"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
+                const isFirst = pageIndex === 0;
+                const isLast = pageIndex === pages.length - 1;
+                
+                return `
+                    <div class="form-page" data-page="${pageIndex}" style="${pageIndex === 0 ? '' : 'display:none;'}">
+                        <div class="page-header">
+                            <span class="page-indicator">Page ${pageIndex + 1} of ${pages.length}</span>
+                            <h3 class="page-title">${escapeHtml(page.title)}</h3>
+                        </div>
+                        ${fieldsHtml}
+                        <div class="page-navigation">
+                            ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
+                            ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}
+                            ${isLast ? `<button type="button" class="viewer-draft-btn" onclick="saveDraft()" style="width:auto;margin:0 10px;">💾 Save Draft</button><button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}
+                        </div>
+                    </div>
+                `;
             }).join('');
             
             document.getElementById('viewerContainer').innerHTML = `
@@ -1748,9 +2208,10 @@
                             </div>
                             <div class="viewer-body">
                                 <form id="viewerForm">
-                                    ${fieldsHtml}
-                                    <button type="button" class="viewer-draft-btn" onclick="saveDraft()">💾 Save Draft</button>
-                                    <button type="submit" class="viewer-submit">✅ Submit</button>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" id="formProgress" style="width: ${100/pages.length}%"></div>
+                                    </div>
+                                    ${pagesHtml}
                                 </form>
                             </div>
                         </div>
@@ -1812,6 +2273,10 @@
                 </div>
             `;
             
+            // Store total pages
+            window.totalPages = pages.length;
+            window.currentPageIndex = 0;
+            
             // Initialize signature pads
             document.querySelectorAll('.sig-canvas').forEach(canvas => {
                 const ctx = canvas.getContext('2d');
@@ -1829,16 +2294,54 @@
             });
             
             // Form submit
-            document.getElementById('viewerForm').onsubmit = function(e) {
+            document.getElementById('viewerForm').onsubmit = async function(e) {
                 e.preventDefault();
+                const form = this;
+                const submitBtn = form.querySelector('.submit-btn, .viewer-submit');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '⏳ Submitting...';
+                }
+                
                 const data = { _id: Date.now(), _timestamp: new Date().toISOString() };
-                new FormData(this).forEach((v, k) => data[k] = v);
-                const key = getStorageKey();
-                const existing = JSON.parse(localStorage.getItem(key) || '[]');
-                existing.push(data);
-                localStorage.setItem(key, JSON.stringify(existing));
-                this.reset();
-                notify('✅ Submitted successfully!');
+                new FormData(form).forEach((v, k) => data[k] = v);
+                
+                // Check for duplicates
+                const dupField = state.settings.duplicateCheckField;
+                if (dupField && data[dupField]) {
+                    const isDuplicate = await checkDuplicate(dupField, data[dupField]);
+                    if (isDuplicate) {
+                        notify(`❌ Duplicate entry! "${data[dupField]}" already exists.`, 'error');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = '✅ Submit';
+                        }
+                        return;
+                    }
+                }
+                
+                // Submit to Google Sheets
+                const result = await submitToGoogleSheets(data);
+                
+                if (result.success) {
+                    saveLocally(data);
+                    form.reset();
+                    window.currentPageIndex = 0;
+                    goToPage(0);
+                    
+                    if (result.offline) {
+                        notify('💾 Saved offline. Will sync when online.');
+                    } else {
+                        notify('✅ Submitted successfully!');
+                    }
+                } else {
+                    notify('⚠️ Saved offline. Will sync when online.');
+                }
+                
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✅ Submit';
+                }
             };
             
             // Load initial data
@@ -1846,6 +2349,46 @@
             loadViewerDashboard();
             loadViewerReport();
             loadViewerDrafts();
+        }
+        
+        function goToPage(pageIndex) {
+            // Validate current page before moving forward
+            if (pageIndex > window.currentPageIndex) {
+                const currentPageEl = document.querySelector(`.form-page[data-page="${window.currentPageIndex}"]`);
+                const requiredFields = currentPageEl.querySelectorAll('[required]');
+                let valid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value) {
+                        field.style.borderColor = '#dc3545';
+                        valid = false;
+                    } else {
+                        field.style.borderColor = '#004080';
+                    }
+                });
+                
+                if (!valid) {
+                    notify('Please fill all required fields', 'error');
+                    return;
+                }
+            }
+            
+            // Hide all pages
+            document.querySelectorAll('.form-page').forEach(p => p.style.display = 'none');
+            
+            // Show target page
+            const targetPage = document.querySelector(`.form-page[data-page="${pageIndex}"]`);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                window.currentPageIndex = pageIndex;
+                
+                // Update progress bar
+                const progress = ((pageIndex + 1) / window.totalPages) * 100;
+                document.getElementById('formProgress').style.width = progress + '%';
+                
+                // Scroll to top of form
+                document.querySelector('.viewer-form-box').scrollIntoView({ behavior: 'smooth' });
+            }
         }
         
         function showViewerTab(tab, btn) {
@@ -1862,10 +2405,32 @@
         
         function getStorageKey() { return 'formData_' + state.settings.title.replace(/\s+/g, '_'); }
         
-        function loadViewerData() {
-            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+        async function loadViewerData() {
             const container = document.getElementById('dataContainer');
             if (!container) return;
+            
+            container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">⏳ Loading data...</p>';
+            
+            let data = [];
+            const scriptUrl = state.settings.scriptUrl;
+            
+            // Try to fetch from Google Sheets first
+            if (scriptUrl) {
+                try {
+                    const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=200`);
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        data = result.data;
+                    }
+                } catch (err) {
+                    console.log('Fetching from local storage instead');
+                }
+            }
+            
+            // Fallback to local storage
+            if (data.length === 0) {
+                data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+            }
             
             if (data.length === 0) {
                 container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">📭 No submissions yet</p>';
@@ -1873,25 +2438,72 @@
             }
             
             const fields = state.fields.filter(f => f.type !== 'section');
-            let html = `<p style="margin-bottom:15px;font-weight:600;">📊 ${data.length} submission(s)</p>`;
+            let html = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px;">
+                    <p style="font-weight:600;">📊 ${data.length} submission(s) ${data.length >= 200 ? '(showing first 200)' : ''}</p>
+                    <button onclick="downloadData()" style="padding:8px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:12px;">📥 Download CSV</button>
+                </div>
+            `;
             html += `<div style="overflow-x:auto;"><table class="data-table"><tr><th>#</th><th>Time</th>${fields.slice(0,5).map(f => `<th>${escapeHtml(f.label)}</th>`).join('')}</tr>`;
             data.forEach((row, i) => {
-                html += `<tr><td>${i+1}</td><td>${new Date(row._timestamp).toLocaleString()}</td>${fields.slice(0,5).map(f => `<td>${row[f.name] || '-'}</td>`).join('')}</tr>`;
+                const timestamp = row._timestamp || row.timestamp || '';
+                html += `<tr><td>${i+1}</td><td>${timestamp ? new Date(timestamp).toLocaleString() : '-'}</td>${fields.slice(0,5).map(f => `<td>${row[f.name] || '-'}</td>`).join('')}</tr>`;
             });
             html += `</table></div>`;
             container.innerHTML = html;
+            
+            // Store data for download
+            window.currentViewData = data;
         }
         
+        window.downloadData = async function() {
+            let data = window.currentViewData || [];
+            
+            if (data.length === 0) {
+                notify('No data to download', 'error');
+                return;
+            }
+            
+            const fields = state.fields.filter(f => f.type !== 'section');
+            const headers = ['Timestamp', ...fields.map(f => f.label)];
+            const rows = data.map(row => {
+                const timestamp = row._timestamp || row.timestamp || '';
+                return [timestamp, ...fields.map(f => row[f.name] || '')];
+            });
+            
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${state.settings.title.replace(/\s+/g, '_')}_data.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            notify('✅ Data downloaded!');
+        };
+        
         function loadViewerDashboard() {
-            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+            const data = window.currentViewData || JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
             const container = document.getElementById('dashboardStats');
             if (!container) return;
             
-            const today = data.filter(d => new Date(d._timestamp).toDateString() === new Date().toDateString()).length;
+            const today = data.filter(d => {
+                const ts = d._timestamp || d.timestamp;
+                return ts && new Date(ts).toDateString() === new Date().toDateString();
+            }).length;
+            
+            const offlineCount = JSON.parse(localStorage.getItem('offlineSubmissions') || '[]').length;
+            
             container.innerHTML = `
                 <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Total</div></div>
                 <div class="stat-card" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><div class="stat-value">${today}</div><div class="stat-label">Today</div></div>
                 <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">${state.fields.length}</div><div class="stat-label">Fields</div></div>
+                ${offlineCount > 0 ? `<div class="stat-card" style="background:linear-gradient(135deg,#ffc107 0%,#e0a800 100%);color:#000;"><div class="stat-value">${offlineCount}</div><div class="stat-label">Pending Sync</div></div>` : ''}
             `;
         }
         
@@ -2005,6 +2617,267 @@
         };
 
         // ============================================
+        // CAMERA FUNCTIONS
+        // ============================================
+        window.openCamera = function(btn, fieldName) {
+            const container = btn.closest('.camera-container');
+            const preview = container.querySelector('.camera-preview');
+            const dataInput = container.querySelector('.camera-data');
+            
+            // Create video element for camera
+            const video = document.createElement('video');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('playsinline', '');
+            video.style.cssText = 'width:100%;max-width:300px;border-radius:8px;border:2px solid #17a2b8;';
+            
+            const captureBtn = document.createElement('button');
+            captureBtn.type = 'button';
+            captureBtn.textContent = '📸 Capture';
+            captureBtn.style.cssText = 'margin:10px 5px;padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = '❌ Cancel';
+            cancelBtn.style.cssText = 'margin:10px 5px;padding:10px 20px;background:#dc3545;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;';
+            
+            preview.innerHTML = '';
+            preview.appendChild(video);
+            preview.appendChild(captureBtn);
+            preview.appendChild(cancelBtn);
+            
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    
+                    captureBtn.onclick = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                        dataInput.value = imageData;
+                        
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        const img = document.createElement('img');
+                        img.src = imageData;
+                        img.style.cssText = 'width:100%;max-width:200px;border-radius:8px;border:2px solid #28a745;';
+                        
+                        const retakeBtn = document.createElement('button');
+                        retakeBtn.type = 'button';
+                        retakeBtn.textContent = '🔄 Retake';
+                        retakeBtn.style.cssText = 'display:block;margin-top:10px;padding:8px 16px;background:#ffc107;color:#000;border:none;border-radius:4px;cursor:pointer;';
+                        retakeBtn.onclick = () => openCamera(btn, fieldName);
+                        
+                        preview.innerHTML = '';
+                        preview.appendChild(img);
+                        preview.appendChild(retakeBtn);
+                    };
+                    
+                    cancelBtn.onclick = () => {
+                        stream.getTracks().forEach(track => track.stop());
+                        preview.innerHTML = '';
+                    };
+                })
+                .catch(err => {
+                    preview.innerHTML = `<p style="color:#dc3545;">❌ Camera error: ${err.message}</p>`;
+                });
+        };
+
+        // ============================================
+        // QR SCANNER FUNCTIONS
+        // ============================================
+        window.openQRScanner = function(btn, fieldName) {
+            const container = btn.closest('.qr-container');
+            const resultInput = container.querySelector('.qr-result');
+            
+            const scannerDiv = document.createElement('div');
+            scannerDiv.style.cssText = 'margin-top:10px;';
+            
+            const video = document.createElement('video');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('playsinline', '');
+            video.style.cssText = 'width:100%;max-width:300px;border-radius:8px;border:2px solid #6f42c1;';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = '❌ Cancel';
+            cancelBtn.style.cssText = 'display:block;margin-top:10px;padding:8px 16px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;';
+            
+            const status = document.createElement('p');
+            status.textContent = '📱 Point camera at QR code...';
+            status.style.cssText = 'font-size:12px;color:#6f42c1;margin-top:8px;';
+            
+            scannerDiv.appendChild(video);
+            scannerDiv.appendChild(status);
+            scannerDiv.appendChild(cancelBtn);
+            
+            container.appendChild(scannerDiv);
+            
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    
+                    // Simple QR detection using canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const scanInterval = setInterval(() => {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            ctx.drawImage(video, 0, 0);
+                            
+                            // Check if BarcodeDetector is available
+                            if ('BarcodeDetector' in window) {
+                                const detector = new BarcodeDetector({ formats: ['qr_code'] });
+                                detector.detect(canvas)
+                                    .then(barcodes => {
+                                        if (barcodes.length > 0) {
+                                            resultInput.value = barcodes[0].rawValue;
+                                            clearInterval(scanInterval);
+                                            stream.getTracks().forEach(track => track.stop());
+                                            scannerDiv.remove();
+                                            notify('✅ QR Code scanned!');
+                                        }
+                                    })
+                                    .catch(err => console.log('Scan error:', err));
+                            }
+                        }
+                    }, 500);
+                    
+                    cancelBtn.onclick = () => {
+                        clearInterval(scanInterval);
+                        stream.getTracks().forEach(track => track.stop());
+                        scannerDiv.remove();
+                    };
+                })
+                .catch(err => {
+                    status.textContent = `❌ Camera error: ${err.message}`;
+                    status.style.color = '#dc3545';
+                });
+        };
+
+        // ============================================
+        // GOOGLE SHEETS INTEGRATION
+        // ============================================
+        async function submitToGoogleSheets(data) {
+            const scriptUrl = state.settings.scriptUrl;
+            const sheetId = state.settings.sheetId;
+            
+            if (!scriptUrl) {
+                // Save locally if no script URL
+                saveLocally(data);
+                return { success: true, offline: true };
+            }
+            
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submit',
+                        formTitle: state.settings.title,
+                        sheetId: sheetId,
+                        data: data
+                    })
+                });
+                return { success: true };
+            } catch (err) {
+                // Save offline if network fails
+                saveOffline(data);
+                return { success: false, offline: true, error: err.message };
+            }
+        }
+        
+        async function checkDuplicate(fieldName, value) {
+            const scriptUrl = state.settings.scriptUrl;
+            if (!scriptUrl || !fieldName || !value) return false;
+            
+            try {
+                const response = await fetch(`${scriptUrl}?action=checkDuplicate&formTitle=${encodeURIComponent(state.settings.title)}&field=${encodeURIComponent(fieldName)}&value=${encodeURIComponent(value)}`);
+                const result = await response.json();
+                return result.isDuplicate;
+            } catch (err) {
+                // Check local storage for duplicates
+                const key = getStorageKey();
+                const localData = JSON.parse(localStorage.getItem(key) || '[]');
+                return localData.some(d => d[fieldName] === value);
+            }
+        }
+        
+        async function fetchDataFromGoogleSheets() {
+            const scriptUrl = state.settings.scriptUrl;
+            if (!scriptUrl) return null;
+            
+            try {
+                const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=200`);
+                const result = await response.json();
+                return result.data || [];
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                return null;
+            }
+        }
+        
+        function saveOffline(data) {
+            data._offline = true;
+            data._pendingSync = true;
+            const offlineData = JSON.parse(localStorage.getItem('offlineSubmissions') || '[]');
+            offlineData.push({ formTitle: state.settings.title, data: data });
+            localStorage.setItem('offlineSubmissions', JSON.stringify(offlineData));
+        }
+        
+        function saveLocally(data) {
+            const key = getStorageKey();
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push(data);
+            localStorage.setItem(key, JSON.stringify(existing));
+        }
+        
+        async function syncOfflineData() {
+            const offlineData = JSON.parse(localStorage.getItem('offlineSubmissions') || '[]');
+            if (offlineData.length === 0) return;
+            
+            const scriptUrl = state.settings.scriptUrl;
+            if (!scriptUrl) return;
+            
+            const synced = [];
+            for (const item of offlineData) {
+                try {
+                    await fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'submit',
+                            formTitle: item.formTitle,
+                            data: item.data
+                        })
+                    });
+                    synced.push(item);
+                } catch (err) {
+                    break;
+                }
+            }
+            
+            if (synced.length > 0) {
+                const remaining = offlineData.filter(d => !synced.includes(d));
+                localStorage.setItem('offlineSubmissions', JSON.stringify(remaining));
+                notify(`✅ Synced ${synced.length} offline submission(s)`);
+            }
+        }
+        
+        // Sync when online
+        window.addEventListener('online', syncOfflineData);
+        
+        // Check connection status
+        function isOnline() {
+            return navigator.onLine;
+        }
+
+        // ============================================
         // GENERATE FORM
         // ============================================
         function generateForm() {
@@ -2116,36 +2989,174 @@ ${fieldsHTML}
         }
 
         function generateAppsScriptCode() {
-            return `// Google Apps Script for ${state.settings.title}
-// Deploy as Web App with "Anyone" access
+            const fields = state.fields.filter(f => f.type !== 'section');
+            const headers = ['_timestamp', ...fields.map(f => f.name)];
+            
+            return `// ============================================
+// Google Apps Script for Form Builder Pro
+// Form: ${state.settings.title}
+// ============================================
+// INSTRUCTIONS:
+// 1. Create a new Google Sheet
+// 2. Go to Extensions → Apps Script
+// 3. Delete any existing code and paste this entire script
+// 4. Click Deploy → New deployment
+// 5. Select "Web app" as type
+// 6. Set "Who has access" to "Anyone"
+// 7. Click Deploy and copy the URL
+// 8. Paste the URL in Form Builder Settings → Google Sheets → Apps Script URL
+
+const SPREADSHEET_ID = '${state.settings.sheetId || 'YOUR_SPREADSHEET_ID_HERE'}';
 
 function doPost(e) {
-    try {
-        const data = JSON.parse(e.postData.contents);
-        const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-        
-        // Get headers or create them
-        let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].filter(h => h);
-        if (headers.length === 0) {
-            headers = Object.keys(data);
-            sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-        }
-        
-        // Add data row
-        const row = headers.map(h => data[h] || '');
-        sheet.appendRow(row);
-        
-        return ContentService.createTextOutput(JSON.stringify({success: true}))
-            .setMimeType(ContentService.MimeType.JSON);
-    } catch (error) {
-        return ContentService.createTextOutput(JSON.stringify({success: false, error: error.message}))
-            .setMimeType(ContentService.MimeType.JSON);
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    const action = payload.action || 'submit';
+    
+    if (action === 'submit') {
+      return handleSubmit(payload);
     }
+    
+    return jsonResponse({ success: false, error: 'Unknown action' });
+  } catch (error) {
+    return jsonResponse({ success: false, error: error.message });
+  }
 }
 
 function doGet(e) {
-    return ContentService.createTextOutput('Form submission endpoint ready.')
-        .setMimeType(ContentService.MimeType.TEXT);
+  try {
+    const action = e.parameter.action;
+    
+    if (action === 'getData') {
+      return handleGetData(e.parameter);
+    }
+    
+    if (action === 'checkDuplicate') {
+      return handleCheckDuplicate(e.parameter);
+    }
+    
+    return jsonResponse({ success: true, message: 'Form API ready' });
+  } catch (error) {
+    return jsonResponse({ success: false, error: error.message });
+  }
+}
+
+function handleSubmit(payload) {
+  const formTitle = payload.formTitle || 'Form Data';
+  const data = payload.data || {};
+  const sheetId = payload.sheetId || SPREADSHEET_ID;
+  
+  const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(formTitle);
+  
+  // Create sheet if it doesn't exist
+  if (!sheet) {
+    sheet = ss.insertSheet(formTitle);
+    // Add headers
+    const headers = ${JSON.stringify(headers)};
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#004080').setFontColor('#ffffff');
+  }
+  
+  // Get headers from first row
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  
+  // Check for new fields and add columns if needed
+  Object.keys(data).forEach(key => {
+    if (!key.startsWith('_') && !headers.includes(key)) {
+      const newCol = sheet.getLastColumn() + 1;
+      sheet.getRange(1, newCol).setValue(key).setFontWeight('bold').setBackground('#004080').setFontColor('#ffffff');
+      headers.push(key);
+    }
+  });
+  
+  // Build row data
+  const rowData = headers.map(h => {
+    const val = data[h];
+    if (val && typeof val === 'string' && val.startsWith('data:image')) {
+      return '[Image Data]'; // Don't store base64 images directly
+    }
+    return val || '';
+  });
+  
+  sheet.appendRow(rowData);
+  
+  return jsonResponse({ success: true });
+}
+
+function handleGetData(params) {
+  const formTitle = params.formTitle || 'Form Data';
+  const limit = parseInt(params.limit) || 200;
+  const sheetId = params.sheetId || SPREADSHEET_ID;
+  
+  const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(formTitle);
+  
+  if (!sheet) {
+    return jsonResponse({ success: true, data: [] });
+  }
+  
+  const lastRow = Math.min(sheet.getLastRow(), limit + 1);
+  if (lastRow < 2) {
+    return jsonResponse({ success: true, data: [] });
+  }
+  
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const dataRange = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn());
+  const values = dataRange.getValues();
+  
+  const data = values.map(row => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h] = row[i];
+    });
+    return obj;
+  });
+  
+  return jsonResponse({ success: true, data: data });
+}
+
+function handleCheckDuplicate(params) {
+  const formTitle = params.formTitle || 'Form Data';
+  const field = params.field;
+  const value = params.value;
+  const sheetId = params.sheetId || SPREADSHEET_ID;
+  
+  if (!field || !value) {
+    return jsonResponse({ success: true, isDuplicate: false });
+  }
+  
+  const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(formTitle);
+  
+  if (!sheet || sheet.getLastRow() < 2) {
+    return jsonResponse({ success: true, isDuplicate: false });
+  }
+  
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const fieldIndex = headers.indexOf(field);
+  
+  if (fieldIndex === -1) {
+    return jsonResponse({ success: true, isDuplicate: false });
+  }
+  
+  const values = sheet.getRange(2, fieldIndex + 1, sheet.getLastRow() - 1, 1).getValues();
+  const isDuplicate = values.some(row => String(row[0]).toLowerCase() === String(value).toLowerCase());
+  
+  return jsonResponse({ success: true, isDuplicate: isDuplicate });
+}
+
+function jsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============================================
+// UTILITY: Test the script
+// ============================================
+function testScript() {
+  Logger.log('Script is working!');
+  Logger.log('Spreadsheet ID: ' + SPREADSHEET_ID);
 }`;
         }
 
@@ -2157,17 +3168,26 @@ function doGet(e) {
             
             document.getElementById('shareFormTitle').textContent = state.settings.title;
             
-            // Simplified data for smaller URL
+            // Simplified data for smaller URL - includes settings for Google Sheets
             const formData = {
                 t: state.settings.title,
                 s: state.settings.subtitle,
                 o: state.settings.organization,
                 l: state.settings.logo,
+                u: state.settings.scriptUrl || '',  // Apps Script URL
+                g: state.settings.sheetId || '',    // Sheet ID
+                df: state.settings.duplicateCheckField || '', // Duplicate check field
                 f: state.fields.map(f => {
                     const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
+                    if (f.placeholder) field.p = f.placeholder;
+                    if (f.helpText) field.h = f.helpText;
                     if (f.options?.length) field.o = f.options;
                     if (f.levels?.length) field.v = f.levels;
                     if (f.columns?.length) field.c = f.columns;
+                    if (f.rows && f.rows !== 3) field.rw = f.rows;
+                    if (f.max && f.max !== 5) field.mx = f.max;
+                    if (f.accept) field.a = f.accept;
+                    if (f.formula) field.fm = f.formula;
                     if (f.skipLogic?.enabled) field.k = f.skipLogic;
                     if (f.validation?.enabled) field.d = f.validation;
                     if (f.conditional?.enabled) field.cn = f.conditional;
