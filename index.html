@@ -226,6 +226,7 @@
         /* Viewer Container */
         .viewer-container { display: none; min-height: 100vh; background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%); }
         .viewer-container.show { display: block; }
+        #homeContainer { padding-top: 20px; }
         .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; padding-left: 180px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); align-items: center; }
         .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-decoration: none; text-transform: uppercase; transition: all 0.2s; cursor: pointer; border: none; }
         .viewer-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
@@ -379,6 +380,7 @@
         </div>
         <div class="header-actions">
             <span class="header-user" id="headerUser">👤 User</span>
+            <button class="header-btn" onclick="showHome()">🏠 Home</button>
             <button class="header-btn success" onclick="newForm()">📄 New Form</button>
             <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
             <button class="header-btn primary" onclick="shareForm()">🔗 Share</button>
@@ -466,6 +468,7 @@
 
     <!-- Viewer Container -->
     <div class="viewer-container" id="viewerContainer"></div>
+    <div class="viewer-container" id="homeContainer"></div>
 
     <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | Form Builder Pro</footer>
 
@@ -520,7 +523,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <script>     
+    <script>
         // ============================================
         // CONFIGURATION - SET YOUR VALUES HERE
         // ============================================
@@ -2074,6 +2077,8 @@
                 if (!confirm('⚠️ Create a new form? This will clear all current fields.\n\nMake sure you have shared/saved your current form first!')) {
                     return;
                 }
+                // Auto-save current form before clearing
+                saveFormToList();
             }
             
             // Clear fields
@@ -2085,6 +2090,7 @@
             const newTitle = prompt('Enter form title:', 'New Data Collection Form');
             if (newTitle) {
                 state.settings.title = newTitle;
+                state.settings.subtitle = 'Data Collection System';
                 document.getElementById('formTitle').value = newTitle;
                 document.getElementById('previewTitle').textContent = newTitle;
             }
@@ -3071,6 +3077,199 @@
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        // ============================================
+        // SHARE FORM
+        // ============================================
+        function shareForm() {
+            if (state.fields.length === 0) { 
+                notify('Add some fields first!', 'error'); 
+                return; 
+            }
+            
+            // Create compressed form data
+            const formData = {
+                s: {
+                    t: state.settings.title,
+                    st: state.settings.subtitle,
+                    o: state.settings.organization,
+                    l: state.settings.logo,
+                    mp: state.settings.multiPage,
+                    cd: state.settings.cascadingData || ''
+                },
+                f: state.fields.map(f => {
+                    const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
+                    if (f.placeholder) field.p = f.placeholder;
+                    if (f.helpText) field.h = f.helpText;
+                    if (f.duplicateCheck) field.dc = true;
+                    if (f.options?.length) field.o = f.options;
+                    if (f.levels?.length) field.v = f.levels;
+                    if (f.columns?.length) field.c = f.columns;
+                    if (f.rows && f.rows !== 3) field.rw = f.rows;
+                    if (f.max && f.max !== 5) field.mx = f.max;
+                    if (f.accept) field.a = f.accept;
+                    if (f.formula) field.fm = f.formula;
+                    if (f.skipLogic?.enabled) field.k = f.skipLogic;
+                    if (f.validation?.enabled) field.d = f.validation;
+                    if (f.conditional?.enabled) field.cn = f.conditional;
+                    return field;
+                })
+            };
+            
+            try {
+                const jsonStr = JSON.stringify(formData);
+                const compressed = pako.deflate(jsonStr);
+                const encoded = btoa(String.fromCharCode.apply(null, compressed));
+                
+                const baseUrl = window.location.origin + window.location.pathname;
+                const shareUrl = baseUrl + '?d=' + encodeURIComponent(encoded);
+                
+                // Update modal
+                document.getElementById('shareFormTitle').textContent = state.settings.title;
+                document.getElementById('shareUrl').textContent = shareUrl;
+                
+                // Generate QR code
+                const qrContainer = document.getElementById('qrCode');
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: shareUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#004080',
+                    colorLight: '#ffffff'
+                });
+                
+                // Save form to forms list
+                saveFormToList();
+                
+                document.getElementById('shareModal').classList.add('show');
+            } catch (err) {
+                notify('Error generating share URL: ' + err.message, 'error');
+            }
+        }
+        
+        function copyShareUrl() {
+            const url = document.getElementById('shareUrl').textContent;
+            navigator.clipboard.writeText(url);
+            notify('📋 URL copied to clipboard!');
+        }
+        
+        function downloadQR() {
+            const canvas = document.querySelector('#qrCode canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = state.settings.title.replace(/[^a-z0-9]/gi, '_') + '_QR.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                notify('⬇️ QR code downloaded!');
+            }
+        }
+        
+        // ============================================
+        // FORMS LIST (HOME)
+        // ============================================
+        function saveFormToList() {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const existingIndex = forms.findIndex(f => f.title === state.settings.title);
+            
+            const formEntry = {
+                title: state.settings.title,
+                subtitle: state.settings.subtitle,
+                fieldCount: state.fields.length,
+                updatedAt: new Date().toISOString(),
+                fields: state.fields,
+                settings: state.settings
+            };
+            
+            if (existingIndex >= 0) {
+                forms[existingIndex] = formEntry;
+            } else {
+                forms.push(formEntry);
+            }
+            
+            localStorage.setItem('formBuilderForms', JSON.stringify(forms));
+        }
+        
+        function showHome() {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            
+            let formsHtml = '';
+            if (forms.length === 0) {
+                formsHtml = '<div style="text-align:center;padding:40px;color:#868e96;"><p style="font-size:48px;">📭</p><p>No forms saved yet.</p><p style="font-size:12px;">Create a form and click Share to save it.</p></div>';
+            } else {
+                formsHtml = forms.map((f, i) => `
+                    <div class="form-card" style="background:#fff;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-left:4px solid #004080;">
+                        <div style="display:flex;justify-content:space-between;align-items:start;">
+                            <div>
+                                <h3 style="color:#004080;margin:0 0 5px 0;font-size:18px;">📋 ${escapeHtml(f.title)}</h3>
+                                <p style="color:#666;margin:0 0 10px 0;font-size:12px;">${escapeHtml(f.subtitle || '')}</p>
+                                <div style="font-size:11px;color:#868e96;">
+                                    📊 ${f.fieldCount} fields &nbsp;|&nbsp; 🕐 ${new Date(f.updatedAt).toLocaleDateString()}
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button onclick="loadForm(${i})" style="padding:10px 15px;background:linear-gradient(135deg,#004080,#002855);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">📂 Open</button>
+                                <button onclick="deleteForm(${i})" style="padding:10px 15px;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('homeContainer').innerHTML = `
+                <div style="max-width:800px;margin:0 auto;padding:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
+                        <h2 style="color:#004080;margin:0;">🏠 My Forms</h2>
+                        <button onclick="closeHome()" style="padding:12px 20px;background:linear-gradient(135deg,#28a745,#218838);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:bold;">➕ Create New Form</button>
+                    </div>
+                    ${formsHtml}
+                </div>
+            `;
+            
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.footer').style.display = 'none';
+            document.getElementById('homeContainer').classList.add('show');
+        }
+        
+        function closeHome() {
+            document.getElementById('homeContainer').classList.remove('show');
+            document.querySelector('.header').style.display = 'flex';
+            document.getElementById('mainContainer').classList.add('show');
+            document.querySelector('.footer').style.display = 'block';
+        }
+        
+        function loadForm(index) {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const form = forms[index];
+            if (!form) return;
+            
+            state.fields = form.fields || [];
+            state.settings = { ...state.settings, ...form.settings };
+            state.fieldCounter = Math.max(...state.fields.map(f => parseInt(f.id.replace('field_', '')) || 0), 0) + 1;
+            
+            document.getElementById('formTitle').value = state.settings.title;
+            document.getElementById('previewTitle').textContent = state.settings.title;
+            document.getElementById('previewSubtitle').textContent = state.settings.subtitle;
+            
+            saveToStorage();
+            closeHome();
+            renderFields();
+            renderProperties();
+            notify('📂 Form "' + form.title + '" loaded!');
+        }
+        
+        function deleteForm(index) {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const formTitle = forms[index]?.title || 'this form';
+            
+            if (!confirm(`Delete "${formTitle}"?`)) return;
+            
+            forms.splice(index, 1);
+            localStorage.setItem('formBuilderForms', JSON.stringify(forms));
+            showHome();
+            notify('🗑️ Form deleted');
+        }
 
         function notify(message, type = 'success') {
             const el = document.getElementById('notification');
