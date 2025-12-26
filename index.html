@@ -341,29 +341,6 @@
                         <input type="password" class="auth-input" id="loginPassword" required placeholder="Enter password">
                     </div>
                     <button type="submit" class="auth-btn" id="loginBtn">🔓 Login</button>
-                    
-                    <!-- Google Sheets Config Toggle -->
-                    <div style="margin-top:15px;text-align:center;">
-                        <button type="button" onclick="toggleAuthConfig()" style="background:none;border:none;color:#004080;font-size:11px;cursor:pointer;text-decoration:underline;">
-                            ⚙️ Configure Google Sheets Connection
-                        </button>
-                    </div>
-                    <div id="authConfigPanel" style="display:none;margin-top:15px;padding:15px;background:#f8f9fa;border-radius:8px;border:1px solid #dee2e6;">
-                        <div class="auth-group" style="margin-bottom:10px;">
-                            <label class="auth-label" style="font-size:11px;">Apps Script URL</label>
-                            <input type="text" class="auth-input" id="authScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:11px;">
-                        </div>
-                        <div class="auth-group" style="margin-bottom:10px;">
-                            <label class="auth-label" style="font-size:11px;">Google Sheet ID</label>
-                            <input type="text" class="auth-input" id="authSheetId" placeholder="Your Google Sheet ID" style="font-size:11px;">
-                        </div>
-                        <button type="button" onclick="saveAuthConfig()" style="width:100%;padding:8px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;font-weight:bold;">
-                            💾 Save Configuration
-                        </button>
-                        <p style="font-size:9px;color:#868e96;margin-top:8px;text-align:center;">
-                            Users will be stored in "_Users" sheet. Leave empty to use local storage only.
-                        </p>
-                    </div>
                 </form>
                 
                 <form class="auth-form" id="signupForm">
@@ -404,7 +381,6 @@
             <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
             <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
             <button class="header-btn primary" onclick="shareForm()">🔗 Share</button>
-            <button class="header-btn success" onclick="generateForm()">⬇️ Generate</button>
             <button class="header-btn danger" onclick="logout()">🚪 Logout</button>
         </div>
     </header>
@@ -503,7 +479,6 @@
                 <div class="tabs">
                     <div class="tab active" data-tab="general">General</div>
                     <div class="tab" data-tab="cascading">Cascading</div>
-                    <div class="tab" data-tab="google">Google Sheets</div>
                 </div>
 
                 <div class="tab-content active" id="tab-general">
@@ -545,38 +520,6 @@
                         <textarea class="property-textarea" id="cascadingData" style="height:150px;font-family:monospace;font-size:10px;" placeholder="Eastern Region||Kailahun District&#10;Kailahun District||Luawa Chiefdom&#10;Luawa Chiefdom||Kailahun Hospital||abc123"></textarea>
                     </div>
                 </div>
-
-                <div class="tab-content" id="tab-google">
-                    <div class="settings-group">
-                        <label class="settings-label">Apps Script Web App URL</label>
-                        <input type="text" class="settings-input" id="settingsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-                        <div class="settings-hint">Deploy your Apps Script and paste the URL here</div>
-                    </div>
-                    <div class="settings-group">
-                        <label class="settings-label">Google Sheet ID</label>
-                        <input type="text" class="settings-input" id="settingsSheetId" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
-                        <div class="settings-hint">From your Google Sheet URL (between /d/ and /edit)</div>
-                    </div>
-                    <div class="settings-group">
-                        <label class="settings-label">Duplicate Check Field</label>
-                        <select class="settings-input" id="settingsDuplicateField">
-                            <option value="">-- No duplicate check --</option>
-                        </select>
-                        <div class="settings-hint">Prevent duplicate submissions based on this field</div>
-                    </div>
-                    <div class="info-box warning">
-                        <h4>📋 Setup Instructions:</h4>
-                        <ol style="margin-left:15px;font-size:10px;line-height:1.8;">
-                            <li>Create a Google Sheet</li>
-                            <li>Go to Extensions → Apps Script</li>
-                            <li>Click "Generate" button to get the Apps Script code</li>
-                            <li>Paste the code in Apps Script editor</li>
-                            <li>Deploy → New deployment → Web app</li>
-                            <li>Set "Who has access" to "Anyone"</li>
-                            <li>Copy the Web App URL and paste above</li>
-                        </ol>
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn secondary" onclick="closeModal('settingsModal')">Cancel</button>
@@ -612,41 +555,6 @@
         </div>
     </div>
 
-    <!-- Generate Modal -->
-    <div class="modal-overlay" id="generateModal">
-        <div class="modal" style="max-width:900px;">
-            <div class="modal-header">
-                <h3>📥 Generated Form</h3>
-                <button class="modal-close" onclick="closeModal('generateModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="tabs">
-                    <div class="tab active" data-tab="html-code">HTML Form</div>
-                    <div class="tab" data-tab="apps-script">Apps Script</div>
-                </div>
-                
-                <div class="tab-content active" id="tab-html-code">
-                    <div style="margin-bottom:12px;display:flex;gap:8px;">
-                        <button class="modal-btn primary" onclick="downloadHTML()">⬇️ Download HTML</button>
-                        <button class="modal-btn secondary" onclick="copyCode('htmlCode')">📋 Copy Code</button>
-                    </div>
-                    <pre id="htmlCode" style="background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:8px;font-size:10px;max-height:350px;overflow:auto;white-space:pre-wrap;"></pre>
-                </div>
-                
-                <div class="tab-content" id="tab-apps-script">
-                    <div style="margin-bottom:12px;display:flex;gap:8px;">
-                        <button class="modal-btn primary" onclick="downloadScript()">⬇️ Download .gs</button>
-                        <button class="modal-btn secondary" onclick="copyCode('scriptCode')">📋 Copy Code</button>
-                    </div>
-                    <pre id="scriptCode" style="background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:8px;font-size:10px;max-height:350px;overflow:auto;white-space:pre-wrap;"></pre>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn secondary" onclick="closeModal('generateModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Table Config Modal -->
     <div class="modal-overlay" id="tableConfigModal">
         <div class="modal" style="max-width:700px;">
@@ -673,6 +581,17 @@
 
     <script>
         // ============================================
+        // CONFIGURATION - SET YOUR VALUES HERE
+        // ============================================
+        const CONFIG = {
+            // Your Google Apps Script Web App URL (Deploy → New deployment → Web app)
+            SCRIPT_URL: 'YOUR_APPS_SCRIPT_URL_HERE',
+            
+            // Your Google Sheet ID (from the URL: https://docs.google.com/spreadsheets/d/SHEET_ID_HERE/edit)
+            SHEET_ID: 'YOUR_GOOGLE_SHEET_ID_HERE'
+        };
+
+        // ============================================
         // STATE MANAGEMENT
         // ============================================
         const state = {
@@ -686,8 +605,8 @@
                 subtitle: 'Data Collection System',
                 organization: 'ICF-SL',
                 logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
-                scriptUrl: '',
-                sheetId: '',
+                scriptUrl: CONFIG.SCRIPT_URL,
+                sheetId: CONFIG.SHEET_ID,
                 multiPage: true,
                 cascadingData: '',
                 duplicateCheckField: ''
@@ -1235,45 +1154,11 @@
         // AUTHENTICATION
         // ============================================
         function checkAuth() {
-            // Load saved config
-            const savedScriptUrl = localStorage.getItem('formBuilderScriptUrl');
-            const savedSheetId = localStorage.getItem('formBuilderSheetId');
-            if (savedScriptUrl) {
-                document.getElementById('authScriptUrl').value = savedScriptUrl;
-                state.settings.scriptUrl = savedScriptUrl;
-            }
-            if (savedSheetId) {
-                document.getElementById('authSheetId').value = savedSheetId;
-                state.settings.sheetId = savedSheetId;
-            }
-            
             const saved = localStorage.getItem('formBuilderUser');
             if (saved) {
                 state.user = JSON.parse(saved);
                 showBuilder();
             }
-        }
-        
-        function toggleAuthConfig() {
-            const panel = document.getElementById('authConfigPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        function saveAuthConfig() {
-            const scriptUrl = document.getElementById('authScriptUrl').value.trim();
-            const sheetId = document.getElementById('authSheetId').value.trim();
-            
-            if (scriptUrl) {
-                localStorage.setItem('formBuilderScriptUrl', scriptUrl);
-                state.settings.scriptUrl = scriptUrl;
-            }
-            if (sheetId) {
-                localStorage.setItem('formBuilderSheetId', sheetId);
-                state.settings.sheetId = sheetId;
-            }
-            
-            notify('✅ Configuration saved!');
-            document.getElementById('authConfigPanel').style.display = 'none';
         }
 
         function switchAuthTab(tab) {
@@ -1309,10 +1194,10 @@
             const password = document.getElementById('loginPassword').value;
             const loginBtn = e.target.querySelector('button[type="submit"]');
             
-            // Get script URL from localStorage or settings
-            const scriptUrl = localStorage.getItem('formBuilderScriptUrl') || state.settings.scriptUrl;
+            // Use CONFIG.SCRIPT_URL
+            const scriptUrl = CONFIG.SCRIPT_URL;
             
-            if (scriptUrl) {
+            if (scriptUrl && scriptUrl !== 'YOUR_APPS_SCRIPT_URL_HERE') {
                 // Use Google Sheets authentication
                 loginBtn.disabled = true;
                 loginBtn.textContent = '⏳ Logging in...';
@@ -1324,7 +1209,8 @@
                         body: JSON.stringify({
                             action: 'login',
                             username: email,
-                            password: password
+                            password: password,
+                            sheetId: CONFIG.SHEET_ID
                         })
                     });
                     
@@ -1377,10 +1263,10 @@
             if (password !== confirm) { showAuthError('Passwords do not match'); return; }
             if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
             
-            // Get script URL from localStorage or settings
-            const scriptUrl = localStorage.getItem('formBuilderScriptUrl') || state.settings.scriptUrl;
+            // Use CONFIG.SCRIPT_URL
+            const scriptUrl = CONFIG.SCRIPT_URL;
             
-            if (scriptUrl) {
+            if (scriptUrl && scriptUrl !== 'YOUR_APPS_SCRIPT_URL_HERE') {
                 // Use Google Sheets registration
                 signupBtn.disabled = true;
                 signupBtn.textContent = '⏳ Creating account...';
@@ -1395,7 +1281,8 @@
                             email: email,
                             password: password,
                             fullName: name,
-                            organization: org
+                            organization: org,
+                            sheetId: CONFIG.SHEET_ID
                         })
                     });
                     
@@ -2247,20 +2134,7 @@
             document.getElementById('settingsOrg').value = state.settings.organization;
             document.getElementById('settingsLogo').value = state.settings.logo;
             document.getElementById('settingsMultiPage').checked = state.settings.multiPage;
-            document.getElementById('settingsScriptUrl').value = state.settings.scriptUrl || '';
-            document.getElementById('settingsSheetId').value = state.settings.sheetId || '';
             document.getElementById('cascadingData').value = state.settings.cascadingData || '';
-            
-            // Populate duplicate check field dropdown
-            const dupSelect = document.getElementById('settingsDuplicateField');
-            dupSelect.innerHTML = '<option value="">-- No duplicate check --</option>';
-            state.fields.filter(f => f.type !== 'section').forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f.name;
-                opt.textContent = f.label;
-                if (state.settings.duplicateCheckField === f.name) opt.selected = true;
-                dupSelect.appendChild(opt);
-            });
             
             document.getElementById('settingsModal').classList.add('show');
         }
@@ -2271,9 +2145,6 @@
             state.settings.organization = document.getElementById('settingsOrg').value;
             state.settings.logo = document.getElementById('settingsLogo').value;
             state.settings.multiPage = document.getElementById('settingsMultiPage').checked;
-            state.settings.scriptUrl = document.getElementById('settingsScriptUrl').value;
-            state.settings.sheetId = document.getElementById('settingsSheetId').value;
-            state.settings.duplicateCheckField = document.getElementById('settingsDuplicateField').value;
             state.settings.cascadingData = document.getElementById('cascadingData').value;
             
             document.getElementById('formTitle').value = state.settings.title;
@@ -3242,439 +3113,6 @@
         // Check connection status
         function isOnline() {
             return navigator.onLine;
-        }
-
-        // ============================================
-        // GENERATE FORM
-        // ============================================
-        function generateForm() {
-            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
-            document.getElementById('htmlCode').textContent = generateHTMLCode();
-            document.getElementById('scriptCode').textContent = generateAppsScriptCode();
-            document.getElementById('generateModal').classList.add('show');
-        }
-
-        function generateHTMLCode() {
-            const s = state.settings;
-            let fieldsHTML = state.fields.map(f => {
-                if (f.type === 'section') return `<div class="section-header">${f.label.toUpperCase()}</div>`;
-                return generateFieldHTML(f);
-            }).join('\n');
-            
-            return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${s.title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Oswald',sans-serif;background:#f5f5f5;padding:20px}
-        .container{max-width:700px;margin:0 auto}
-        .form-card{border:4px double #004080;border-radius:12px;background:#fff;overflow:hidden}
-        .header{background:linear-gradient(135deg,#004080 0%,#002855 100%);color:#fff;padding:25px;text-align:center}
-        .header img{width:80px;border-radius:10px;margin-bottom:12px}
-        .header h1{font-size:22px;margin-bottom:5px}
-        .header p{font-size:12px;opacity:0.9}
-        .form-body{padding:25px}
-        .form-group{margin-bottom:20px}
-        .form-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase}
-        .required{color:#dc3545}
-        .form-input,.form-select,.form-textarea{width:100%;padding:12px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px}
-        .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(0,64,128,0.2)}
-        .radio-group,.checkbox-group{display:flex;flex-wrap:wrap;gap:10px}
-        .radio-option,.checkbox-option{display:flex;align-items:center;gap:6px;padding:10px 14px;border:2px solid #dee2e6;border-radius:6px;cursor:pointer;font-size:12px;transition:all 0.2s}
-        .radio-option:hover,.checkbox-option:hover{border-color:#004080}
-        .section-header{background:#004080;color:#fff;padding:14px 18px;margin:25px -25px;font-size:14px;font-weight:700}
-        .btn-submit{width:100%;padding:16px;background:#28a745;color:#fff;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-transform:uppercase;margin-top:10px}
-        .btn-submit:hover{background:#218838}
-        .help-text{font-size:10px;color:#868e96;margin-top:4px}
-        .footer{text-align:center;padding:20px;font-size:11px;color:#868e96}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="form-card">
-            <div class="header">
-                <img src="${s.logo}" alt="Logo">
-                <h1>${s.title}</h1>
-                <p>${s.subtitle}</p>
-            </div>
-            <div class="form-body">
-                <form id="dataForm">
-${fieldsHTML}
-                    <button type="submit" class="btn-submit">✅ SUBMIT</button>
-                </form>
-            </div>
-        </div>
-        <div class="footer">© 2025 ${s.organization}</div>
-    </div>
-    <script>
-        document.getElementById('dataForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const data = {};
-            new FormData(this).forEach((v, k) => data[k] = v);
-            data._timestamp = new Date().toISOString();
-            console.log('Form data:', data);
-            alert('✅ Form submitted successfully!');
-            this.reset();
-        });
-    <\/script>
-</body>
-</html>`;
-        }
-
-        function generateFieldHTML(field) {
-            const req = field.required ? '<span class="required">*</span>' : '';
-            const reqAttr = field.required ? 'required' : '';
-            const help = field.helpText ? `<div class="help-text">${escapeHtml(field.helpText)}</div>` : '';
-            let inner = '';
-            
-            switch (field.type) {
-                case 'text': inner = `<input type="text" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
-                case 'email': inner = `<input type="email" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
-                case 'phone': inner = `<input type="tel" class="form-input" name="${field.name}" placeholder="${field.placeholder || 'Enter 9 digits'}" pattern="[0-9]{9}" maxlength="9" minlength="9" title="Please enter exactly 9 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'')" ${reqAttr}>`; break;
-                case 'number': inner = `<input type="number" class="form-input" name="${field.name}" placeholder="${field.placeholder || ''}" ${reqAttr}>`; break;
-                case 'date': inner = `<input type="date" class="form-input" name="${field.name}" ${reqAttr}>`; break;
-                case 'time': inner = `<input type="time" class="form-input" name="${field.name}" ${reqAttr}>`; break;
-                case 'textarea': inner = `<textarea class="form-textarea" name="${field.name}" rows="4" placeholder="${field.placeholder || ''}" ${reqAttr}></textarea>`; break;
-                case 'select': 
-                    inner = `<select class="form-select" name="${field.name}" ${reqAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; 
-                    break;
-                case 'radio': case 'yesno': case 'yesnona':
-                    const opts = field.type === 'yesno' ? ['Yes', 'No'] : field.type === 'yesnona' ? ['Yes', 'No', 'N/A'] : (field.options || []);
-                    inner = `<div class="radio-group">${opts.map(o => `<label class="radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; 
-                    break;
-                case 'checkbox':
-                    inner = `<div class="checkbox-group">${(field.options || []).map(o => `<label class="checkbox-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; 
-                    break;
-                default: return '';
-            }
-            
-            return `                    <div class="form-group"><label class="form-label">${escapeHtml(field.label)} ${req}</label>${inner}${help}</div>`;
-        }
-
-        function generateAppsScriptCode() {
-            const fields = state.fields.filter(f => f.type !== 'section');
-            const headers = ['_timestamp', ...fields.map(f => f.name)];
-            
-            return `// ============================================
-// Google Apps Script for Form Builder Pro
-// Form: ${state.settings.title}
-// ============================================
-// INSTRUCTIONS:
-// 1. Create a new Google Sheet
-// 2. Go to Extensions → Apps Script
-// 3. Delete any existing code and paste this entire script
-// 4. Click Deploy → New deployment
-// 5. Select "Web app" as type
-// 6. Set "Who has access" to "Anyone"
-// 7. Click Deploy and copy the URL
-// 8. Paste the URL in Form Builder Settings → Google Sheets → Apps Script URL
-
-const SPREADSHEET_ID = '${state.settings.sheetId || 'YOUR_SPREADSHEET_ID_HERE'}';
-
-function doPost(e) {
-  try {
-    const payload = JSON.parse(e.postData.contents);
-    const action = payload.action || 'submit';
-    
-    if (action === 'submit') {
-      return handleSubmit(payload);
-    }
-    
-    return jsonResponse({ success: false, error: 'Unknown action' });
-  } catch (error) {
-    return jsonResponse({ success: false, error: error.message });
-  }
-}
-
-function doGet(e) {
-  try {
-    const action = e.parameter.action;
-    
-    if (action === 'getData') {
-      return handleGetData(e.parameter);
-    }
-    
-    if (action === 'checkDuplicate') {
-      return handleCheckDuplicate(e.parameter);
-    }
-    
-    return jsonResponse({ success: true, message: 'Form API ready' });
-  } catch (error) {
-    return jsonResponse({ success: false, error: error.message });
-  }
-}
-
-function handleSubmit(payload) {
-  const formTitle = payload.formTitle || 'Form Data';
-  const data = payload.data || {};
-  const sheetId = payload.sheetId || SPREADSHEET_ID;
-  
-  const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(formTitle);
-  
-  // Create sheet if it doesn't exist
-  if (!sheet) {
-    sheet = ss.insertSheet(formTitle);
-    // Add headers
-    const headers = ${JSON.stringify(headers)};
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#004080').setFontColor('#ffffff');
-  }
-  
-  // Get headers from first row
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  
-  // Check for new fields and add columns if needed
-  Object.keys(data).forEach(key => {
-    if (!key.startsWith('_') && !headers.includes(key)) {
-      const newCol = sheet.getLastColumn() + 1;
-      sheet.getRange(1, newCol).setValue(key).setFontWeight('bold').setBackground('#004080').setFontColor('#ffffff');
-      headers.push(key);
-    }
-  });
-  
-  // Build row data
-  const rowData = headers.map(h => {
-    const val = data[h];
-    if (val && typeof val === 'string' && val.startsWith('data:image')) {
-      return '[Image Data]'; // Don't store base64 images directly
-    }
-    return val || '';
-  });
-  
-  sheet.appendRow(rowData);
-  
-  return jsonResponse({ success: true });
-}
-
-function handleGetData(params) {
-  const formTitle = params.formTitle || 'Form Data';
-  const limit = parseInt(params.limit) || 200;
-  const sheetId = params.sheetId || SPREADSHEET_ID;
-  
-  const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(formTitle);
-  
-  if (!sheet) {
-    return jsonResponse({ success: true, data: [] });
-  }
-  
-  const lastRow = Math.min(sheet.getLastRow(), limit + 1);
-  if (lastRow < 2) {
-    return jsonResponse({ success: true, data: [] });
-  }
-  
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const dataRange = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn());
-  const values = dataRange.getValues();
-  
-  const data = values.map(row => {
-    const obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = row[i];
-    });
-    return obj;
-  });
-  
-  return jsonResponse({ success: true, data: data });
-}
-
-function handleCheckDuplicate(params) {
-  const formTitle = params.formTitle || 'Form Data';
-  const field = params.field;
-  const value = params.value;
-  const sheetId = params.sheetId || SPREADSHEET_ID;
-  
-  if (!field || !value) {
-    return jsonResponse({ success: true, isDuplicate: false });
-  }
-  
-  const ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(formTitle);
-  
-  if (!sheet || sheet.getLastRow() < 2) {
-    return jsonResponse({ success: true, isDuplicate: false });
-  }
-  
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const fieldIndex = headers.indexOf(field);
-  
-  if (fieldIndex === -1) {
-    return jsonResponse({ success: true, isDuplicate: false });
-  }
-  
-  const values = sheet.getRange(2, fieldIndex + 1, sheet.getLastRow() - 1, 1).getValues();
-  const isDuplicate = values.some(row => String(row[0]).toLowerCase() === String(value).toLowerCase());
-  
-  return jsonResponse({ success: true, isDuplicate: isDuplicate });
-}
-
-function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-// ============================================
-// UTILITY: Test the script
-// ============================================
-function testScript() {
-  Logger.log('Script is working!');
-  Logger.log('Spreadsheet ID: ' + SPREADSHEET_ID);
-}`;
-        }
-
-        // ============================================
-        // SHARE & QR CODE
-        // ============================================
-        function shareForm() {
-            if (state.fields.length === 0) { notify('Add some fields first!', 'error'); return; }
-            
-            document.getElementById('shareFormTitle').textContent = state.settings.title;
-            
-            // Simplified data for smaller URL - includes settings for Google Sheets
-            const formData = {
-                t: state.settings.title,
-                s: state.settings.subtitle,
-                o: state.settings.organization,
-                l: state.settings.logo,
-                u: state.settings.scriptUrl || '',  // Apps Script URL
-                g: state.settings.sheetId || '',    // Sheet ID
-                df: state.settings.duplicateCheckField || '', // Duplicate check field
-                f: state.fields.map(f => {
-                    const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
-                    if (f.placeholder) field.p = f.placeholder;
-                    if (f.helpText) field.h = f.helpText;
-                    if (f.duplicateCheck) field.dc = true;
-                    if (f.options?.length) field.o = f.options;
-                    if (f.levels?.length) field.v = f.levels;
-                    if (f.columns?.length) field.c = f.columns;
-                    if (f.rows && f.rows !== 3) field.rw = f.rows;
-                    if (f.max && f.max !== 5) field.mx = f.max;
-                    if (f.accept) field.a = f.accept;
-                    if (f.formula) field.fm = f.formula;
-                    if (f.skipLogic?.enabled) field.k = f.skipLogic;
-                    if (f.validation?.enabled) field.d = f.validation;
-                    if (f.conditional?.enabled) field.cn = f.conditional;
-                    return field;
-                })
-            };
-            
-            try {
-                const jsonStr = JSON.stringify(formData);
-                const compressed = pako.deflate(jsonStr);
-                const encoded = btoa(String.fromCharCode.apply(null, compressed));
-                
-                const baseUrl = window.location.protocol === 'file:' 
-                    ? 'https://yourdomain.com/form.html'
-                    : window.location.origin + window.location.pathname;
-                
-                currentShareUrl = baseUrl + '?c=' + encodeURIComponent(encoded);
-                document.getElementById('shareUrl').textContent = currentShareUrl;
-                
-                // Generate QR code
-                const qrContainer = document.getElementById('qrCode');
-                qrContainer.innerHTML = '';
-                new QRCode(qrContainer, {
-                    text: currentShareUrl,
-                    width: 200,
-                    height: 200,
-                    colorDark: '#004080',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M
-                });
-                
-                document.getElementById('shareModal').classList.add('show');
-            } catch (err) {
-                console.error('Share error:', err);
-                notify('Error creating share link', 'error');
-            }
-        }
-
-        function copyShareUrl() {
-            navigator.clipboard.writeText(currentShareUrl).then(() => notify('📋 URL copied!'));
-        }
-
-        function downloadQR() {
-            const qrContainer = document.getElementById('qrCode');
-            const canvas = qrContainer.querySelector('canvas');
-            const img = qrContainer.querySelector('img');
-            
-            if (!canvas && !img) { notify('No QR code to download', 'error'); return; }
-            
-            const newCanvas = document.createElement('canvas');
-            const ctx = newCanvas.getContext('2d');
-            const padding = 30;
-            const titleHeight = 50;
-            const qrSize = 200;
-            
-            newCanvas.width = qrSize + padding * 2;
-            newCanvas.height = qrSize + padding * 2 + titleHeight;
-            
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-            
-            ctx.fillStyle = '#004080';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(state.settings.title, newCanvas.width / 2, 28);
-            
-            ctx.font = '12px Arial';
-            ctx.fillStyle = '#666';
-            ctx.fillText('Scan to open form', newCanvas.width / 2, 45);
-            
-            if (canvas) {
-                ctx.drawImage(canvas, padding, titleHeight + 10, qrSize, qrSize);
-                downloadImage();
-            } else if (img) {
-                const tempImg = new Image();
-                tempImg.crossOrigin = 'anonymous';
-                tempImg.onload = function() {
-                    ctx.drawImage(tempImg, padding, titleHeight + 10, qrSize, qrSize);
-                    downloadImage();
-                };
-                tempImg.src = img.src;
-            }
-            
-            function downloadImage() {
-                const link = document.createElement('a');
-                link.download = state.settings.title.replace(/[^a-z0-9]/gi, '-') + '-QR.png';
-                link.href = newCanvas.toDataURL('image/png');
-                link.click();
-                notify('⬇️ QR Code downloaded!');
-            }
-        }
-
-        // ============================================
-        // UTILITIES
-        // ============================================
-        function downloadHTML() {
-            const code = document.getElementById('htmlCode').textContent;
-            const blob = new Blob([code], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = state.settings.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
-            a.click();
-            notify('⬇️ HTML downloaded!');
-        }
-
-        function downloadScript() {
-            const code = document.getElementById('scriptCode').textContent;
-            const blob = new Blob([code], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'apps-script.gs';
-            a.click();
-            notify('⬇️ Script downloaded!');
-        }
-
-        function copyCode(id) {
-            const code = document.getElementById(id).textContent;
-            navigator.clipboard.writeText(code);
-            notify('📋 Code copied!');
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
