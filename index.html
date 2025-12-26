@@ -381,7 +381,8 @@
         <div class="header-actions">
             <span class="header-user" id="headerUser">👤 User</span>
             <button class="header-btn" onclick="showHome()">🏠 Home</button>
-            <button class="header-btn success" onclick="newForm()">📄 New Form</button>
+            <button class="header-btn success" onclick="newForm()">📄 New</button>
+            <button class="header-btn" onclick="saveCurrentForm()">💾 Save</button>
             <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
             <button class="header-btn primary" onclick="shareForm()">🔗 Share</button>
             <button class="header-btn danger" onclick="logout()">🚪 Logout</button>
@@ -3168,14 +3169,27 @@
         // ============================================
         // FORMS LIST (HOME)
         // ============================================
+        function saveCurrentForm() {
+            if (state.fields.length === 0) {
+                notify('Add some fields first!', 'error');
+                return;
+            }
+            saveFormToList();
+            notify('💾 Form "' + state.settings.title + '" saved!');
+        }
+        
         function saveFormToList() {
             const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
             const existingIndex = forms.findIndex(f => f.title === state.settings.title);
             
             const formEntry = {
+                id: existingIndex >= 0 ? forms[existingIndex].id : 'form_' + Date.now(),
                 title: state.settings.title,
                 subtitle: state.settings.subtitle,
+                organization: state.settings.organization,
+                logo: state.settings.logo,
                 fieldCount: state.fields.length,
+                createdAt: existingIndex >= 0 ? forms[existingIndex].createdAt : new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 fields: state.fields,
                 settings: state.settings
@@ -3195,21 +3209,48 @@
             
             let formsHtml = '';
             if (forms.length === 0) {
-                formsHtml = '<div style="text-align:center;padding:40px;color:#868e96;"><p style="font-size:48px;">📭</p><p>No forms saved yet.</p><p style="font-size:12px;">Create a form and click Share to save it.</p></div>';
+                formsHtml = `
+                    <div style="text-align:center;padding:60px 20px;color:#868e96;">
+                        <p style="font-size:64px;margin-bottom:20px;">📭</p>
+                        <h3 style="color:#004080;margin-bottom:10px;">No Forms Yet</h3>
+                        <p style="font-size:14px;margin-bottom:20px;">Create your first form to get started!</p>
+                        <button onclick="closeHome()" style="padding:15px 30px;background:linear-gradient(135deg,#28a745,#218838);color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:bold;">
+                            ➕ Create New Form
+                        </button>
+                    </div>
+                `;
             } else {
                 formsHtml = forms.map((f, i) => `
-                    <div class="form-card" style="background:#fff;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-left:4px solid #004080;">
-                        <div style="display:flex;justify-content:space-between;align-items:start;">
-                            <div>
-                                <h3 style="color:#004080;margin:0 0 5px 0;font-size:18px;">📋 ${escapeHtml(f.title)}</h3>
-                                <p style="color:#666;margin:0 0 10px 0;font-size:12px;">${escapeHtml(f.subtitle || '')}</p>
-                                <div style="font-size:11px;color:#868e96;">
-                                    📊 ${f.fieldCount} fields &nbsp;|&nbsp; 🕐 ${new Date(f.updatedAt).toLocaleDateString()}
-                                </div>
+                    <div class="home-form-card" style="background:#fff;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,#004080,#002855);color:#fff;padding:15px 20px;">
+                            <h3 style="margin:0;font-size:18px;">📋 ${escapeHtml(f.title)}</h3>
+                            <p style="margin:5px 0 0 0;font-size:12px;opacity:0.8;">${escapeHtml(f.subtitle || 'Data Collection Form')}</p>
+                        </div>
+                        <div style="padding:15px 20px;">
+                            <div style="display:flex;gap:15px;flex-wrap:wrap;font-size:11px;color:#666;margin-bottom:15px;">
+                                <span>📊 ${f.fieldCount} fields</span>
+                                <span>🏢 ${escapeHtml(f.organization || 'ICF-SL')}</span>
+                                <span>🕐 ${new Date(f.updatedAt).toLocaleDateString()}</span>
                             </div>
-                            <div style="display:flex;gap:8px;">
-                                <button onclick="loadForm(${i})" style="padding:10px 15px;background:linear-gradient(135deg,#004080,#002855);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">📂 Open</button>
-                                <button onclick="deleteForm(${i})" style="padding:10px 15px;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">🗑️</button>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button onclick="editForm(${i})" style="flex:1;min-width:80px;padding:10px;background:linear-gradient(135deg,#004080,#002855);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">
+                                    ✏️ Edit
+                                </button>
+                                <button onclick="shareFormFromHome(${i})" style="flex:1;min-width:80px;padding:10px;background:linear-gradient(135deg,#17a2b8,#138496);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">
+                                    🔗 Share
+                                </button>
+                                <button onclick="viewFormData(${i})" style="flex:1;min-width:80px;padding:10px;background:linear-gradient(135deg,#28a745,#218838);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">
+                                    📊 Data
+                                </button>
+                                <button onclick="viewFormDashboard(${i})" style="flex:1;min-width:80px;padding:10px;background:linear-gradient(135deg,#ffc107,#e0a800);color:#000;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">
+                                    📈 Dashboard
+                                </button>
+                                <button onclick="viewFormReport(${i})" style="flex:1;min-width:80px;padding:10px;background:linear-gradient(135deg,#6c757d,#5a6268);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">
+                                    📄 Report
+                                </button>
+                                <button onclick="deleteForm(${i})" style="padding:10px 15px;background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;">
+                                    🗑️
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -3217,10 +3258,15 @@
             }
             
             document.getElementById('homeContainer').innerHTML = `
-                <div style="max-width:800px;margin:0 auto;padding:20px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
-                        <h2 style="color:#004080;margin:0;">🏠 My Forms</h2>
-                        <button onclick="closeHome()" style="padding:12px 20px;background:linear-gradient(135deg,#28a745,#218838);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:bold;">➕ Create New Form</button>
+                <div style="max-width:900px;margin:0 auto;padding:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px;">
+                        <div>
+                            <h2 style="color:#004080;margin:0;">🏠 My Forms</h2>
+                            <p style="color:#666;margin:5px 0 0 0;font-size:12px;">${forms.length} form(s) saved</p>
+                        </div>
+                        <button onclick="closeHome()" style="padding:12px 25px;background:linear-gradient(135deg,#28a745,#218838);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:bold;box-shadow:0 3px 10px rgba(40,167,69,0.3);">
+                            ➕ Create New Form
+                        </button>
                     </div>
                     ${formsHtml}
                 </div>
@@ -3237,6 +3283,10 @@
             document.querySelector('.header').style.display = 'flex';
             document.getElementById('mainContainer').classList.add('show');
             document.querySelector('.footer').style.display = 'block';
+        }
+        
+        function editForm(index) {
+            loadForm(index);
         }
         
         function loadForm(index) {
@@ -3259,11 +3309,88 @@
             notify('📂 Form "' + form.title + '" loaded!');
         }
         
+        function shareFormFromHome(index) {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const form = forms[index];
+            if (!form) return;
+            
+            // Temporarily set state to this form
+            const tempFields = state.fields;
+            const tempSettings = state.settings;
+            
+            state.fields = form.fields;
+            state.settings = form.settings;
+            
+            // Generate share URL
+            shareForm();
+            
+            // Restore state
+            state.fields = tempFields;
+            state.settings = tempSettings;
+        }
+        
+        function viewFormData(index) {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const form = forms[index];
+            if (!form) return;
+            
+            // Load form and go to data view
+            state.fields = form.fields || [];
+            state.settings = { ...state.settings, ...form.settings };
+            
+            document.getElementById('homeContainer').classList.remove('show');
+            openFormViewer('data');
+        }
+        
+        function viewFormDashboard(index) {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const form = forms[index];
+            if (!form) return;
+            
+            // Load form and go to dashboard view
+            state.fields = form.fields || [];
+            state.settings = { ...state.settings, ...form.settings };
+            
+            document.getElementById('homeContainer').classList.remove('show');
+            openFormViewer('dashboard');
+        }
+        
+        function viewFormReport(index) {
+            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
+            const form = forms[index];
+            if (!form) return;
+            
+            // Load form and go to report view
+            state.fields = form.fields || [];
+            state.settings = { ...state.settings, ...form.settings };
+            
+            document.getElementById('homeContainer').classList.remove('show');
+            openFormViewer('report');
+        }
+        
+        function openFormViewer(activeTab = 'form') {
+            // Similar to previewForm but with specific tab active
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.footer').style.display = 'none';
+            document.getElementById('viewerContainer').classList.add('show');
+            
+            renderFormViewer();
+            
+            // Switch to the requested tab
+            setTimeout(() => {
+                const tabBtn = document.querySelector(`.viewer-nav-btn[onclick*="'${activeTab}'"]`);
+                if (tabBtn) {
+                    showViewerTab(activeTab, tabBtn);
+                }
+            }, 100);
+        }
+        
         function deleteForm(index) {
             const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
             const formTitle = forms[index]?.title || 'this form';
             
-            if (!confirm(`Delete "${formTitle}"?`)) return;
+            if (!confirm(`Delete "${formTitle}"?\n\nThis cannot be undone.`)) return;
             
             forms.splice(index, 1);
             localStorage.setItem('formBuilderForms', JSON.stringify(forms));
