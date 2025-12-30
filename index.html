@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Builder Pro - ICF-SL | DHIS2 Integration</title>
+    <title>Form Builder Pro - ICF-SL | Auto DHIS2 Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
@@ -53,7 +53,7 @@
         .field-type:hover { border-color: #004080; background: #e8f4fc; }
         
         .canvas-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .canvas-header { background: white; padding: 12px 20px; border-bottom: 3px solid #004080; display: flex; justify-content: space-between; align-items: center; }
+        .canvas-header { background: white; padding: 12px 20px; border-bottom: 3px solid #004080; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .form-title-input { font-size: 16px; font-weight: 700; border: 2px solid #ddd; padding: 8px 12px; border-radius: 6px; font-family: 'Oswald', sans-serif; width: 300px; }
         .canvas { flex: 1; overflow-y: auto; padding: 20px; background: #e9ecef; }
         .form-preview { max-width: 650px; margin: 0 auto; background: white; border: 4px double #004080; border-radius: 12px; min-height: 350px; }
@@ -71,11 +71,9 @@
         .form-field-actions { display: flex; gap: 4px; }
         .field-action-btn { background: #e9ecef; border: 2px solid #adb5bd; cursor: pointer; font-size: 16px; padding: 6px 10px; border-radius: 6px; }
         .field-action-btn:hover { background: #004080; color: white; }
-        .field-action-btn.move-up, .field-action-btn.move-down { background: #17a2b8; color: white; border-color: #17a2b8; }
         .field-action-btn.delete { background: #dc3545; color: white; border-color: #dc3545; }
         .field-badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; margin-left: 8px; }
         .field-badge.required { background: #f8d7da; color: #721c24; }
-        .field-badge.dhis2 { background: #d1ecf1; color: #0c5460; }
         
         .section-divider { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 12px 16px; margin: 15px 0; border-radius: 8px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         
@@ -90,67 +88,31 @@
         .no-selection { text-align: center; color: #868e96; padding: 40px 15px; }
         .prop-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; margin-bottom: 15px; }
         .prop-section-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; }
-        .prop-section.dhis2 { background: #e8f4fc; border-color: #17a2b8; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; overflow-y: auto; }
         .modal-overlay.show { display: flex; }
-        .modal { background: white; border-radius: 12px; max-width: 700px; width: 100%; border: 4px double #004080; max-height: 90vh; overflow-y: auto; }
-        .modal.large { max-width: 900px; }
-        .modal-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-        .modal-header.dhis2 { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); }
+        .modal { background: white; border-radius: 12px; max-width: 600px; width: 100%; border: 4px double #004080; max-height: 90vh; overflow-y: auto; }
+        .modal-header { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
         .modal-body { padding: 20px; }
-        .modal-footer { padding: 15px 20px; border-top: 2px solid #dee2e6; display: flex; justify-content: flex-end; gap: 10px; }
-        .modal-btn { padding: 10px 20px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; border: 2px solid; }
-        .modal-btn.primary { background: #004080; color: white; border-color: #004080; }
-        .modal-btn.success { background: #28a745; color: white; border-color: #28a745; }
-        .modal-btn.danger { background: #dc3545; color: white; border-color: #dc3545; }
-        .modal-btn.dhis2 { background: #17a2b8; color: white; border-color: #17a2b8; }
-        .modal-btn.secondary { background: #6c757d; color: white; border-color: #6c757d; }
+        .modal-btn { padding: 12px 24px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; border: none; }
+        .modal-btn.primary { background: #004080; color: white; }
+        .modal-btn.success { background: #28a745; color: white; }
+        .modal-btn.danger { background: #dc3545; color: white; }
+        .modal-btn.dhis2 { background: #17a2b8; color: white; }
         
-        /* DHIS2 Specific Styles */
-        .dhis2-config-section { background: #f8f9fa; border: 2px solid #17a2b8; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .dhis2-config-title { font-size: 13px; font-weight: 700; color: #17a2b8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .dhis2-input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .dhis2-input-group.full { grid-template-columns: 1fr; }
-        .dhis2-input { width: 100%; padding: 10px 12px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
+        .dhis2-config-section { background: #e8f4fc; border: 2px solid #17a2b8; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .dhis2-config-title { font-size: 13px; font-weight: 700; color: #17a2b8; margin-bottom: 12px; }
+        .dhis2-input { width: 100%; padding: 10px 12px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; margin-bottom: 10px; }
         .dhis2-input:focus { outline: none; border-color: #17a2b8; }
         .dhis2-label { display: block; font-size: 10px; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; }
-        .dhis2-status { padding: 10px 15px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .dhis2-status { padding: 12px 15px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
         .dhis2-status.connected { background: #d4edda; color: #155724; border: 2px solid #28a745; }
         .dhis2-status.disconnected { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
-        .dhis2-status.loading { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+        .dhis2-status.syncing { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
         
-        .mapping-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
-        .mapping-table th, .mapping-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
-        .mapping-table th { background: #17a2b8; color: white; font-weight: 700; font-size: 10px; position: sticky; top: 0; }
-        .mapping-table tr:nth-child(even) { background: #f8f9fa; }
-        .mapping-table tr:hover { background: #e8f4fc; }
-        .mapping-table .status-icon { font-size: 14px; }
-        .mapping-table select { width: 100%; padding: 6px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 11px; }
-        
-        .org-unit-tree { max-height: 300px; overflow-y: auto; border: 2px solid #dee2e6; border-radius: 6px; padding: 10px; background: white; }
-        .org-unit-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; margin-bottom: 4px; cursor: pointer; font-size: 12px; }
-        .org-unit-item:hover { background: #e8f4fc; }
-        .org-unit-item input { width: 16px; height: 16px; }
-        .org-unit-level { font-size: 9px; padding: 2px 6px; background: #17a2b8; color: white; border-radius: 10px; }
-        
-        .progress-modal { text-align: center; padding: 30px; }
-        .progress-modal .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #17a2b8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .progress-modal h3 { color: #004080; margin-bottom: 10px; }
-        .progress-modal p { color: #666; font-size: 12px; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .stat-box { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-box.success { background: linear-gradient(135deg, #28a745 0%, #218838 100%); }
-        .stat-box.warning { background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000; }
-        .stat-box.danger { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); }
-        .stat-box .stat-value { font-size: 24px; font-weight: 700; }
-        .stat-box .stat-label { font-size: 10px; opacity: 0.9; margin-top: 4px; }
-        
-        .log-container { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto; margin-top: 15px; }
-        .log-entry { padding: 4px 0; border-bottom: 1px solid #333; }
+        .sync-log { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
+        .log-entry { padding: 3px 0; border-bottom: 1px solid #333; }
         .log-entry.error { color: #ff6b6b; }
         .log-entry.success { color: #51cf66; }
         .log-entry.warning { color: #ffd43b; }
@@ -162,7 +124,7 @@
         .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 10px; word-break: break-all; margin-top: 15px; max-height: 80px; overflow-y: auto; font-family: monospace; }
         .qr-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         
-        .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; }
+        .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; max-width: 350px; }
         .notification.show { display: block; }
         .notification.error { background: #dc3545; }
         .notification.info { background: #17a2b8; }
@@ -171,9 +133,7 @@
         .viewer-container.show { display: block; }
         .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; position: sticky; top: 0; z-index: 100; }
         .viewer-back-btn { background: #dc3545; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; margin-right: 10px; }
-        .viewer-back-btn:hover { background: #c82333; }
         .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
-        .viewer-nav-btn:hover { transform: translateY(-2px); }
         .connection-status { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-left: auto; }
         .connection-status.online { background: #28a745; color: white; }
         .connection-status.offline { background: #dc3545; color: white; }
@@ -190,12 +150,9 @@
         .viewer-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; color: #333; }
         .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
         .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
-        .viewer-input.error { border-color: #dc3545 !important; background: #fff5f5 !important; }
-        .field-error-msg { color: #dc3545; font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #fff5f5; border-radius: 4px; }
         .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
         .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .viewer-radio-option:hover { border-color: #004080; }
-        .viewer-section { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 14px 18px; margin: 20px -25px; font-size: 13px; font-weight: 700; }
         
         .page-header { background: #e8f4fc; margin: -25px -25px 20px -25px; padding: 15px 25px; border-bottom: 2px solid #004080; }
         .page-indicator { display: inline-block; background: #004080; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
@@ -208,33 +165,23 @@
         
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
         .data-table th, .data-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
-        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; position: sticky; top: 0; }
+        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; }
         .data-table tr:nth-child(even) { background: #f8f9fa; }
-        .data-table tr:hover { background: #e8f4fc; }
         
-        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        .stat-card .stat-value { font-size: 28px; font-weight: 700; }
-        .stat-card .stat-label { font-size: 10px; opacity: 0.9; margin-top: 5px; }
+        .sync-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+        .sync-badge.synced { background: #d4edda; color: #155724; }
+        .sync-badge.pending { background: #fff3cd; color: #856404; }
+        .sync-badge.failed { background: #f8d7da; color: #721c24; }
         
-        .chart-container { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .chart-container h4 { color: #004080; font-size: 14px; margin-bottom: 15px; border-bottom: 2px solid #004080; padding-bottom: 8px; }
-        
-        .tabs-container { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 20px; background: #e9ecef; border: 2px solid #dee2e6; border-radius: 6px 6px 0 0; cursor: pointer; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 12px; }
-        .tab-btn.active { background: #17a2b8; color: white; border-color: #17a2b8; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .help-text { font-size: 10px; color: #666; margin-top: 4px; font-style: italic; }
+        .dhis2-info-bar { background: #17a2b8; color: white; padding: 8px 15px; font-size: 11px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .dhis2-info-item { display: flex; align-items: center; gap: 5px; }
         
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
             .header { flex-wrap: wrap; padding: 10px 15px; }
             .header h1 { font-size: 16px; }
-            .dhis2-input-group { grid-template-columns: 1fr; }
-            .modal { max-width: 95%; }
+            .form-title-input { width: 100%; }
         }
     </style>
 </head>
@@ -245,7 +192,7 @@
             <div class="auth-header">
                 <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL">
                 <h1>Form Builder Pro</h1>
-                <p>DHIS2 Integrated Data Collection</p>
+                <p>Auto DHIS2 Sync</p>
             </div>
             <div class="auth-body">
                 <div class="auth-tabs">
@@ -275,16 +222,8 @@
                         <input type="email" class="auth-input" id="signupEmail" required placeholder="your@email.com">
                     </div>
                     <div class="auth-group">
-                        <label class="auth-label">Organization</label>
-                        <input type="text" class="auth-input" id="signupOrg" value="ICF-SL">
-                    </div>
-                    <div class="auth-group">
                         <label class="auth-label">Password</label>
                         <input type="password" class="auth-input" id="signupPassword" required minlength="6" placeholder="Min 6 characters">
-                    </div>
-                    <div class="auth-group">
-                        <label class="auth-label">Confirm Password</label>
-                        <input type="password" class="auth-input" id="signupConfirm" required placeholder="Confirm password">
                     </div>
                     <button type="submit" class="auth-btn">📝 Create Account</button>
                 </form>
@@ -333,7 +272,6 @@
             <div class="sidebar-section">
                 <h3 class="sidebar-title">🎯 Special Fields</h3>
                 <div class="field-type" data-type="gps">📍 GPS Location</div>
-                <div class="field-type" data-type="signature">✍️ Signature</div>
                 <div class="field-type" data-type="rating">⭐ Rating</div>
             </div>
             <div class="sidebar-section">
@@ -344,19 +282,25 @@
 
         <div class="canvas-container">
             <div class="canvas-header">
-                <input type="text" class="form-title-input" id="formTitle" value="My Data Collection Form" placeholder="Form Title...">
-                <span style="color:#666;font-size:12px;font-weight:600;" id="fieldCount">📊 0 fields | 1 page</span>
+                <input type="text" class="form-title-input" id="formTitle" value="My Data Collection Form" placeholder="Form Title (becomes Dataset name)...">
+                <span style="color:#666;font-size:12px;font-weight:600;" id="fieldCount">📊 0 fields</span>
+            </div>
+            <div id="dhis2InfoBar" class="dhis2-info-bar" style="display:none;">
+                <div class="dhis2-info-item">🔗 <span id="dhis2ServerName">Not connected</span></div>
+                <div class="dhis2-info-item">📊 Dataset: <span id="dhis2DatasetName">-</span></div>
+                <div class="dhis2-info-item">🏥 Org Units: <span id="dhis2OrgUnitCount">0</span></div>
             </div>
             <div class="canvas">
                 <div class="form-preview">
                     <div class="form-preview-header">
                         <h2 id="previewTitle">My Data Collection Form</h2>
-                        <p id="previewSubtitle">Data Collection System</p>
+                        <p>Data Collection System</p>
                     </div>
                     <div class="form-preview-body">
                         <div class="drop-zone" id="dropZone">
                             <p style="font-size:36px;margin-bottom:12px;">📥</p>
-                            <p style="font-weight:600;">Click field types on the left to add them</p>
+                            <p style="font-weight:600;">Click field types to add them</p>
+                            <p style="font-size:11px;color:#868e96;margin-top:10px;">Fields become DHIS2 Data Elements</p>
                         </div>
                     </div>
                 </div>
@@ -368,7 +312,7 @@
             <div id="propertiesContent">
                 <div class="no-selection">
                     <p style="font-size:32px;margin-bottom:12px;">👆</p>
-                    <p>Select a field to edit its properties</p>
+                    <p>Select a field to edit</p>
                 </div>
             </div>
         </div>
@@ -379,240 +323,63 @@
     <div class="viewer-container" id="homeContainer"></div>
     
     <!-- Footer -->
-    <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | Form Builder Pro with DHIS2 Integration</footer>
+    <footer class="footer">© 2025 ICF-SL | Form Builder Pro with Auto DHIS2 Sync</footer>
 
     <!-- DHIS2 Configuration Modal -->
     <div class="modal-overlay" id="dhis2Modal">
-        <div class="modal large">
-            <div class="modal-header dhis2">
+        <div class="modal">
+            <div class="modal-header">
                 <h3>🔗 DHIS2 Configuration</h3>
                 <button class="modal-close" onclick="closeModal('dhis2Modal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="tabs-container">
-                    <button class="tab-btn active" onclick="switchDhis2Tab('connection')">🔌 Connection</button>
-                    <button class="tab-btn" onclick="switchDhis2Tab('mapping')">🔄 Data Element Mapping</button>
-                    <button class="tab-btn" onclick="switchDhis2Tab('orgunits')">🏥 Org Units</button>
-                    <button class="tab-btn" onclick="switchDhis2Tab('dataset')">📊 Dataset</button>
-                    <button class="tab-btn" onclick="switchDhis2Tab('submit')">📤 Submit Data</button>
+                <div id="dhis2Status" class="dhis2-status disconnected">
+                    <span>🔴</span> <span>Not Connected</span>
                 </div>
                 
-                <!-- Connection Tab -->
-                <div class="tab-content active" id="tabConnection">
-                    <div id="dhis2ConnectionStatus" class="dhis2-status disconnected">
-                        <span>🔴</span> <span>Not Connected</span>
-                    </div>
+                <div class="dhis2-config-section" autocomplete="off">
+                    <div class="dhis2-config-title">🌐 Server Connection</div>
+                    <label class="dhis2-label">DHIS2 Server URL</label>
+                    <input type="url" class="dhis2-input" id="dhis2Url" placeholder="https://your-dhis2-instance.org" autocomplete="off">
                     
-                    <div class="dhis2-config-section">
-                        <div class="dhis2-config-title">🌐 Server Settings</div>
-                        <div class="dhis2-input-group full">
-                            <div>
-                                <label class="dhis2-label">DHIS2 Server URL</label>
-                                <input type="url" class="dhis2-input" id="dhis2Url" placeholder="https://your-dhis2-instance.org">
-                                <p class="help-text">Enter the full URL without trailing slash</p>
-                            </div>
-                        </div>
-                        <div class="dhis2-input-group" style="margin-top:12px;">
-                            <div>
-                                <label class="dhis2-label">Username</label>
-                                <input type="text" class="dhis2-input" id="dhis2Username" placeholder="admin">
-                            </div>
-                            <div>
-                                <label class="dhis2-label">Password</label>
-                                <input type="password" class="dhis2-input" id="dhis2Password" placeholder="••••••••">
-                            </div>
-                        </div>
-                        <div class="dhis2-input-group" style="margin-top:12px;">
-                            <div>
-                                <label class="dhis2-label">Organization Unit Level</label>
-                                <select class="dhis2-input" id="dhis2OrgLevel">
-                                    <option value="1">Level 1 (National)</option>
-                                    <option value="2">Level 2 (Region)</option>
-                                    <option value="3">Level 3 (District)</option>
-                                    <option value="4">Level 4 (Chiefdom/Sub-district)</option>
-                                    <option value="5" selected>Level 5 (Facility)</option>
-                                    <option value="6">Level 6</option>
-                                    <option value="7">Level 7</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="dhis2-label">Period Type</label>
-                                <select class="dhis2-input" id="dhis2PeriodType">
-                                    <option value="Monthly" selected>Monthly</option>
-                                    <option value="Weekly">Weekly</option>
-                                    <option value="Daily">Daily</option>
-                                    <option value="Quarterly">Quarterly</option>
-                                    <option value="Yearly">Yearly</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    <label class="dhis2-label">Username</label>
+                    <input type="text" class="dhis2-input" id="dhis2Username" placeholder="Enter username" autocomplete="off">
                     
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="modal-btn dhis2" onclick="testDhis2Connection()">🧪 Test Connection</button>
-                        <button class="modal-btn success" onclick="saveDhis2Config()">💾 Save Configuration</button>
-                        <button class="modal-btn secondary" onclick="loadDhis2Config()">📂 Load Saved</button>
-                    </div>
+                    <label class="dhis2-label">Password</label>
+                    <input type="password" class="dhis2-input" id="dhis2Password" placeholder="Enter password" autocomplete="new-password">
                     
-                    <div id="dhis2ServerInfo" style="margin-top:20px;display:none;">
-                        <div class="dhis2-config-section">
-                            <div class="dhis2-config-title">📊 Server Information</div>
-                            <div id="serverInfoContent"></div>
-                        </div>
-                    </div>
+                    <label class="dhis2-label">Org Unit Level for Data Entry</label>
+                    <select class="dhis2-input" id="dhis2OrgLevel">
+                        <option value="1">Level 1 (National)</option>
+                        <option value="2">Level 2 (Region)</option>
+                        <option value="3">Level 3 (District)</option>
+                        <option value="4">Level 4 (Chiefdom)</option>
+                        <option value="5" selected>Level 5 (Facility)</option>
+                        <option value="6">Level 6</option>
+                    </select>
                 </div>
                 
-                <!-- Mapping Tab -->
-                <div class="tab-content" id="tabMapping">
-                    <div class="stats-grid" id="mappingStats">
-                        <div class="stat-box"><div class="stat-value" id="statTotalFields">0</div><div class="stat-label">Form Fields</div></div>
-                        <div class="stat-box success"><div class="stat-value" id="statMapped">0</div><div class="stat-label">Mapped</div></div>
-                        <div class="stat-box warning"><div class="stat-value" id="statUnmapped">0</div><div class="stat-label">Unmapped</div></div>
-                        <div class="stat-box"><div class="stat-value" id="statDhis2Elements">0</div><div class="stat-label">DHIS2 Elements</div></div>
-                    </div>
-                    
-                    <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-                        <button class="modal-btn dhis2" onclick="fetchDataElements()">🔄 Fetch DHIS2 Data Elements</button>
-                        <button class="modal-btn success" onclick="autoMapFields()">🎯 Auto-Map Fields</button>
-                        <button class="modal-btn primary" onclick="createDataElementsInDhis2()">➕ Create Missing in DHIS2</button>
-                    </div>
-                    
-                    <div id="mappingTableContainer" style="max-height:400px;overflow:auto;">
-                        <table class="mapping-table" id="mappingTable">
-                            <thead>
-                                <tr>
-                                    <th>Form Field</th>
-                                    <th>Field Name/Code</th>
-                                    <th>Type</th>
-                                    <th>DHIS2 Data Element</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="mappingTableBody">
-                                <tr><td colspan="5" style="text-align:center;padding:30px;color:#868e96;">Add fields to your form first</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+                    <button class="modal-btn dhis2" onclick="testConnection()">🧪 Test Connection</button>
+                    <button class="modal-btn primary" onclick="saveConfig()">💾 Save Config</button>
                 </div>
                 
-                <!-- Org Units Tab -->
-                <div class="tab-content" id="tabOrgunits">
-                    <div class="stats-grid" id="orgUnitStats">
-                        <div class="stat-box"><div class="stat-value" id="statTotalOrgUnits">0</div><div class="stat-label">Total Org Units</div></div>
-                        <div class="stat-box success"><div class="stat-value" id="statSelectedOrgUnits">0</div><div class="stat-label">Selected</div></div>
-                    </div>
-                    
-                    <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-                        <button class="modal-btn dhis2" onclick="fetchOrgUnits()">🔄 Fetch Org Units</button>
-                        <button class="modal-btn success" onclick="selectAllOrgUnits()">✅ Select All</button>
-                        <button class="modal-btn danger" onclick="deselectAllOrgUnits()">❌ Deselect All</button>
-                    </div>
-                    
-                    <div class="dhis2-input-group" style="margin-bottom:15px;">
-                        <div>
-                            <label class="dhis2-label">Filter Org Units</label>
-                            <input type="text" class="dhis2-input" id="orgUnitFilter" placeholder="Type to filter..." oninput="filterOrgUnits()">
-                        </div>
-                        <div>
-                            <label class="dhis2-label">Filter by Level</label>
-                            <select class="dhis2-input" id="orgUnitLevelFilter" onchange="filterOrgUnits()">
-                                <option value="">All Levels</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="org-unit-tree" id="orgUnitTree">
-                        <p style="text-align:center;padding:30px;color:#868e96;">Click "Fetch Org Units" to load</p>
-                    </div>
+                <div class="dhis2-config-section">
+                    <div class="dhis2-config-title">🚀 Auto Setup & Sync</div>
+                    <p style="font-size:11px;color:#666;margin-bottom:15px;">
+                        This will automatically:<br>
+                        ✓ Create Dataset using Form Name<br>
+                        ✓ Create Data Elements from Form Fields<br>
+                        ✓ Assign ALL org units to the Dataset<br>
+                        ✓ Sync collected data to DHIS2
+                    </p>
+                    <button class="modal-btn success" onclick="autoSetupAndSync()" style="width:100%;">
+                        🚀 Auto Setup & Sync to DHIS2
+                    </button>
                 </div>
                 
-                <!-- Dataset Tab -->
-                <div class="tab-content" id="tabDataset">
-                    <div class="dhis2-config-section">
-                        <div class="dhis2-config-title">📊 Dataset Configuration</div>
-                        
-                        <div class="dhis2-input-group full">
-                            <div>
-                                <label class="dhis2-label">Dataset Name</label>
-                                <input type="text" class="dhis2-input" id="datasetName" placeholder="e.g., Monthly Health Facility Report">
-                            </div>
-                        </div>
-                        <div class="dhis2-input-group" style="margin-top:12px;">
-                            <div>
-                                <label class="dhis2-label">Short Name</label>
-                                <input type="text" class="dhis2-input" id="datasetShortName" placeholder="e.g., MHFR">
-                            </div>
-                            <div>
-                                <label class="dhis2-label">Code</label>
-                                <input type="text" class="dhis2-input" id="datasetCode" placeholder="e.g., DS_MHFR_001">
-                            </div>
-                        </div>
-                        <div class="dhis2-input-group full" style="margin-top:12px;">
-                            <div>
-                                <label class="dhis2-label">Description</label>
-                                <textarea class="dhis2-input" id="datasetDescription" rows="2" placeholder="Dataset description..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="existingDatasetInfo" style="display:none;margin-bottom:15px;">
-                        <div class="dhis2-status connected">
-                            <span>📊</span>
-                            <span id="existingDatasetText">Using existing dataset</span>
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="modal-btn dhis2" onclick="fetchExistingDatasets()">🔍 Find Existing Datasets</button>
-                        <button class="modal-btn success" onclick="createDataset()">➕ Create New Dataset</button>
-                        <button class="modal-btn primary" onclick="updateDataset()">📝 Update Dataset</button>
-                    </div>
-                    
-                    <div id="existingDatasets" style="margin-top:15px;display:none;">
-                        <div class="dhis2-config-section">
-                            <div class="dhis2-config-title">📋 Existing Datasets</div>
-                            <div id="datasetsList" style="max-height:200px;overflow:auto;"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Submit Tab -->
-                <div class="tab-content" id="tabSubmit">
-                    <div class="stats-grid" id="submitStats">
-                        <div class="stat-box"><div class="stat-value" id="statTotalRecords">0</div><div class="stat-label">Total Records</div></div>
-                        <div class="stat-box success"><div class="stat-value" id="statSubmitted">0</div><div class="stat-label">Submitted</div></div>
-                        <div class="stat-box danger"><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending</div></div>
-                        <div class="stat-box warning"><div class="stat-value" id="statFailed">0</div><div class="stat-label">Failed</div></div>
-                    </div>
-                    
-                    <div class="dhis2-config-section">
-                        <div class="dhis2-config-title">📤 Submission Settings</div>
-                        <div class="dhis2-input-group">
-                            <div>
-                                <label class="dhis2-label">Period (YYYYMM)</label>
-                                <input type="text" class="dhis2-input" id="submitPeriod" placeholder="e.g., 202501">
-                            </div>
-                            <div>
-                                <label class="dhis2-label">Batch Size</label>
-                                <select class="dhis2-input" id="submitBatchSize">
-                                    <option value="10">10 records</option>
-                                    <option value="25" selected>25 records</option>
-                                    <option value="50">50 records</option>
-                                    <option value="100">100 records</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
-                        <button class="modal-btn success" onclick="submitDataToDhis2()">🚀 Submit All Pending</button>
-                        <button class="modal-btn dhis2" onclick="dryRunSubmission()">🧪 Dry Run (Test)</button>
-                        <button class="modal-btn secondary" onclick="exportForDhis2()">📥 Export JSON</button>
-                    </div>
-                    
-                    <div class="log-container" id="submitLog">
-                        <div class="log-entry info">Ready for submission...</div>
-                    </div>
+                <div class="sync-log" id="syncLog">
+                    <div class="log-entry info">Ready for setup...</div>
                 </div>
             </div>
         </div>
@@ -621,35 +388,18 @@
     <!-- Share Modal -->
     <div class="modal-overlay" id="shareModal">
         <div class="modal">
-            <div class="modal-header">
+            <div class="modal-header" style="background:linear-gradient(135deg,#004080,#002855);">
                 <h3>🔗 Share Form</h3>
                 <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div style="text-align:center;margin-bottom:15px;">
-                    <div style="font-size:20px;font-weight:700;color:#004080;" id="shareFormTitle">Form Title</div>
-                </div>
                 <div class="qr-container">
                     <div class="qr-box"><div id="qrCode"></div></div>
                     <div style="margin-top:15px;font-weight:700;color:#004080;">📱 Scan to open form</div>
                     <div class="qr-url" id="shareUrl"></div>
                     <div class="qr-actions">
                         <button class="modal-btn primary" onclick="copyShareUrl()">📋 Copy URL</button>
-                        <button class="modal-btn success" onclick="downloadQR()">⬇️ Download QR</button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Progress Modal -->
-    <div class="modal-overlay" id="progressModal">
-        <div class="modal" style="max-width:400px;">
-            <div class="modal-body">
-                <div class="progress-modal">
-                    <div class="spinner"></div>
-                    <h3 id="progressTitle">Processing...</h3>
-                    <p id="progressText">Please wait...</p>
                 </div>
             </div>
         </div>
@@ -661,6 +411,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
+        // ==================== CORS PROXIES ====================
+        const CORS_PROXIES = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/'
+        ];
+        let currentProxyIndex = 0;
+
         // ==================== GLOBAL STATE ====================
         const state = {
             user: null,
@@ -670,8 +428,6 @@
             isSharedMode: false,
             settings: {
                 title: 'My Data Collection Form',
-                subtitle: 'Data Collection System',
-                organization: 'ICF-SL',
                 logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg'
             },
             dhis2: {
@@ -679,16 +435,13 @@
                 username: '',
                 password: '',
                 orgUnitLevel: 5,
-                periodType: 'Monthly',
                 connected: false,
                 serverInfo: null,
-                dataElements: [],
-                orgUnits: [],
-                selectedOrgUnits: [],
                 datasetId: null,
-                datasetName: ''
+                datasetName: '',
+                dataElements: {},
+                orgUnits: []
             },
-            fieldMappings: {},
             collectedData: []
         };
 
@@ -697,15 +450,14 @@
             number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field', valueType: 'NUMBER' },
             date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field', valueType: 'DATE' },
             time: { label: 'Time', icon: '🕐', defaultLabel: 'Time Field', valueType: 'TIME' },
-            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address', valueType: 'EMAIL' },
+            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address', valueType: 'TEXT' },
             phone: { label: 'Phone', icon: '📱', defaultLabel: 'Phone Number', valueType: 'PHONE_NUMBER' },
             textarea: { label: 'Long Text', icon: '📝', defaultLabel: 'Long Text', valueType: 'LONG_TEXT' },
             select: { label: 'Dropdown', icon: '📋', defaultLabel: 'Dropdown', valueType: 'TEXT', options: ['Option 1', 'Option 2', 'Option 3'] },
             radio: { label: 'Radio', icon: '🔘', defaultLabel: 'Radio Choice', valueType: 'TEXT', options: ['Option 1', 'Option 2', 'Option 3'] },
-            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', valueType: 'TEXT', options: ['Option 1', 'Option 2', 'Option 3'] },
+            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', valueType: 'TRUE_ONLY', options: ['Option 1', 'Option 2'] },
             yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question', valueType: 'BOOLEAN' },
             gps: { label: 'GPS', icon: '📍', defaultLabel: 'GPS Location', valueType: 'COORDINATE' },
-            signature: { label: 'Signature', icon: '✍️', defaultLabel: 'Signature', valueType: 'IMAGE' },
             rating: { label: 'Rating', icon: '⭐', defaultLabel: 'Rating', valueType: 'INTEGER', max: 5 },
             section: { label: 'Section', icon: '📁', defaultLabel: 'New Section', valueType: null }
         };
@@ -725,7 +477,7 @@
                     state.isSharedMode = true;
                     renderSharedForm(data);
                     return;
-                } catch (err) { console.error('Error decoding:', err); }
+                } catch (err) { console.error('Decode error:', err); }
             }
             
             loadFromStorage();
@@ -742,7 +494,6 @@
             document.getElementById('formTitle').addEventListener('input', (e) => {
                 state.settings.title = e.target.value;
                 document.getElementById('previewTitle').textContent = e.target.value;
-                document.getElementById('datasetName').value = e.target.value;
                 saveToStorage();
             });
             document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -750,8 +501,12 @@
             });
         }
 
-        // ==================== DHIS2 API ====================
-        async function dhis2Request(endpoint, method = 'GET', payload = null) {
+        // ==================== DHIS2 API WITH CORS PROXY ====================
+        function getProxiedUrl(url) {
+            return CORS_PROXIES[currentProxyIndex] + encodeURIComponent(url);
+        }
+
+        async function dhis2Request(endpoint, method = 'GET', payload = null, retryCount = 0) {
             const { url, username, password } = state.dhis2;
             if (!url || !username || !password) {
                 throw new Error('DHIS2 not configured');
@@ -759,12 +514,14 @@
 
             const serverUrl = url.replace(/\/$/, '');
             const apiUrl = `${serverUrl}/api/${endpoint}`;
+            const proxiedUrl = getProxiedUrl(apiUrl);
             
             const options = {
                 method: method,
                 headers: {
                     'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             };
             
@@ -772,14 +529,18 @@
                 options.body = JSON.stringify(payload);
             }
             
-            console.log(`DHIS2 ${method}: ${apiUrl}`);
-            
             try {
-                const response = await fetch(apiUrl, options);
+                const response = await fetch(proxiedUrl, options);
                 const text = await response.text();
                 
                 let data;
                 try { data = JSON.parse(text); } catch (e) { data = text; }
+                
+                if (!response.ok && retryCount < CORS_PROXIES.length - 1) {
+                    currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+                    addLog('warning', `Trying alternate proxy...`);
+                    return dhis2Request(endpoint, method, payload, retryCount + 1);
+                }
                 
                 return {
                     success: response.ok,
@@ -787,7 +548,11 @@
                     data: data
                 };
             } catch (error) {
-                console.error('DHIS2 Request Error:', error);
+                if (retryCount < CORS_PROXIES.length - 1) {
+                    currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+                    addLog('warning', `Proxy failed, trying next...`);
+                    return dhis2Request(endpoint, method, payload, retryCount + 1);
+                }
                 return {
                     success: false,
                     status: 0,
@@ -796,22 +561,23 @@
             }
         }
 
-        async function testDhis2Connection() {
+        async function testConnection() {
             const url = document.getElementById('dhis2Url').value.trim();
             const username = document.getElementById('dhis2Username').value.trim();
             const password = document.getElementById('dhis2Password').value;
             
             if (!url || !username || !password) {
-                notify('Please fill in all connection fields', 'error');
+                notify('Please fill all fields', 'error');
                 return;
             }
             
             state.dhis2.url = url;
             state.dhis2.username = username;
             state.dhis2.password = password;
+            state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
             
-            showProgress('Testing Connection', 'Connecting to DHIS2 server...');
-            updateConnectionStatus('loading', 'Testing...');
+            updateStatus('syncing', 'Testing connection...');
+            addLog('info', 'Connecting to DHIS2...');
             
             try {
                 const result = await dhis2Request('system/info.json');
@@ -819,54 +585,60 @@
                 if (result.success && result.data) {
                     state.dhis2.connected = true;
                     state.dhis2.serverInfo = result.data;
-                    updateConnectionStatus('connected', `Connected to ${result.data.systemName}`);
+                    updateStatus('connected', `Connected to ${result.data.systemName}`);
+                    addLog('success', `✓ Connected: ${result.data.systemName} v${result.data.version}`);
                     
-                    document.getElementById('dhis2ServerInfo').style.display = 'block';
-                    document.getElementById('serverInfoContent').innerHTML = `
-                        <p><strong>System:</strong> ${result.data.systemName}</p>
-                        <p><strong>Version:</strong> ${result.data.version}</p>
-                        <p><strong>Calendar:</strong> ${result.data.calendar || 'ISO'}</p>
-                        <p><strong>Date Format:</strong> ${result.data.dateFormat || 'yyyy-MM-dd'}</p>
-                    `;
+                    document.getElementById('dhis2ServerName').textContent = result.data.systemName;
+                    document.getElementById('dhis2InfoBar').style.display = 'flex';
                     
+                    saveConfig();
                     notify('✅ Connected to DHIS2!', 'success');
                 } else {
                     state.dhis2.connected = false;
-                    updateConnectionStatus('disconnected', `Failed: ${result.error || result.status}`);
-                    notify('❌ Connection failed: ' + (result.error || 'Unknown error'), 'error');
+                    updateStatus('disconnected', 'Connection failed');
+                    addLog('error', `✗ Failed: ${result.error || result.status}`);
+                    notify('Connection failed', 'error');
                 }
             } catch (error) {
                 state.dhis2.connected = false;
-                updateConnectionStatus('disconnected', 'Connection error');
-                notify('❌ Connection error: ' + error.message, 'error');
+                updateStatus('disconnected', 'Connection error');
+                addLog('error', `✗ Error: ${error.message}`);
+                notify('Connection error', 'error');
             }
-            
-            hideProgress();
         }
 
-        function updateConnectionStatus(type, message) {
-            const statusEl = document.getElementById('dhis2ConnectionStatus');
-            statusEl.className = `dhis2-status ${type}`;
-            const icon = type === 'connected' ? '🟢' : type === 'loading' ? '🟡' : '🔴';
-            statusEl.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+        function updateStatus(type, message) {
+            const el = document.getElementById('dhis2Status');
+            el.className = `dhis2-status ${type}`;
+            const icon = type === 'connected' ? '🟢' : type === 'syncing' ? '🟡' : '🔴';
+            el.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
         }
 
-        function saveDhis2Config() {
+        function addLog(type, message) {
+            const log = document.getElementById('syncLog');
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `<div class="log-entry ${type}">[${time}] ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('syncLog').innerHTML = '';
+        }
+
+        function saveConfig() {
             state.dhis2.url = document.getElementById('dhis2Url').value.trim();
             state.dhis2.username = document.getElementById('dhis2Username').value.trim();
             state.dhis2.password = document.getElementById('dhis2Password').value;
             state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
-            state.dhis2.periodType = document.getElementById('dhis2PeriodType').value;
             
             localStorage.setItem('dhis2Config', JSON.stringify({
                 url: state.dhis2.url,
                 username: state.dhis2.username,
                 password: state.dhis2.password,
-                orgUnitLevel: state.dhis2.orgUnitLevel,
-                periodType: state.dhis2.periodType
+                orgUnitLevel: state.dhis2.orgUnitLevel
             }));
             
-            notify('💾 DHIS2 configuration saved!', 'success');
+            notify('💾 Config saved!');
         }
 
         function loadDhis2Config() {
@@ -874,705 +646,286 @@
             if (saved) {
                 try {
                     const config = JSON.parse(saved);
-                    state.dhis2.url = config.url || '';
-                    state.dhis2.username = config.username || '';
-                    state.dhis2.password = config.password || '';
-                    state.dhis2.orgUnitLevel = config.orgUnitLevel || 5;
-                    state.dhis2.periodType = config.periodType || 'Monthly';
+                    state.dhis2 = { ...state.dhis2, ...config };
                     
-                    // Update form fields
                     if (document.getElementById('dhis2Url')) {
-                        document.getElementById('dhis2Url').value = state.dhis2.url;
-                        document.getElementById('dhis2Username').value = state.dhis2.username;
-                        document.getElementById('dhis2Password').value = state.dhis2.password;
-                        document.getElementById('dhis2OrgLevel').value = state.dhis2.orgUnitLevel;
-                        document.getElementById('dhis2PeriodType').value = state.dhis2.periodType;
+                        document.getElementById('dhis2Url').value = state.dhis2.url || '';
+                        document.getElementById('dhis2Username').value = state.dhis2.username || '';
+                        document.getElementById('dhis2Password').value = state.dhis2.password || '';
+                        document.getElementById('dhis2OrgLevel').value = state.dhis2.orgUnitLevel || 5;
                     }
-                } catch (e) { console.error('Error loading DHIS2 config:', e); }
+                } catch (e) {}
             }
         }
 
-        // ==================== DATA ELEMENTS ====================
-        async function fetchDataElements() {
-            if (!state.dhis2.connected) {
-                notify('Please connect to DHIS2 first', 'error');
-                return;
-            }
-            
-            showProgress('Fetching Data Elements', 'Loading from DHIS2...');
-            
-            try {
-                const result = await dhis2Request('dataElements.json?fields=id,code,name,shortName,displayName,valueType&paging=false');
-                
-                if (result.success && result.data && result.data.dataElements) {
-                    state.dhis2.dataElements = result.data.dataElements;
-                    document.getElementById('statDhis2Elements').textContent = state.dhis2.dataElements.length;
-                    updateMappingTable();
-                    notify(`✅ Loaded ${state.dhis2.dataElements.length} data elements`, 'success');
-                } else {
-                    notify('Failed to fetch data elements', 'error');
-                }
-            } catch (error) {
-                notify('Error: ' + error.message, 'error');
-            }
-            
-            hideProgress();
-        }
-
-        function findDataElementMatch(fieldName, fieldCode) {
-            const searchTerms = [
-                fieldCode?.toLowerCase().trim(),
-                fieldName?.toLowerCase().trim(),
-                fieldCode?.toLowerCase().replace(/_/g, ' ').trim(),
-                fieldName?.toLowerCase().replace(/_/g, ' ').trim()
-            ].filter(Boolean);
-            
-            for (const de of state.dhis2.dataElements) {
-                const deName = de.name?.toLowerCase();
-                const deCode = de.code?.toLowerCase();
-                const deShort = de.shortName?.toLowerCase();
-                
-                for (const term of searchTerms) {
-                    if (deCode === term || deName === term || deShort === term) {
-                        return de;
-                    }
-                }
-            }
-            
-            // Fuzzy match
-            for (const de of state.dhis2.dataElements) {
-                const deName = de.name?.toLowerCase() || '';
-                const deCode = de.code?.toLowerCase() || '';
-                
-                for (const term of searchTerms) {
-                    if (deName.includes(term) || term.includes(deName) ||
-                        deCode.includes(term) || term.includes(deCode)) {
-                        return de;
-                    }
-                }
-            }
-            
-            return null;
-        }
-
-        function autoMapFields() {
-            if (state.dhis2.dataElements.length === 0) {
-                notify('Fetch data elements first', 'error');
-                return;
-            }
-            
-            let mapped = 0;
-            state.fields.filter(f => f.type !== 'section').forEach(field => {
-                const match = findDataElementMatch(field.label, field.name);
-                if (match) {
-                    state.fieldMappings[field.id] = match.id;
-                    mapped++;
-                }
-            });
-            
-            updateMappingTable();
-            saveToStorage();
-            notify(`✅ Auto-mapped ${mapped} fields`, 'success');
-        }
-
-        function updateMappingTable() {
-            const tbody = document.getElementById('mappingTableBody');
-            const formFields = state.fields.filter(f => f.type !== 'section');
-            
-            document.getElementById('statTotalFields').textContent = formFields.length;
-            
-            if (formFields.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#868e96;">Add fields to your form first</td></tr>';
-                document.getElementById('statMapped').textContent = '0';
-                document.getElementById('statUnmapped').textContent = '0';
-                return;
-            }
-            
-            let mapped = 0;
-            let html = '';
-            
-            formFields.forEach(field => {
-                const def = fieldDefs[field.type];
-                const mappedDeId = state.fieldMappings[field.id];
-                const isMapped = !!mappedDeId;
-                if (isMapped) mapped++;
-                
-                let selectHtml = `<select onchange="updateFieldMapping('${field.id}', this.value)">
-                    <option value="">-- Select Data Element --</option>`;
-                
-                state.dhis2.dataElements.forEach(de => {
-                    const selected = mappedDeId === de.id ? 'selected' : '';
-                    selectHtml += `<option value="${de.id}" ${selected}>${escapeHtml(de.name)} [${de.code || 'no code'}]</option>`;
-                });
-                selectHtml += '</select>';
-                
-                html += `
-                    <tr>
-                        <td><strong>${escapeHtml(field.label)}</strong></td>
-                        <td><code>${escapeHtml(field.name)}</code></td>
-                        <td>${def?.icon || '📄'} ${def?.label || field.type}</td>
-                        <td>${selectHtml}</td>
-                        <td class="status-icon">${isMapped ? '✅' : '⚠️'}</td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-            document.getElementById('statMapped').textContent = mapped;
-            document.getElementById('statUnmapped').textContent = formFields.length - mapped;
-        }
-
-        function updateFieldMapping(fieldId, dataElementId) {
-            if (dataElementId) {
-                state.fieldMappings[fieldId] = dataElementId;
-            } else {
-                delete state.fieldMappings[fieldId];
-            }
-            updateMappingTable();
-            saveToStorage();
-        }
-
-        async function createDataElementsInDhis2() {
+        // ==================== AUTO SETUP & SYNC ====================
+        async function autoSetupAndSync() {
             if (!state.dhis2.connected) {
                 notify('Connect to DHIS2 first', 'error');
                 return;
             }
             
-            const unmappedFields = state.fields.filter(f => 
-                f.type !== 'section' && !state.fieldMappings[f.id]
-            );
-            
-            if (unmappedFields.length === 0) {
-                notify('All fields are already mapped!', 'info');
+            if (state.fields.filter(f => f.type !== 'section').length === 0) {
+                notify('Add fields to your form first', 'error');
                 return;
             }
             
-            if (!confirm(`Create ${unmappedFields.length} data elements in DHIS2?`)) return;
+            clearLog();
+            addLog('info', '🚀 Starting Auto Setup...');
+            updateStatus('syncing', 'Setting up...');
             
-            showProgress('Creating Data Elements', 'Please wait...');
-            
-            let created = 0;
-            let errors = [];
-            
-            for (const field of unmappedFields) {
-                const def = fieldDefs[field.type];
-                const payload = {
-                    name: field.label,
-                    shortName: field.label.substring(0, 50),
-                    code: field.name.toUpperCase(),
-                    domainType: 'AGGREGATE',
-                    valueType: def?.valueType || 'TEXT',
-                    aggregationType: 'SUM',
-                    categoryCombo: { id: 'bjDvmb4bfuf' } // Default category combo
-                };
+            try {
+                // Step 1: Get default category combo
+                addLog('info', '📋 Getting default category combo...');
+                const catResult = await dhis2Request('categoryOptionCombos.json?filter=name:eq:default&fields=id');
+                let categoryComboId = 'bjDvmb4bfuf';
+                if (catResult.success && catResult.data?.categoryOptionCombos?.length > 0) {
+                    categoryComboId = catResult.data.categoryOptionCombos[0].id;
+                }
+                addLog('success', `✓ Category combo: ${categoryComboId}`);
                 
-                try {
-                    const result = await dhis2Request('dataElements', 'POST', payload);
-                    if (result.success) {
-                        created++;
-                        // Get the created element ID
-                        if (result.data && result.data.response && result.data.response.uid) {
-                            state.fieldMappings[field.id] = result.data.response.uid;
-                        }
+                // Step 2: Create Data Elements
+                addLog('info', '📝 Creating Data Elements from form fields...');
+                const formFields = state.fields.filter(f => f.type !== 'section');
+                const createdElements = [];
+                
+                for (const field of formFields) {
+                    const def = fieldDefs[field.type];
+                    const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                    
+                    // Check if exists
+                    const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
+                    
+                    if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
+                        const existing = checkResult.data.dataElements[0];
+                        state.dhis2.dataElements[field.id] = existing.id;
+                        createdElements.push({ id: existing.id });
+                        addLog('info', `  ↳ Exists: ${field.label} (${existing.id})`);
                     } else {
-                        errors.push(`${field.label}: ${result.error || 'Failed'}`);
+                        // Create new
+                        const payload = {
+                            name: field.label,
+                            shortName: field.label.substring(0, 50),
+                            code: code,
+                            domainType: 'AGGREGATE',
+                            valueType: def?.valueType || 'TEXT',
+                            aggregationType: 'SUM'
+                        };
+                        
+                        const createResult = await dhis2Request('dataElements', 'POST', payload);
+                        
+                        if (createResult.success && createResult.data?.response?.uid) {
+                            const newId = createResult.data.response.uid;
+                            state.dhis2.dataElements[field.id] = newId;
+                            createdElements.push({ id: newId });
+                            addLog('success', `  ✓ Created: ${field.label} (${newId})`);
+                        } else {
+                            addLog('error', `  ✗ Failed: ${field.label}`);
+                        }
                     }
-                } catch (e) {
-                    errors.push(`${field.label}: ${e.message}`);
-                }
-            }
-            
-            hideProgress();
-            
-            if (created > 0) {
-                await fetchDataElements(); // Refresh list
-            }
-            
-            if (errors.length > 0) {
-                notify(`Created ${created}, Failed ${errors.length}`, 'warning');
-                console.error('Creation errors:', errors);
-            } else {
-                notify(`✅ Created ${created} data elements!`, 'success');
-            }
-        }
-
-        // ==================== ORG UNITS ====================
-        async function fetchOrgUnits() {
-            if (!state.dhis2.connected) {
-                notify('Connect to DHIS2 first', 'error');
-                return;
-            }
-            
-            showProgress('Fetching Org Units', 'Loading from DHIS2...');
-            
-            const level = state.dhis2.orgUnitLevel;
-            
-            try {
-                const result = await dhis2Request(`organisationUnits.json?fields=id,code,displayName,name,shortName,level,parent[id,name]&filter=level:eq:${level}&paging=false`);
-                
-                if (result.success && result.data && result.data.organisationUnits) {
-                    state.dhis2.orgUnits = result.data.organisationUnits;
-                    document.getElementById('statTotalOrgUnits').textContent = state.dhis2.orgUnits.length;
-                    renderOrgUnitTree();
-                    updateOrgLevelFilter();
-                    notify(`✅ Loaded ${state.dhis2.orgUnits.length} org units`, 'success');
-                } else {
-                    // Try all levels if specific level returns empty
-                    const allResult = await dhis2Request('organisationUnits.json?fields=id,code,displayName,name,shortName,level,parent[id,name]&paging=false');
-                    if (allResult.success && allResult.data && allResult.data.organisationUnits) {
-                        state.dhis2.orgUnits = allResult.data.organisationUnits;
-                        document.getElementById('statTotalOrgUnits').textContent = state.dhis2.orgUnits.length;
-                        renderOrgUnitTree();
-                        updateOrgLevelFilter();
-                        notify(`✅ Loaded ${state.dhis2.orgUnits.length} org units (all levels)`, 'success');
-                    }
-                }
-            } catch (error) {
-                notify('Error: ' + error.message, 'error');
-            }
-            
-            hideProgress();
-        }
-
-        function updateOrgLevelFilter() {
-            const levels = [...new Set(state.dhis2.orgUnits.map(ou => ou.level))].sort((a, b) => a - b);
-            const select = document.getElementById('orgUnitLevelFilter');
-            select.innerHTML = '<option value="">All Levels</option>';
-            levels.forEach(level => {
-                select.innerHTML += `<option value="${level}">Level ${level}</option>`;
-            });
-        }
-
-        function renderOrgUnitTree() {
-            const container = document.getElementById('orgUnitTree');
-            const filter = document.getElementById('orgUnitFilter').value.toLowerCase();
-            const levelFilter = document.getElementById('orgUnitLevelFilter').value;
-            
-            let filtered = state.dhis2.orgUnits;
-            
-            if (filter) {
-                filtered = filtered.filter(ou => 
-                    ou.displayName?.toLowerCase().includes(filter) ||
-                    ou.name?.toLowerCase().includes(filter) ||
-                    ou.code?.toLowerCase().includes(filter)
-                );
-            }
-            
-            if (levelFilter) {
-                filtered = filtered.filter(ou => ou.level === parseInt(levelFilter));
-            }
-            
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="text-align:center;padding:20px;color:#868e96;">No org units found</p>';
-                return;
-            }
-            
-            container.innerHTML = filtered.slice(0, 500).map(ou => {
-                const isSelected = state.dhis2.selectedOrgUnits.includes(ou.id);
-                return `
-                    <div class="org-unit-item" onclick="toggleOrgUnit('${ou.id}')">
-                        <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleOrgUnit('${ou.id}')">
-                        <span>${escapeHtml(ou.displayName || ou.name)}</span>
-                        <span class="org-unit-level">L${ou.level}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            if (filtered.length > 500) {
-                container.innerHTML += `<p style="text-align:center;padding:10px;color:#868e96;font-size:11px;">Showing 500 of ${filtered.length}. Use filter to narrow down.</p>`;
-            }
-            
-            updateSelectedCount();
-        }
-
-        function toggleOrgUnit(id) {
-            const index = state.dhis2.selectedOrgUnits.indexOf(id);
-            if (index === -1) {
-                state.dhis2.selectedOrgUnits.push(id);
-            } else {
-                state.dhis2.selectedOrgUnits.splice(index, 1);
-            }
-            renderOrgUnitTree();
-        }
-
-        function selectAllOrgUnits() {
-            state.dhis2.selectedOrgUnits = state.dhis2.orgUnits.map(ou => ou.id);
-            renderOrgUnitTree();
-            notify(`✅ Selected all ${state.dhis2.selectedOrgUnits.length} org units`);
-        }
-
-        function deselectAllOrgUnits() {
-            state.dhis2.selectedOrgUnits = [];
-            renderOrgUnitTree();
-            notify('Deselected all org units');
-        }
-
-        function filterOrgUnits() {
-            renderOrgUnitTree();
-        }
-
-        function updateSelectedCount() {
-            document.getElementById('statSelectedOrgUnits').textContent = state.dhis2.selectedOrgUnits.length;
-        }
-
-        // ==================== DATASET ====================
-        async function fetchExistingDatasets() {
-            if (!state.dhis2.connected) {
-                notify('Connect to DHIS2 first', 'error');
-                return;
-            }
-            
-            showProgress('Fetching Datasets', 'Loading...');
-            
-            try {
-                const result = await dhis2Request('dataSets.json?fields=id,name,shortName,code,periodType&paging=false');
-                
-                if (result.success && result.data && result.data.dataSets) {
-                    const datasets = result.data.dataSets;
-                    document.getElementById('existingDatasets').style.display = 'block';
                     
-                    document.getElementById('datasetsList').innerHTML = datasets.map(ds => `
-                        <div class="org-unit-item" onclick="selectDataset('${ds.id}', '${escapeHtml(ds.name)}')">
-                            <span>📊 ${escapeHtml(ds.name)}</span>
-                            <span class="org-unit-level">${ds.periodType}</span>
-                        </div>
-                    `).join('');
+                    await sleep(200);
+                }
+                
+                addLog('success', `✓ ${createdElements.length} data elements ready`);
+                
+                // Step 3: Get ALL org units
+                addLog('info', '🏥 Fetching ALL organization units...');
+                const orgResult = await dhis2Request('organisationUnits.json?fields=id&paging=false');
+                
+                if (!orgResult.success || !orgResult.data?.organisationUnits) {
+                    throw new Error('Failed to fetch org units');
+                }
+                
+                state.dhis2.orgUnits = orgResult.data.organisationUnits;
+                addLog('success', `✓ Found ${state.dhis2.orgUnits.length} org units`);
+                document.getElementById('dhis2OrgUnitCount').textContent = state.dhis2.orgUnits.length;
+                
+                // Step 4: Create or Update Dataset
+                const datasetName = state.settings.title;
+                const datasetCode = datasetName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
+                
+                addLog('info', `📊 Setting up Dataset: ${datasetName}...`);
+                
+                // Check if dataset exists
+                const dsCheckResult = await dhis2Request(`dataSets.json?filter=code:eq:${datasetCode}&fields=id,name`);
+                
+                if (dsCheckResult.success && dsCheckResult.data?.dataSets?.length > 0) {
+                    // Update existing
+                    const existingDs = dsCheckResult.data.dataSets[0];
+                    state.dhis2.datasetId = existingDs.id;
+                    state.dhis2.datasetName = existingDs.name;
+                    addLog('info', `  ↳ Dataset exists: ${existingDs.id}`);
                     
-                    notify(`Found ${datasets.length} datasets`);
-                }
-            } catch (error) {
-                notify('Error: ' + error.message, 'error');
-            }
-            
-            hideProgress();
-        }
-
-        function selectDataset(id, name) {
-            state.dhis2.datasetId = id;
-            state.dhis2.datasetName = name;
-            document.getElementById('existingDatasetInfo').style.display = 'block';
-            document.getElementById('existingDatasetText').textContent = `Using: ${name}`;
-            notify(`Selected dataset: ${name}`);
-        }
-
-        async function createDataset() {
-            if (!state.dhis2.connected) {
-                notify('Connect to DHIS2 first', 'error');
-                return;
-            }
-            
-            const name = document.getElementById('datasetName').value.trim();
-            const shortName = document.getElementById('datasetShortName').value.trim();
-            const code = document.getElementById('datasetCode').value.trim();
-            const description = document.getElementById('datasetDescription').value.trim();
-            
-            if (!name) {
-                notify('Please enter a dataset name', 'error');
-                return;
-            }
-            
-            // Collect mapped data element IDs
-            const dataElementIds = Object.values(state.fieldMappings).filter(Boolean);
-            
-            if (dataElementIds.length === 0) {
-                notify('No data elements mapped. Map fields first.', 'error');
-                return;
-            }
-            
-            if (state.dhis2.selectedOrgUnits.length === 0) {
-                notify('No org units selected. Select org units first.', 'error');
-                return;
-            }
-            
-            showProgress('Creating Dataset', 'Please wait...');
-            
-            const payload = {
-                name: name,
-                shortName: shortName || name.substring(0, 50),
-                code: code || name.toUpperCase().replace(/\s+/g, '_').substring(0, 30),
-                description: description,
-                periodType: state.dhis2.periodType,
-                dataSetElements: dataElementIds.map(deId => ({
-                    dataElement: { id: deId }
-                })),
-                organisationUnits: state.dhis2.selectedOrgUnits.map(ouId => ({
-                    id: ouId
-                }))
-            };
-            
-            try {
-                const result = await dhis2Request('dataSets', 'POST', payload);
-                
-                if (result.success) {
-                    const newId = result.data?.response?.uid;
-                    if (newId) {
-                        state.dhis2.datasetId = newId;
-                        state.dhis2.datasetName = name;
+                    // Update with new elements and all org units
+                    const updatePayload = {
+                        dataSetElements: createdElements.map(de => ({ dataElement: { id: de.id } })),
+                        organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
+                    };
+                    
+                    // Use metadata import for update
+                    const fullDs = await dhis2Request(`dataSets/${existingDs.id}.json?fields=:owner`);
+                    if (fullDs.success && fullDs.data) {
+                        const merged = {
+                            ...fullDs.data,
+                            dataSetElements: createdElements.map(de => ({ 
+                                dataSet: { id: existingDs.id },
+                                dataElement: { id: de.id } 
+                            })),
+                            organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
+                        };
+                        
+                        const updateResult = await dhis2Request(`dataSets/${existingDs.id}`, 'PUT', merged);
+                        if (updateResult.success) {
+                            addLog('success', `  ✓ Dataset updated with ${createdElements.length} elements`);
+                        } else {
+                            addLog('warning', `  ⚠ Could not update dataset`);
+                        }
                     }
-                    document.getElementById('existingDatasetInfo').style.display = 'block';
-                    document.getElementById('existingDatasetText').textContent = `Created: ${name}`;
-                    notify('✅ Dataset created successfully!', 'success');
                 } else {
-                    notify('Failed: ' + (result.error || JSON.stringify(result.data)), 'error');
+                    // Create new dataset
+                    const createPayload = {
+                        name: datasetName,
+                        shortName: datasetName.substring(0, 50),
+                        code: datasetCode,
+                        periodType: 'Monthly',
+                        dataSetElements: createdElements.map(de => ({ dataElement: { id: de.id } })),
+                        organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
+                    };
+                    
+                    const createResult = await dhis2Request('dataSets', 'POST', createPayload);
+                    
+                    if (createResult.success && createResult.data?.response?.uid) {
+                        state.dhis2.datasetId = createResult.data.response.uid;
+                        state.dhis2.datasetName = datasetName;
+                        addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
+                    } else {
+                        addLog('error', `  ✗ Failed to create dataset: ${JSON.stringify(createResult.data)}`);
+                    }
                 }
-            } catch (error) {
-                notify('Error: ' + error.message, 'error');
-            }
-            
-            hideProgress();
-        }
-
-        async function updateDataset() {
-            if (!state.dhis2.datasetId) {
-                notify('No dataset selected', 'error');
-                return;
-            }
-            
-            showProgress('Updating Dataset', 'Please wait...');
-            
-            const dataElementIds = Object.values(state.fieldMappings).filter(Boolean);
-            
-            const payload = {
-                dataSetElements: dataElementIds.map(deId => ({
-                    dataElement: { id: deId }
-                })),
-                organisationUnits: state.dhis2.selectedOrgUnits.map(ouId => ({
-                    id: ouId
-                }))
-            };
-            
-            try {
-                const result = await dhis2Request(`dataSets/${state.dhis2.datasetId}`, 'PATCH', payload);
                 
-                if (result.success) {
-                    notify('✅ Dataset updated!', 'success');
+                document.getElementById('dhis2DatasetName').textContent = datasetName;
+                
+                // Step 5: Sync collected data
+                const pendingData = state.collectedData.filter(d => !d._synced);
+                if (pendingData.length > 0) {
+                    addLog('info', `📤 Syncing ${pendingData.length} records...`);
+                    await syncDataToDhis2(pendingData);
                 } else {
-                    notify('Failed: ' + (result.error || 'Unknown error'), 'error');
+                    addLog('info', '📤 No pending data to sync');
                 }
+                
+                // Done
+                updateStatus('connected', 'Setup complete!');
+                addLog('success', '✅ AUTO SETUP COMPLETE!');
+                saveToStorage();
+                notify('✅ DHIS2 setup complete!', 'success');
+                
             } catch (error) {
-                notify('Error: ' + error.message, 'error');
+                updateStatus('disconnected', 'Setup failed');
+                addLog('error', `✗ Error: ${error.message}`);
+                notify('Setup failed: ' + error.message, 'error');
             }
-            
-            hideProgress();
         }
 
-        // ==================== DATA SUBMISSION ====================
-        async function submitDataToDhis2() {
-            if (!state.dhis2.connected) {
-                notify('Connect to DHIS2 first', 'error');
-                return;
-            }
-            
+        async function syncDataToDhis2(dataRecords) {
             if (!state.dhis2.datasetId) {
-                notify('Select or create a dataset first', 'error');
+                addLog('error', 'No dataset configured');
                 return;
             }
-            
-            const period = document.getElementById('submitPeriod').value.trim();
-            if (!period) {
-                notify('Enter a period (YYYYMM format)', 'error');
-                return;
-            }
-            
-            const data = state.collectedData.filter(d => !d._submitted);
-            if (data.length === 0) {
-                notify('No pending data to submit', 'info');
-                return;
-            }
-            
-            const log = document.getElementById('submitLog');
-            log.innerHTML = '';
-            addLog('info', `Starting submission of ${data.length} records...`);
             
             let success = 0, failed = 0;
             
-            for (const record of data) {
-                const orgUnitId = findOrgUnitIdForRecord(record);
+            for (const record of dataRecords) {
+                // Get org unit - try to find facility or use first selected
+                let orgUnitId = null;
+                
+                // Look for facility field
+                const facilityField = state.fields.find(f => 
+                    f.name.toLowerCase().includes('facility') || 
+                    f.label.toLowerCase().includes('facility') ||
+                    f.name.toLowerCase().includes('org_unit')
+                );
+                
+                if (facilityField && record[facilityField.name]) {
+                    const facilityName = record[facilityField.name].toLowerCase();
+                    const match = state.dhis2.orgUnits.find(ou => 
+                        ou.displayName?.toLowerCase() === facilityName ||
+                        ou.name?.toLowerCase() === facilityName
+                    );
+                    if (match) orgUnitId = match.id;
+                }
+                
+                // If no match, use first org unit (for demo)
+                if (!orgUnitId && state.dhis2.orgUnits.length > 0) {
+                    orgUnitId = state.dhis2.orgUnits[0].id;
+                }
+                
                 if (!orgUnitId) {
-                    addLog('error', `No org unit found for record`);
+                    addLog('warning', `  ⚠ No org unit for record`);
                     failed++;
                     continue;
                 }
                 
+                // Build period from timestamp
+                const ts = new Date(record._timestamp || Date.now());
+                const period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
+                
+                // Build data values
                 const dataValues = [];
                 state.fields.filter(f => f.type !== 'section').forEach(field => {
-                    const deId = state.fieldMappings[field.id];
+                    const deId = state.dhis2.dataElements[field.id];
                     const value = record[field.name];
                     
                     if (deId && value !== undefined && value !== null && value !== '') {
                         dataValues.push({
                             dataElement: deId,
-                            value: String(value)
+                            value: String(value),
+                            period: period,
+                            orgUnit: orgUnitId
                         });
                     }
                 });
                 
                 if (dataValues.length === 0) {
-                    addLog('warning', `No mapped values in record`);
+                    addLog('warning', `  ⚠ No values in record`);
                     failed++;
                     continue;
                 }
                 
-                try {
-                    const payload = {
-                        dataSet: state.dhis2.datasetId,
-                        completeDate: new Date().toISOString().split('T')[0],
-                        period: period,
-                        orgUnit: orgUnitId,
-                        dataValues: dataValues
-                    };
-                    
-                    const result = await dhis2Request('dataValueSets', 'POST', payload);
-                    
-                    if (result.success) {
-                        record._submitted = true;
-                        success++;
-                        addLog('success', `Submitted: ${dataValues.length} values`);
-                    } else {
-                        failed++;
-                        addLog('error', `Failed: ${result.error || 'Unknown error'}`);
-                    }
-                } catch (e) {
+                // Submit
+                const payload = {
+                    dataValues: dataValues
+                };
+                
+                const result = await dhis2Request('dataValueSets', 'POST', payload);
+                
+                if (result.success) {
+                    record._synced = true;
+                    record._syncedAt = new Date().toISOString();
+                    success++;
+                    addLog('success', `  ✓ Synced ${dataValues.length} values`);
+                } else {
+                    record._syncError = result.error || 'Unknown error';
                     failed++;
-                    addLog('error', `Error: ${e.message}`);
+                    addLog('error', `  ✗ Failed: ${result.error || 'Unknown'}`);
                 }
                 
-                await new Promise(r => setTimeout(r, 200));
+                await sleep(300);
             }
             
-            document.getElementById('statSubmitted').textContent = state.collectedData.filter(d => d._submitted).length;
-            document.getElementById('statPending').textContent = state.collectedData.filter(d => !d._submitted).length;
-            
-            addLog('info', `Completed: ${success} success, ${failed} failed`);
-            notify(`Submitted: ${success} success, ${failed} failed`);
+            addLog('info', `📊 Sync complete: ${success} success, ${failed} failed`);
+            saveToStorage();
         }
 
-        function findOrgUnitIdForRecord(record) {
-            // Try to match facility name
-            const facilityFields = ['facility', 'facility_name', 'org_unit', 'health_facility'];
-            for (const fieldName of facilityFields) {
-                const value = record[fieldName];
-                if (value) {
-                    const match = state.dhis2.orgUnits.find(ou => 
-                        ou.displayName?.toLowerCase() === value.toLowerCase() ||
-                        ou.name?.toLowerCase() === value.toLowerCase()
-                    );
-                    if (match) return match.id;
-                }
-            }
-            
-            // If only one org unit selected, use it
-            if (state.dhis2.selectedOrgUnits.length === 1) {
-                return state.dhis2.selectedOrgUnits[0];
-            }
-            
-            return null;
-        }
-
-        async function dryRunSubmission() {
-            const data = state.collectedData.filter(d => !d._submitted);
-            const log = document.getElementById('submitLog');
-            log.innerHTML = '';
-            
-            addLog('info', '=== DRY RUN ===');
-            addLog('info', `Records to submit: ${data.length}`);
-            addLog('info', `Dataset: ${state.dhis2.datasetName || 'Not selected'}`);
-            addLog('info', `Mapped fields: ${Object.keys(state.fieldMappings).length}`);
-            addLog('info', `Selected org units: ${state.dhis2.selectedOrgUnits.length}`);
-            
-            if (data.length > 0) {
-                const sample = data[0];
-                let valueCount = 0;
-                state.fields.filter(f => f.type !== 'section').forEach(field => {
-                    if (state.fieldMappings[field.id] && sample[field.name]) {
-                        valueCount++;
-                    }
-                });
-                addLog('info', `Values per record: ~${valueCount}`);
-            }
-            
-            if (!state.dhis2.datasetId) addLog('warning', 'No dataset selected!');
-            if (Object.keys(state.fieldMappings).length === 0) addLog('warning', 'No fields mapped!');
-            if (state.dhis2.selectedOrgUnits.length === 0) addLog('warning', 'No org units selected!');
-            
-            addLog('info', '=== END DRY RUN ===');
-        }
-
-        function exportForDhis2() {
-            const data = state.collectedData;
-            if (data.length === 0) {
-                notify('No data to export', 'error');
-                return;
-            }
-            
-            const period = document.getElementById('submitPeriod').value.trim() || new Date().toISOString().slice(0, 7).replace('-', '');
-            
-            const dataValueSets = {
-                dataSet: state.dhis2.datasetId,
-                period: period,
-                dataValues: []
-            };
-            
-            data.forEach(record => {
-                const orgUnitId = findOrgUnitIdForRecord(record) || state.dhis2.selectedOrgUnits[0];
-                
-                state.fields.filter(f => f.type !== 'section').forEach(field => {
-                    const deId = state.fieldMappings[field.id];
-                    const value = record[field.name];
-                    
-                    if (deId && value !== undefined && value !== null && value !== '') {
-                        dataValueSets.dataValues.push({
-                            dataElement: deId,
-                            orgUnit: orgUnitId,
-                            period: period,
-                            value: String(value)
-                        });
-                    }
-                });
-            });
-            
-            const blob = new Blob([JSON.stringify(dataValueSets, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `dhis2_export_${period}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            notify('✅ JSON exported!', 'success');
-        }
-
-        function addLog(type, message) {
-            const log = document.getElementById('submitLog');
-            const time = new Date().toLocaleTimeString();
-            log.innerHTML += `<div class="log-entry ${type}">[${time}] ${message}</div>`;
-            log.scrollTop = log.scrollHeight;
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         // ==================== UI HELPERS ====================
         function openDhis2Config() {
             loadDhis2Config();
-            document.getElementById('datasetName').value = state.settings.title;
-            updateMappingTable();
             document.getElementById('dhis2Modal').classList.add('show');
-        }
-
-        function switchDhis2Tab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
-        }
-
-        function showProgress(title, text) {
-            document.getElementById('progressTitle').textContent = title;
-            document.getElementById('progressText').textContent = text;
-            document.getElementById('progressModal').classList.add('show');
-        }
-
-        function hideProgress() {
-            document.getElementById('progressModal').classList.remove('show');
         }
 
         function closeModal(id) {
@@ -1583,12 +936,12 @@
             const el = document.getElementById('notification');
             el.textContent = message;
             el.className = 'notification show' + (type === 'error' ? ' error' : type === 'info' ? ' info' : '');
-            setTimeout(() => el.classList.remove('show'), 3000);
+            setTimeout(() => el.classList.remove('show'), 4000);
         }
 
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         // ==================== AUTH ====================
@@ -1609,7 +962,7 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
-            const user = users.find(u => (u.email === email || u.username === email) && u.password === password);
+            const user = users.find(u => u.email === email && u.password === password);
             if (user) { state.user = user; localStorage.setItem('formBuilderUser', JSON.stringify(user)); showBuilder(); }
             else { document.getElementById('authError').style.display = 'block'; document.getElementById('authError').textContent = 'Invalid credentials'; }
         }
@@ -1618,15 +971,13 @@
             e.preventDefault();
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
-            const org = document.getElementById('signupOrg').value;
             const password = document.getElementById('signupPassword').value;
-            const confirm = document.getElementById('signupConfirm').value;
-            if (password !== confirm) { document.getElementById('authError').style.display = 'block'; document.getElementById('authError').textContent = 'Passwords do not match'; return; }
             const users = JSON.parse(localStorage.getItem('formBuilderUsers') || '[]');
             if (users.find(u => u.email === email)) { document.getElementById('authError').style.display = 'block'; document.getElementById('authError').textContent = 'Email exists'; return; }
-            users.push({ id: Date.now().toString(), name, email, org, password, createdAt: new Date().toISOString() });
+            users.push({ id: Date.now().toString(), name, email, password });
             localStorage.setItem('formBuilderUsers', JSON.stringify(users));
-            document.getElementById('authSuccess').style.display = 'block'; document.getElementById('authSuccess').textContent = 'Account created! Please login.';
+            document.getElementById('authSuccess').style.display = 'block';
+            document.getElementById('authSuccess').textContent = 'Account created! Please login.';
             setTimeout(() => switchAuthTab('login'), 1500);
         }
 
@@ -1656,25 +1007,21 @@
                 name: type + '_' + state.fieldCounter,
                 required: true,
                 options: def.options ? [...def.options] : [],
-                max: def.max || 5,
-                placeholder: ''
+                max: def.max || 5
             };
             state.fields.push(field);
             renderFields();
             selectField(field.id);
             saveToStorage();
-            notify('✅ Added!');
         }
 
         function removeField(id) {
             event?.stopPropagation();
-            if (!confirm('Delete?')) return;
+            if (!confirm('Delete field?')) return;
             state.fields = state.fields.filter(f => f.id !== id);
-            delete state.fieldMappings[id];
             if (state.selectedFieldId === id) { state.selectedFieldId = null; renderProperties(); }
             renderFields();
             saveToStorage();
-            notify('🗑️ Deleted');
         }
 
         function moveField(id, direction) {
@@ -1701,12 +1048,12 @@
 
         function renderFields() {
             const dropZone = document.getElementById('dropZone');
-            const sectionCount = state.fields.filter(f => f.type === 'section').length;
-            document.getElementById('fieldCount').textContent = `📊 ${state.fields.length} fields | ${sectionCount + 1} page${sectionCount > 0 ? 's' : ''}`;
+            const fieldCount = state.fields.filter(f => f.type !== 'section').length;
+            document.getElementById('fieldCount').textContent = `📊 ${fieldCount} data elements`;
             
             if (state.fields.length === 0) {
                 dropZone.classList.remove('has-fields');
-                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add</p>';
+                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Fields become DHIS2 Data Elements</p>';
                 return;
             }
             
@@ -1718,33 +1065,28 @@
                     currentPage++;
                     return `<div class="section-divider ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
                         <span>📁 ${f.label.toUpperCase()}</span>
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <span style="background:rgba(255,255,255,0.25);padding:4px 10px;border-radius:12px;font-size:10px;">PAGE ${currentPage}</span>
-                            <div class="form-field-actions">
-                                <button class="field-action-btn move-up" onclick="moveField('${f.id}','up')">▲</button>
-                                <button class="field-action-btn move-down" onclick="moveField('${f.id}','down')">▼</button>
-                                <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
-                            </div>
+                        <div style="display:flex;gap:5px;">
+                            <button class="field-action-btn" onclick="moveField('${f.id}','up')">▲</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','down')">▼</button>
+                            <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
                         </div>
                     </div>`;
                 }
                 
                 const def = fieldDefs[f.type];
-                const isMapped = !!state.fieldMappings[f.id];
                 
                 return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
                     <div class="form-field-header">
                         <span class="form-field-label">${def?.icon || '📄'} ${f.label}</span>
                         <div class="form-field-actions">
-                            <button class="field-action-btn move-up" onclick="moveField('${f.id}','up')">▲</button>
-                            <button class="field-action-btn move-down" onclick="moveField('${f.id}','down')">▼</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','up')">▲</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','down')">▼</button>
                             <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
                         </div>
                     </div>
                     <div style="font-size:10px;color:#868e96;">
-                        ${f.name}
+                        Code: <code>${f.name}</code>
                         ${f.required ? '<span class="field-badge required">Required</span>' : ''}
-                        ${isMapped ? '<span class="field-badge dhis2">DHIS2 ✓</span>' : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -1768,21 +1110,20 @@
             
             let html = `
                 <div class="prop-section">
-                    <div class="prop-section-title">📝 Basic</div>
+                    <div class="prop-section-title">📝 Field Settings</div>
                     <div class="property-group">
-                        <label class="property-label">Label</label>
+                        <label class="property-label">Label (Data Element Name)</label>
                         <input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}">
                     </div>
                     <div class="property-group">
-                        <label class="property-label">Name/Code</label>
+                        <label class="property-label">Code (Data Element Code)</label>
                         <input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}">
-                        <p class="help-text">Used for DHIS2 mapping</p>
                     </div>
                     ${field.type !== 'section' ? `
                         <div class="property-group">
                             <label class="property-checkbox">
                                 <input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}>
-                                <span>Required</span>
+                                <span>Required Field</span>
                             </label>
                         </div>
                     ` : ''}
@@ -1792,44 +1133,8 @@
             if (['select', 'radio', 'checkbox'].includes(field.type)) {
                 html += `
                     <div class="prop-section">
-                        <div class="prop-section-title">📋 Options</div>
-                        <div class="property-group">
-                            <label class="property-label">One per line</label>
-                            <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            if (field.type === 'rating') {
-                html += `
-                    <div class="prop-section">
-                        <div class="prop-section-title">⭐ Rating</div>
-                        <div class="property-group">
-                            <label class="property-label">Max</label>
-                            <select class="property-select" id="propMax">
-                                ${[3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${field.max === n ? 'selected' : ''}>${n}</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // DHIS2 Mapping Info
-            if (field.type !== 'section') {
-                const mappedDeId = state.fieldMappings[field.id];
-                const mappedDe = mappedDeId ? state.dhis2.dataElements.find(de => de.id === mappedDeId) : null;
-                
-                html += `
-                    <div class="prop-section dhis2">
-                        <div class="prop-section-title">🔗 DHIS2 Mapping</div>
-                        ${mappedDe ? `
-                            <p style="font-size:11px;color:#155724;margin-bottom:8px;">✅ Mapped to: <strong>${escapeHtml(mappedDe.name)}</strong></p>
-                            <p style="font-size:10px;color:#666;">ID: ${mappedDe.id}</p>
-                        ` : `
-                            <p style="font-size:11px;color:#856404;">⚠️ Not mapped to DHIS2</p>
-                            <p style="font-size:10px;color:#666;margin-top:4px;">Click "DHIS2" button to configure</p>
-                        `}
+                        <div class="prop-section-title">📋 Options (one per line)</div>
+                        <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
                     </div>
                 `;
             }
@@ -1840,42 +1145,55 @@
             document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
             document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
             document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
-            document.getElementById('propMax')?.addEventListener('change', (e) => updateField('max', parseInt(e.target.value) || 5));
         }
 
         // ==================== STORAGE ====================
         function saveToStorage() {
-            localStorage.setItem('formBuilderDhis2', JSON.stringify({
+            localStorage.setItem('formBuilderAutoSync', JSON.stringify({
                 fields: state.fields,
                 settings: state.settings,
                 fieldCounter: state.fieldCounter,
-                fieldMappings: state.fieldMappings,
-                collectedData: state.collectedData
+                collectedData: state.collectedData,
+                dhis2: {
+                    datasetId: state.dhis2.datasetId,
+                    datasetName: state.dhis2.datasetName,
+                    dataElements: state.dhis2.dataElements
+                }
             }));
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('formBuilderDhis2');
+            const saved = localStorage.getItem('formBuilderAutoSync');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
                     state.fields = data.fields || [];
                     state.settings = { ...state.settings, ...data.settings };
                     state.fieldCounter = data.fieldCounter || 0;
-                    state.fieldMappings = data.fieldMappings || {};
                     state.collectedData = data.collectedData || [];
-                } catch (e) { console.error('Load error:', e); }
+                    if (data.dhis2) {
+                        state.dhis2.datasetId = data.dhis2.datasetId;
+                        state.dhis2.datasetName = data.dhis2.datasetName;
+                        state.dhis2.dataElements = data.dhis2.dataElements || {};
+                    }
+                    
+                    document.getElementById('formTitle').value = state.settings.title;
+                    document.getElementById('previewTitle').textContent = state.settings.title;
+                } catch (e) {}
             }
         }
 
         // ==================== FORM OPERATIONS ====================
         function newForm() {
-            if (state.fields.length > 0 && !confirm('Create new?')) return;
+            if (state.fields.length > 0 && !confirm('Create new form?')) return;
             state.fields = [];
             state.selectedFieldId = null;
             state.fieldCounter = 0;
-            state.fieldMappings = {};
-            const title = prompt('Title:', 'New Form');
+            state.dhis2.dataElements = {};
+            state.dhis2.datasetId = null;
+            state.collectedData = [];
+            
+            const title = prompt('Form/Dataset Name:', 'New Form');
             if (title) {
                 state.settings.title = title;
                 document.getElementById('formTitle').value = title;
@@ -1888,7 +1206,7 @@
         }
 
         function saveCurrentForm() {
-            if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
+            if (state.fields.length === 0) { notify('Add fields first!', 'error'); return; }
             saveToStorage();
             saveFormToList();
             notify('💾 Saved!');
@@ -1900,17 +1218,14 @@
             const formEntry = {
                 id: existingIndex >= 0 ? forms[existingIndex].id : 'form_' + Date.now(),
                 title: state.settings.title,
-                subtitle: state.settings.subtitle,
-                organization: state.settings.organization,
-                logo: state.settings.logo,
-                fieldCount: state.fields.length,
+                fieldCount: state.fields.filter(f => f.type !== 'section').length,
                 updatedAt: new Date().toISOString(),
                 fields: state.fields,
                 settings: state.settings,
-                fieldMappings: state.fieldMappings,
                 dhis2: {
                     datasetId: state.dhis2.datasetId,
-                    datasetName: state.dhis2.datasetName
+                    datasetName: state.dhis2.datasetName,
+                    dataElements: state.dhis2.dataElements
                 }
             };
             if (existingIndex >= 0) forms[existingIndex] = formEntry;
@@ -1925,7 +1240,7 @@
             document.getElementById('mainContainer').classList.remove('show');
             document.querySelector('.footer').style.display = 'none';
             document.getElementById('viewerContainer').classList.add('show');
-            renderSharedFormViewer();
+            renderFormViewer();
         }
 
         function closeViewer() {
@@ -1939,24 +1254,9 @@
             if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
             
             const formData = {
-                s: {
-                    t: state.settings.title,
-                    st: state.settings.subtitle,
-                    o: state.settings.organization,
-                    l: state.settings.logo
-                },
-                f: state.fields.map(f => {
-                    const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required };
-                    if (f.placeholder) field.p = f.placeholder;
-                    if (f.options?.length) field.o = f.options;
-                    if (f.max !== 5) field.mx = f.max;
-                    return field;
-                }),
-                m: state.fieldMappings,
-                d: state.dhis2.datasetId ? {
-                    id: state.dhis2.datasetId,
-                    name: state.dhis2.datasetName
-                } : null
+                s: { t: state.settings.title, l: state.settings.logo },
+                f: state.fields.map(f => ({ i: f.id, y: f.type, l: f.label, n: f.name, r: f.required, o: f.options, mx: f.max })),
+                d: state.dhis2.datasetId ? { id: state.dhis2.datasetId, de: state.dhis2.dataElements } : null
             };
             
             try {
@@ -1965,12 +1265,11 @@
                 const encoded = btoa(String.fromCharCode.apply(null, compressed));
                 const shareUrl = window.location.origin + window.location.pathname + '?d=' + encodeURIComponent(encoded);
                 
-                document.getElementById('shareFormTitle').textContent = state.settings.title;
                 document.getElementById('shareUrl').textContent = shareUrl;
                 
                 const qrContainer = document.getElementById('qrCode');
                 qrContainer.innerHTML = '';
-                new QRCode(qrContainer, { text: shareUrl, width: 200, height: 200, colorDark: '#004080', colorLight: '#ffffff' });
+                new QRCode(qrContainer, { text: shareUrl, width: 200, height: 200, colorDark: '#004080' });
                 
                 saveFormToList();
                 document.getElementById('shareModal').classList.add('show');
@@ -1978,19 +1277,9 @@
         }
 
         function copyShareUrl() {
-            const urlText = document.getElementById('shareUrl').textContent;
-            navigator.clipboard.writeText(urlText).then(() => notify('📋 Copied!')).catch(() => notify('Copy failed', 'error'));
-        }
-
-        function downloadQR() {
-            const canvas = document.querySelector('#qrCode canvas');
-            if (canvas) {
-                const link = document.createElement('a');
-                link.download = state.settings.title.replace(/[^a-z0-9]/gi, '_') + '_QR.png';
-                link.href = canvas.toDataURL();
-                link.click();
-                notify('⬇️ Downloaded!');
-            }
+            navigator.clipboard.writeText(document.getElementById('shareUrl').textContent)
+                .then(() => notify('📋 Copied!'))
+                .catch(() => notify('Copy failed', 'error'));
         }
 
         // ==================== HOME ====================
@@ -1999,33 +1288,32 @@
             let formsHtml = forms.length === 0 ? `
                 <div style="text-align:center;padding:60px;color:#868e96;">
                     <p style="font-size:64px;">📭</p>
-                    <h3 style="color:#004080;">No Forms</h3>
-                    <button onclick="closeHome()" style="padding:15px 30px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:20px;">➕ Create</button>
+                    <h3 style="color:#004080;">No Forms Yet</h3>
+                    <button onclick="closeHome()" style="padding:15px 30px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:20px;font-weight:bold;">➕ Create Form</button>
                 </div>
             ` : forms.map((f, i) => `
-                <div style="background:#fff;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);overflow:hidden;">
-                    <div style="background:linear-gradient(135deg,#004080,#002855);color:#fff;padding:15px 20px;">
-                        <h3 style="margin:0;">📋 ${escapeHtml(f.title)}</h3>
+                <div style="background:#fff;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#004080,#002855);color:#fff;padding:12px 15px;">
+                        <h3 style="margin:0;font-size:14px;">📋 ${escapeHtml(f.title)}</h3>
                     </div>
-                    <div style="padding:15px 20px;">
-                        <div style="font-size:11px;color:#666;margin-bottom:15px;">
-                            📊 ${f.fieldCount} fields
-                            ${f.dhis2?.datasetId ? '<span style="color:#17a2b8;margin-left:10px;">🔗 DHIS2</span>' : ''}
+                    <div style="padding:12px 15px;">
+                        <div style="font-size:11px;color:#666;margin-bottom:10px;">
+                            📊 ${f.fieldCount} elements
+                            ${f.dhis2?.datasetId ? '<span style="color:#17a2b8;margin-left:8px;">🔗 DHIS2</span>' : ''}
                         </div>
-                        <div style="display:flex;gap:8px;">
-                            <button onclick="editForm(${i})" style="flex:1;padding:10px;background:#004080;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">✏️ Edit</button>
-                            <button onclick="shareFormFromHome(${i})" style="flex:1;padding:10px;background:#17a2b8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🔗 Share</button>
-                            <button onclick="deleteForm(${i})" style="padding:10px 15px;background:#dc3545;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🗑️</button>
+                        <div style="display:flex;gap:6px;">
+                            <button onclick="editForm(${i})" style="flex:1;padding:8px;background:#004080;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;">✏️ Edit</button>
+                            <button onclick="deleteForm(${i})" style="padding:8px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;">🗑️</button>
                         </div>
                     </div>
                 </div>
             `).join('');
             
             document.getElementById('homeContainer').innerHTML = `
-                <div style="max-width:900px;margin:0 auto;padding:20px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
+                <div style="max-width:600px;margin:0 auto;padding:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
                         <h2 style="color:#004080;">🏠 My Forms</h2>
-                        <button onclick="closeHome()" style="padding:12px 25px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">➕ New</button>
+                        <button onclick="closeHome()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">➕ New</button>
                     </div>
                     ${formsHtml}
                 </div>
@@ -2052,11 +1340,11 @@
             state.fields = form.fields || [];
             state.settings = { ...state.settings, ...form.settings };
             state.fieldCounter = Math.max(...state.fields.map(f => parseInt(f.id.replace('field_', '')) || 0), 0) + 1;
-            state.fieldMappings = form.fieldMappings || {};
             
             if (form.dhis2) {
                 state.dhis2.datasetId = form.dhis2.datasetId;
                 state.dhis2.datasetName = form.dhis2.datasetName;
+                state.dhis2.dataElements = form.dhis2.dataElements || {};
             }
             
             document.getElementById('formTitle').value = state.settings.title;
@@ -2065,22 +1353,7 @@
             closeHome();
             renderFields();
             renderProperties();
-            notify('📂 Loaded!');
-        }
-
-        function shareFormFromHome(index) {
-            const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]');
-            const form = forms[index];
-            if (!form) return;
-            
-            const tempFields = state.fields, tempSettings = state.settings, tempMappings = state.fieldMappings;
-            state.fields = form.fields;
-            state.settings = form.settings;
-            state.fieldMappings = form.fieldMappings || {};
-            shareForm();
-            state.fields = tempFields;
-            state.settings = tempSettings;
-            state.fieldMappings = tempMappings;
+            notify('📂 Form loaded!');
         }
 
         function deleteForm(index) {
@@ -2092,37 +1365,28 @@
             notify('🗑️ Deleted');
         }
 
-        // ==================== SHARED FORM VIEWER ====================
+        // ==================== FORM VIEWER ====================
         function renderSharedForm(data) {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainContainer').classList.remove('show');
             document.querySelector('.header').style.display = 'none';
             document.querySelector('.footer').style.display = 'none';
             
-            state.settings = {
-                title: data.s?.t || 'Form',
-                subtitle: data.s?.st || 'Data Collection',
-                organization: data.s?.o || 'ICF-SL',
-                logo: data.s?.l || 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg'
-            };
-            
+            state.settings = { title: data.s?.t || 'Form', logo: data.s?.l || state.settings.logo };
             state.fields = (data.f || []).map(f => ({
-                id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false,
-                placeholder: f.p || '', options: f.o || [], max: f.mx || 5
+                id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false, options: f.o || [], max: f.mx || 5
             }));
-            
-            state.fieldMappings = data.m || {};
             
             if (data.d) {
                 state.dhis2.datasetId = data.d.id;
-                state.dhis2.datasetName = data.d.name;
+                state.dhis2.dataElements = data.d.de || {};
             }
             
             document.getElementById('viewerContainer').classList.add('show');
-            renderSharedFormViewer();
+            renderFormViewer();
         }
 
-        function renderSharedFormViewer() {
+        function renderFormViewer() {
             const s = state.settings;
             let pages = [], currentPage = { title: 'Page 1', fields: [] };
             
@@ -2144,9 +1408,12 @@
                     let input = '';
                     
                     switch (field.type) {
-                        case 'text': case 'email': case 'phone': case 'number': case 'date': case 'time':
+                        case 'text': case 'email': case 'phone': case 'date': case 'time':
                             const type = field.type === 'phone' ? 'tel' : field.type;
-                            input = `<input type="${type}" name="${field.name}" class="viewer-input" placeholder="${escapeHtml(field.placeholder || '')}" ${reqAttr}>`;
+                            input = `<input type="${type}" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                            break;
+                        case 'number':
+                            input = `<input type="number" name="${field.name}" class="viewer-input" ${reqAttr}>`;
                             break;
                         case 'textarea':
                             input = `<textarea name="${field.name}" class="viewer-input" rows="3" ${reqAttr}></textarea>`;
@@ -2162,10 +1429,10 @@
                             input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
                             break;
                         case 'gps':
-                            input = `<div style="text-align:center;"><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;">📍 Capture GPS</button><input type="hidden" name="${field.name}_lat"><input type="hidden" name="${field.name}_lng"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`;
+                            input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;">📍 Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`;
                             break;
                         case 'rating':
-                            input = `<div class="rating-container">${Array(field.max || 5).fill().map((_, i) => `<span class="rating-star" onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
+                            input = `<div>${Array(field.max || 5).fill().map((_, i) => `<span onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
                             break;
                         default:
                             input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
@@ -2178,10 +1445,7 @@
                 
                 return `
                     <div class="form-page" data-page="${pageIndex}" style="${pageIndex === 0 ? '' : 'display:none;'}">
-                        <div class="page-header">
-                            <span class="page-indicator">Page ${pageIndex + 1} of ${pages.length}</span>
-                            <h3 class="page-title">${escapeHtml(page.title)}</h3>
-                        </div>
+                        ${pages.length > 1 ? `<div class="page-header"><span class="page-indicator">Page ${pageIndex + 1}/${pages.length}</span><h3 class="page-title">${escapeHtml(page.title)}</h3></div>` : ''}
                         ${fieldsHtml}
                         <div class="page-navigation">
                             ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
@@ -2192,15 +1456,16 @@
                 `;
             }).join('');
             
-            const backBtnHtml = state.isSharedMode ? '' : '<button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back to Builder</button>';
+            const backBtn = state.isSharedMode ? '' : '<button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back</button>';
             
             document.getElementById('viewerContainer').innerHTML = `
                 <div class="viewer-nav">
-                    ${backBtnHtml}
-                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showViewerTab('form',this)">📝 Form</button>
-                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showViewerTab('data',this)">📊 Data</button>
-                    <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}" id="connectionStatus">
-                        <span>${navigator.onLine ? '🟢 Online' : '🔴 Offline'}</span>
+                    ${backBtn}
+                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)">📝 Form</button>
+                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)">📊 Data</button>
+                    ${state.dhis2.connected ? `<button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="syncNow()">🔄 Sync</button>` : ''}
+                    <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
+                        ${navigator.onLine ? '🟢 Online' : '🔴 Offline'}
                     </div>
                 </div>
                 
@@ -2210,12 +1475,9 @@
                             <div class="viewer-header">
                                 <img src="${s.logo}" alt="Logo">
                                 <h1>${escapeHtml(s.title)}</h1>
-                                <p>${escapeHtml(s.subtitle)}</p>
                             </div>
                             <div class="viewer-body">
-                                <form id="viewerForm">
-                                    ${pagesHtml}
-                                </form>
+                                <form id="viewerForm">${pagesHtml}</form>
                             </div>
                         </div>
                     </div>
@@ -2223,70 +1485,74 @@
                 
                 <div id="tabData" class="viewer-tab">
                     <div style="max-width:900px;margin:0 auto;">
-                        <h3 style="color:#004080;margin-bottom:15px;">📊 Collected Data</h3>
-                        <div id="collectedDataTable"></div>
+                        <h3 style="color:#004080;margin-bottom:15px;">📊 Collected Data (${state.collectedData.length} records)</h3>
+                        <div id="dataTable"></div>
                     </div>
                 </div>
             `;
             
             window.totalPages = pages.length;
-            window.currentPageIndex = 0;
             setupFormSubmit();
-            renderCollectedData();
+            renderDataTable();
         }
 
         function setupFormSubmit() {
             const form = document.getElementById('viewerForm');
             if (!form) return;
             
-            form.onsubmit = function(e) {
+            form.onsubmit = async function(e) {
                 e.preventDefault();
                 
-                const data = { _id: Date.now(), _timestamp: new Date().toISOString(), _submitted: false };
+                const data = { _id: Date.now(), _timestamp: new Date().toISOString(), _synced: false };
                 new FormData(form).forEach((v, k) => data[k] = v);
                 
                 state.collectedData.push(data);
                 saveToStorage();
                 
                 form.reset();
-                window.currentPageIndex = 0;
                 goToPage(0);
                 
                 notify('✅ Data saved!');
-                renderCollectedData();
+                renderDataTable();
                 
-                // Update submit stats
-                document.getElementById('statTotalRecords').textContent = state.collectedData.length;
-                document.getElementById('statPending').textContent = state.collectedData.filter(d => !d._submitted).length;
+                // Auto-sync if connected
+                if (state.dhis2.connected && state.dhis2.datasetId) {
+                    notify('🔄 Syncing to DHIS2...', 'info');
+                    await syncDataToDhis2([data]);
+                }
             };
         }
 
-        function renderCollectedData() {
-            const container = document.getElementById('collectedDataTable');
+        function renderDataTable() {
+            const container = document.getElementById('dataTable');
             if (!container) return;
             
             if (state.collectedData.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">No data collected yet</p>';
+                container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">No data yet</p>';
                 return;
             }
             
             const fields = state.fields.filter(f => f.type !== 'section');
             
-            let html = '<table class="data-table"><thead><tr><th>#</th><th>Timestamp</th>';
-            fields.forEach(f => html += `<th>${escapeHtml(f.label)}</th>`);
+            let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>#</th><th>Time</th>';
+            fields.slice(0, 5).forEach(f => html += `<th>${escapeHtml(f.label)}</th>`);
             html += '<th>Status</th></tr></thead><tbody>';
             
-            state.collectedData.forEach((row, i) => {
-                html += `<tr><td>${i + 1}</td><td>${new Date(row._timestamp).toLocaleString()}</td>`;
-                fields.forEach(f => html += `<td>${escapeHtml(row[f.name] || '-')}</td>`);
-                html += `<td>${row._submitted ? '✅' : '⏳'}</td></tr>`;
+            state.collectedData.slice(-20).reverse().forEach((row, i) => {
+                const syncStatus = row._synced ? 
+                    '<span class="sync-badge synced">Synced</span>' : 
+                    '<span class="sync-badge pending">Pending</span>';
+                    
+                html += `<tr><td>${state.collectedData.length - i}</td><td>${new Date(row._timestamp).toLocaleString()}</td>`;
+                fields.slice(0, 5).forEach(f => html += `<td>${escapeHtml(String(row[f.name] || '-').substring(0, 20))}</td>`);
+                html += `<td>${syncStatus}</td></tr>`;
             });
             
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
             container.innerHTML = html;
         }
 
-        function showViewerTab(tab, btn) {
+        function showTab(tab, btn) {
             document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
@@ -2295,37 +1561,47 @@
 
         function goToPage(pageIndex) {
             document.querySelectorAll('.form-page').forEach(p => p.style.display = 'none');
-            const targetPage = document.querySelector(`.form-page[data-page="${pageIndex}"]`);
-            if (targetPage) {
-                targetPage.style.display = 'block';
-                window.currentPageIndex = pageIndex;
-            }
+            document.querySelector(`.form-page[data-page="${pageIndex}"]`).style.display = 'block';
         }
 
-        // GPS & Rating helpers
+        async function syncNow() {
+            const pending = state.collectedData.filter(d => !d._synced);
+            if (pending.length === 0) {
+                notify('No pending data to sync', 'info');
+                return;
+            }
+            notify(`🔄 Syncing ${pending.length} records...`, 'info');
+            await syncDataToDhis2(pending);
+            renderDataTable();
+        }
+
         window.captureGPS = function(btn) {
             const container = btn.parentElement;
             const status = container.querySelector('.gps-status');
+            const input = container.querySelector('input[type="hidden"]');
             status.textContent = '📍 Getting location...';
+            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
-                        container.querySelector('[name$="_lat"]').value = pos.coords.latitude.toFixed(6);
-                        container.querySelector('[name$="_lng"]').value = pos.coords.longitude.toFixed(6);
-                        status.textContent = '✅ ' + pos.coords.latitude.toFixed(6) + ', ' + pos.coords.longitude.toFixed(6);
+                        const coords = `[${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}]`;
+                        input.value = coords;
+                        status.textContent = '✅ ' + coords;
                     },
                     err => { status.textContent = '❌ ' + err.message; }
                 );
-            } else { status.textContent = '❌ Not supported'; }
+            } else {
+                status.textContent = '❌ Not supported';
+            }
         };
 
         window.setRating = function(star, val) {
             const container = star.parentElement;
-            container.querySelectorAll('.rating-star').forEach((s, i) => s.style.opacity = i < val ? '1' : '0.3');
+            container.querySelectorAll('span').forEach((s, i) => s.style.opacity = i < val ? '1' : '0.3');
             container.querySelector('input').value = val;
         };
 
-        // Initialize
+        // Init
         init();
     </script>
 </body>
