@@ -41,7 +41,7 @@
         .header-btn.success { background: #28a745; color: white; }
         .header-btn.danger { background: #dc3545; color: white; }
         
-        .main-container { display: none; margin-top: 60px; height: calc(100vh - 90px); }
+        .main-container { display: none; margin-top: 70px; height: calc(100vh - 100px); }
         .main-container.show { display: flex; }
         .footer { background: #004080; color: white; padding: 8px 20px; text-align: center; font-size: 11px; position: fixed; bottom: 0; left: 0; right: 0; }
         
@@ -111,7 +111,32 @@
         
         .viewer-container { display: none; min-height: 100vh; background: #e9ecef; }
         .viewer-container.show { display: block; }
-        .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 100; }
+        
+        /* FIXED: Viewer navigation bar with back button inside */
+        .viewer-nav { 
+            background: linear-gradient(135deg, #004080 0%, #002855 100%); 
+            padding: 12px 20px; 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            align-items: center;
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+        .viewer-back-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .viewer-back-btn:hover { background: #c82333; }
         .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
         .viewer-nav-btn:hover { transform: translateY(-2px); }
         .connection-status { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-left: auto; }
@@ -136,21 +161,21 @@
         .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .viewer-radio-option:hover { border-color: #004080; }
         .viewer-section { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 14px 18px; margin: 20px -25px; font-size: 13px; font-weight: 700; }
-        .viewer-back-btn { position: fixed; top: 15px; left: 20px; background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; cursor: pointer; z-index: 200; }
+        
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
         .data-table th, .data-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
         .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; position: sticky; top: 0; }
         .data-table tr:nth-child(even) { background: #f8f9fa; }
         .data-table tr:hover { background: #e8f4fc; }
-        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        .stat-card .stat-value { font-size: 32px; font-weight: 700; }
-        .stat-card .stat-label { font-size: 11px; opacity: 0.9; margin-top: 5px; }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-card .stat-label { font-size: 10px; opacity: 0.9; margin-top: 5px; }
         
         .chart-container { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .chart-container h4 { color: #004080; font-size: 14px; margin-bottom: 15px; border-bottom: 2px solid #004080; padding-bottom: 8px; }
         .chart-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-        .chart-box { flex: 1; min-width: 280px; max-width: 400px; }
+        .chart-box { flex: 1; min-width: 250px; max-width: 380px; }
         
         .progress-bar-container { width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; margin-bottom: 20px; }
         .progress-bar { height: 100%; background: #28a745; border-radius: 4px; transition: width 0.3s; }
@@ -163,16 +188,11 @@
         .next-btn { background: #004080; color: white; }
         .submit-btn { background: #28a745; color: white; }
         
-        /* FULL SCREEN DATA VIEW STYLES */
+        /* FIXED: Full screen data view styles */
         .data-tab-fullscreen { padding: 0 !important; }
         .data-fullscreen-container { 
-            position: fixed; 
-            top: 50px; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
             background: #f5f5f5; 
-            overflow: hidden;
+            min-height: calc(100vh - 60px);
             display: flex;
             flex-direction: column;
         }
@@ -186,8 +206,17 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .data-header-bar h2 { margin: 0; font-size: 18px; }
-        .data-header-actions { display: flex; gap: 10px; align-items: center; }
+        .data-header-bar h2 { margin: 0; font-size: 16px; }
+        .data-header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .data-header-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+        }
         .data-table-wrapper {
             flex: 1;
             overflow: auto;
@@ -200,25 +229,25 @@
         .data-table-fullscreen { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 12px;
+            font-size: 11px;
         }
         .data-table-fullscreen th { 
             background: #004080; 
             color: white; 
             font-weight: 700; 
-            font-size: 11px; 
+            font-size: 10px; 
             position: sticky; 
             top: 0; 
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-align: left;
             white-space: nowrap;
             z-index: 10;
         }
         .data-table-fullscreen td { 
             border: 1px solid #dee2e6; 
-            padding: 10px; 
+            padding: 8px; 
             text-align: left;
-            max-width: 200px;
+            max-width: 150px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -232,32 +261,33 @@
         .data-table-fullscreen tr:hover { background: #e8f4fc; }
         .data-stats-bar {
             background: white;
-            padding: 10px 20px;
+            padding: 10px 15px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
             border-bottom: 2px solid #004080;
+            align-items: center;
         }
         .data-stat-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
+            gap: 6px;
+            font-size: 11px;
             font-weight: 600;
         }
         .data-stat-value {
             background: #004080;
             color: white;
-            padding: 4px 10px;
-            border-radius: 15px;
+            padding: 3px 8px;
+            border-radius: 12px;
             font-weight: 700;
+            font-size: 10px;
         }
         
-        /* FILTER PANEL STYLES */
+        /* FIXED: Filter panel styles - ICF Blue */
         .filter-panel {
-            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
-            padding: 15px 20px;
-            border-bottom: 3px solid #4a2a8a;
+            background: linear-gradient(135deg, #004080 0%, #002855 100%);
+            padding: 12px 15px;
         }
         .filter-header {
             display: flex;
@@ -267,7 +297,7 @@
         }
         .filter-title {
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -277,40 +307,42 @@
             background: rgba(255,255,255,0.2);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-family: 'Oswald', sans-serif;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 10px;
         }
         .filter-toggle-btn:hover { background: rgba(255,255,255,0.3); }
         .filter-controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
             align-items: flex-end;
         }
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            min-width: 150px;
+            gap: 4px;
+            min-width: 130px;
+            flex: 1;
+            max-width: 180px;
         }
         .filter-label {
             color: rgba(255,255,255,0.9);
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
             text-transform: uppercase;
         }
         .filter-select {
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 6px;
             font-family: 'Oswald', sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             background: white;
-            min-width: 150px;
+            width: 100%;
             cursor: pointer;
         }
         .filter-select:focus {
@@ -319,62 +351,69 @@
         }
         .filter-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         .filter-btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 6px;
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
         }
-        .filter-btn.apply { background: #28a745; color: white; }
         .filter-btn.clear { background: #dc3545; color: white; }
-        .filter-btn:hover { transform: translateY(-2px); }
+        .filter-btn:hover { transform: translateY(-1px); }
         .filter-active-count {
             background: #ffc107;
             color: #000;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 700;
         }
-        .filter-collapsed .filter-controls { display: none; }
-        .no-filters-msg {
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
-            padding: 10px;
+        
+        /* Dashboard tab improvements */
+        .dashboard-tab-content {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        .dashboard-header-box {
+            background: white;
+            border: 3px solid #17a2b8;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .dashboard-header-title {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 20px;
             text-align: center;
         }
+        .dashboard-header-title h1 { font-size: 18px; margin-bottom: 5px; }
+        .dashboard-header-title p { font-size: 11px; opacity: 0.9; }
+        .dashboard-body { padding: 20px; }
         
-        /* Date range filter */
-        .filter-date-range {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .filter-date-range input {
-            padding: 10px 12px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            font-family: 'Oswald', sans-serif;
-            font-size: 12px;
-            background: white;
-        }
-        
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
             .header { flex-wrap: wrap; padding: 10px 15px; }
-            .viewer-nav { padding: 10px; }
+            .header h1 { font-size: 16px; }
+            .viewer-nav { padding: 10px; flex-direction: row; }
+            .viewer-back-btn { padding: 8px 12px; font-size: 11px; }
+            .viewer-nav-btn { padding: 8px 12px; font-size: 11px; }
             .page-navigation { flex-direction: column; }
             .nav-btn { width: 100%; }
             .data-header-bar { flex-direction: column; text-align: center; }
             .filter-controls { flex-direction: column; }
-            .filter-group { width: 100%; }
+            .filter-group { width: 100%; max-width: none; }
+            .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+            .stat-card { padding: 15px; }
+            .stat-card .stat-value { font-size: 22px; }
+            .chart-box { min-width: 100%; }
         }
     </style>
 </head>
@@ -555,7 +594,6 @@
                 logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
                 scriptUrl: CONFIG.SCRIPT_URL, sheetId: CONFIG.SHEET_ID
             },
-            // Filter state - shared between Data and Dashboard
             filters: {},
             dateFilter: { start: '', end: '' }
         };
@@ -624,33 +662,27 @@
             renderSharedFormViewer();
         }
         
-        // Get filterable fields (categorical types)
         function getFilterableFields() {
             const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating'];
             return state.fields.filter(f => categoricalTypes.includes(f.type));
         }
         
-        // Build filter panel HTML
         function buildFilterPanel() {
             const filterableFields = getFilterableFields();
             const activeFilterCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
                                      (state.dateFilter.start || state.dateFilter.end ? 1 : 0);
             
-            let filtersHtml = '';
-            
-            // Date range filter
-            filtersHtml += `
+            let filtersHtml = `
                 <div class="filter-group">
-                    <label class="filter-label">📅 Date From</label>
+                    <label class="filter-label">📅 From</label>
                     <input type="date" class="filter-select" id="filterDateStart" value="${state.dateFilter.start}" onchange="updateDateFilter('start', this.value)">
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">📅 Date To</label>
+                    <label class="filter-label">📅 To</label>
                     <input type="date" class="filter-select" id="filterDateEnd" value="${state.dateFilter.end}" onchange="updateDateFilter('end', this.value)">
                 </div>
             `;
             
-            // Categorical field filters
             filterableFields.forEach(field => {
                 filtersHtml += `
                     <div class="filter-group">
@@ -662,6 +694,13 @@
                 `;
             });
             
+            filtersHtml += `
+                <div class="filter-group" style="min-width:auto;">
+                    <label class="filter-label">&nbsp;</label>
+                    <button class="filter-btn clear" onclick="clearAllFilters()">🗑️ Clear</button>
+                </div>
+            `;
+            
             return `
                 <div class="filter-panel" id="filterPanel">
                     <div class="filter-header">
@@ -669,19 +708,15 @@
                             🔍 Filters
                             ${activeFilterCount > 0 ? `<span class="filter-active-count">${activeFilterCount} active</span>` : ''}
                         </div>
-                        <div class="filter-actions">
-                            <button class="filter-btn clear" onclick="clearAllFilters()">🗑️ Clear All</button>
-                            <button class="filter-toggle-btn" onclick="toggleFilterPanel()">▼ Hide</button>
-                        </div>
+                        <button class="filter-toggle-btn" onclick="toggleFilterPanel()">▼ Hide</button>
                     </div>
                     <div class="filter-controls" id="filterControls">
-                        ${filterableFields.length > 0 || true ? filtersHtml : '<p class="no-filters-msg">No filterable fields available</p>'}
+                        ${filtersHtml}
                     </div>
                 </div>
             `;
         }
         
-        // Populate filter dropdowns with actual data values
         function populateFilterOptions(data) {
             const filterableFields = getFilterableFields();
             
@@ -689,7 +724,6 @@
                 const selectEl = document.getElementById(`filter_${field.name}`);
                 if (!selectEl) return;
                 
-                // Get unique values from data
                 const uniqueValues = new Set();
                 data.forEach(row => {
                     const value = row[field.name] || row[field.label];
@@ -698,7 +732,6 @@
                     }
                 });
                 
-                // Sort and add options
                 const sortedValues = Array.from(uniqueValues).sort();
                 const currentValue = state.filters[field.name] || '';
                 
@@ -710,7 +743,6 @@
             });
         }
         
-        // Update filter state
         window.updateFilter = function(fieldName, value) {
             if (value) {
                 state.filters[fieldName] = value;
@@ -729,13 +761,8 @@
             state.filters = {};
             state.dateFilter = { start: '', end: '' };
             
-            // Reset all filter dropdowns
             document.querySelectorAll('.filter-select').forEach(el => {
-                if (el.type === 'date') {
-                    el.value = '';
-                } else {
-                    el.value = '';
-                }
+                el.value = '';
             });
             
             applyFilters();
@@ -743,36 +770,40 @@
         };
         
         window.toggleFilterPanel = function() {
-            const panel = document.getElementById('filterPanel');
-            const btn = panel.querySelector('.filter-toggle-btn');
-            panel.classList.toggle('filter-collapsed');
-            btn.textContent = panel.classList.contains('filter-collapsed') ? '▶ Show' : '▼ Hide';
+            const panels = document.querySelectorAll('.filter-panel');
+            panels.forEach(panel => {
+                const controls = panel.querySelector('.filter-controls');
+                const btn = panel.querySelector('.filter-toggle-btn');
+                if (controls && btn) {
+                    if (controls.style.display === 'none') {
+                        controls.style.display = 'flex';
+                        btn.textContent = '▼ Hide';
+                    } else {
+                        controls.style.display = 'none';
+                        btn.textContent = '▶ Show';
+                    }
+                }
+            });
         };
         
-        // Apply filters and update both Data and Dashboard
         function applyFilters() {
             const filteredData = getFilteredData();
             window.filteredViewData = filteredData;
             
-            // Update active filter count display
             const activeCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
                                (state.dateFilter.start || state.dateFilter.end ? 1 : 0);
-            const countEl = document.querySelector('.filter-active-count');
-            if (countEl) {
-                countEl.textContent = `${activeCount} active`;
-                countEl.style.display = activeCount > 0 ? 'inline' : 'none';
-            }
+            document.querySelectorAll('.filter-active-count').forEach(el => {
+                el.textContent = `${activeCount} active`;
+                el.style.display = activeCount > 0 ? 'inline' : 'none';
+            });
             
-            // Refresh both views
             renderDataTable(filteredData);
             renderDashboardCharts(filteredData);
         }
         
-        // Get filtered data based on current filter state
         function getFilteredData() {
             let data = window.currentViewData || [];
             
-            // Apply date filters
             if (state.dateFilter.start || state.dateFilter.end) {
                 data = data.filter(row => {
                     const ts = row._timestamp || row.timestamp || row.Timestamp;
@@ -792,7 +823,6 @@
                 });
             }
             
-            // Apply categorical filters
             Object.keys(state.filters).forEach(fieldName => {
                 const filterValue = state.filters[fieldName];
                 if (filterValue) {
@@ -807,7 +837,6 @@
             return data;
         }
         
-        // Render data table with filtered data
         function renderDataTable(data) {
             const wrapper = document.querySelector('.data-table-wrapper');
             if (!wrapper) return;
@@ -815,14 +844,14 @@
             const fields = state.fields.filter(f => f.type !== 'section');
             
             if (data.length === 0) {
-                wrapper.innerHTML = '<p style="text-align:center;color:#868e96;padding:50px;">📭 No records match the current filters</p>';
+                wrapper.innerHTML = '<p style="text-align:center;color:#868e96;padding:40px;">📭 No records match the current filters</p>';
                 updateDataStats(data);
                 return;
             }
             
-            let tableHeaders = `<th style="min-width:50px;">#</th><th style="min-width:150px;">📅 Timestamp</th>`;
+            let tableHeaders = `<th>#</th><th>📅 Timestamp</th>`;
             fields.forEach(f => {
-                tableHeaders += `<th style="min-width:120px;">${escapeHtml(f.label)}</th>`;
+                tableHeaders += `<th>${escapeHtml(f.label)}</th>`;
             });
             
             let tableRows = '';
@@ -846,7 +875,6 @@
             updateDataStats(data);
         }
         
-        // Update data statistics
         function updateDataStats(data) {
             const totalData = window.currentViewData || [];
             const statsContainer = document.querySelector('.data-stats-bar');
@@ -857,38 +885,24 @@
                 return ts && new Date(ts).toDateString() === new Date().toDateString();
             }).length;
             
-            const thisWeek = data.filter(d => {
-                const ts = d._timestamp || d.timestamp || d.Timestamp;
-                if (!ts) return false;
-                const date = new Date(ts);
-                const now = new Date();
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return date >= weekAgo;
-            }).length;
-            
             const fields = state.fields.filter(f => f.type !== 'section');
             
             statsContainer.innerHTML = `
                 <div class="data-stat-item">
                     <span>📊 Showing:</span>
-                    <span class="data-stat-value">${data.length} of ${totalData.length}</span>
+                    <span class="data-stat-value">${data.length} / ${totalData.length}</span>
                 </div>
                 <div class="data-stat-item">
                     <span>📅 Today:</span>
                     <span class="data-stat-value" style="background:#28a745;">${today}</span>
                 </div>
                 <div class="data-stat-item">
-                    <span>📆 This Week:</span>
-                    <span class="data-stat-value" style="background:#17a2b8;">${thisWeek}</span>
-                </div>
-                <div class="data-stat-item">
-                    <span>📋 Variables:</span>
+                    <span>📋 Fields:</span>
                     <span class="data-stat-value" style="background:#6f42c1;">${fields.length}</span>
                 </div>
             `;
         }
         
-        // Render dashboard charts with filtered data
         function renderDashboardCharts(data) {
             const container = document.getElementById('dashboardStats');
             const chartsContainer = document.getElementById('dashboardCharts');
@@ -901,9 +915,9 @@
             }).length;
             
             container.innerHTML = `
-                <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Filtered Results (of ${totalData.length})</div></div>
+                <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Filtered (of ${totalData.length})</div></div>
                 <div class="stat-card" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><div class="stat-value">${today}</div><div class="stat-label">Today</div></div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">${state.fields.length}</div><div class="stat-label">Fields</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">${state.fields.filter(f=>f.type!=='section').length}</div><div class="stat-label">Fields</div></div>
             `;
             
             if (chartsContainer) {
@@ -911,7 +925,7 @@
                 chartInstances = {};
                 
                 if (data.length === 0) {
-                    chartsContainer.innerHTML = '<div style="text-align:center;color:#868e96;padding:40px;">📭 No data matches the current filters</div>';
+                    chartsContainer.innerHTML = '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">📭 No data matches filters</p></div>';
                     return;
                 }
                 
@@ -919,7 +933,7 @@
                 const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
                 
                 if (categoricalFields.length === 0) {
-                    chartsContainer.innerHTML = '<div style="text-align:center;color:#868e96;padding:40px;">📊 No categorical fields for charts</div>';
+                    chartsContainer.innerHTML = '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">📊 No categorical fields for charts</p></div>';
                     return;
                 }
                 
@@ -945,7 +959,7 @@
                     }
                 });
                 
-                chartsContainer.innerHTML = chartsHtml || '<div style="text-align:center;color:#868e96;padding:40px;">📊 No data for categorical fields</div>';
+                chartsContainer.innerHTML = chartsHtml || '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">📊 No data for charts</p></div>';
                 
                 setTimeout(() => {
                     categoricalFields.forEach((field, index) => {
@@ -968,10 +982,10 @@
                                     type: 'bar',
                                     data: { labels: labels, datasets: [{ label: 'Count', data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2 }] },
                                     options: {
-                                        responsive: true,
+                                        responsive: true, maintainAspectRatio: true,
                                         plugins: {
                                             legend: { display: false },
-                                            title: { display: true, text: 'Bar Chart - Counts', font: { family: 'Oswald', size: 14, weight: 'bold' } },
+                                            title: { display: true, text: 'Bar Chart', font: { family: 'Oswald', size: 12, weight: 'bold' } },
                                             tooltip: { callbacks: { label: ctx => `${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)` } }
                                         },
                                         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
@@ -985,11 +999,10 @@
                                     type: 'pie',
                                     data: { labels: labels.map((l, i) => `${l} (${percentages[i]}%)`), datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderColor: '#fff', borderWidth: 2 }] },
                                     options: {
-                                        responsive: true,
+                                        responsive: true, maintainAspectRatio: true,
                                         plugins: {
-                                            legend: { position: 'bottom', labels: { font: { family: 'Oswald', size: 11 } } },
-                                            title: { display: true, text: 'Pie Chart - Percentages', font: { family: 'Oswald', size: 14, weight: 'bold' } },
-                                            tooltip: { callbacks: { label: ctx => `${ctx.label.split(' (')[0]}: ${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)` } }
+                                            legend: { position: 'bottom', labels: { font: { family: 'Oswald', size: 10 }, boxWidth: 12 } },
+                                            title: { display: true, text: 'Pie Chart', font: { family: 'Oswald', size: 12, weight: 'bold' } }
                                         }
                                     }
                                 });
@@ -1063,8 +1076,12 @@
                 `;
             }).join('');
             
+            // FIXED: Back button is now INSIDE the nav bar, not overlapping
+            const backBtnHtml = state.isSharedMode ? '' : '<button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back to Builder</button>';
+            
             document.getElementById('viewerContainer').innerHTML = `
                 <div class="viewer-nav">
+                    ${backBtnHtml}
                     <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showViewerTab('form',this)">📝 Form</button>
                     <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showViewerTab('data',this)">📊 Data</button>
                     <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard',this)">📈 Dashboard</button>
@@ -1092,18 +1109,18 @@
                 </div>
                 
                 <div id="tabData" class="viewer-tab data-tab-fullscreen">
-                    <div id="dataContainer"><p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading from Google Sheets...</p></div>
+                    <div id="dataContainer"><p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading...</p></div>
                 </div>
                 
                 <div id="tabDashboard" class="viewer-tab">
                     <div id="dashboardFilterPanel"></div>
-                    <div style="max-width:900px;margin:0 auto;padding:0 15px;">
-                        <div class="viewer-form-box" style="margin-bottom:20px;">
-                            <div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);">
+                    <div class="dashboard-tab-content">
+                        <div class="dashboard-header-box">
+                            <div class="dashboard-header-title">
                                 <h1>📈 Dashboard</h1>
                                 <p>${escapeHtml(s.title)}</p>
                             </div>
-                            <div class="viewer-body">
+                            <div class="dashboard-body">
                                 <div class="dashboard-stats" id="dashboardStats"></div>
                             </div>
                         </div>
@@ -1161,7 +1178,7 @@
         async function loadViewerData() {
             const container = document.getElementById('dataContainer');
             if (!container) return;
-            container.innerHTML = '<p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading data from Google Sheets...</p>';
+            container.innerHTML = '<p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading data...</p>';
             
             let data = [];
             const scriptUrl = state.settings.scriptUrl || CONFIG.SCRIPT_URL;
@@ -1173,21 +1190,18 @@
                     const result = await response.json();
                     if (result.success && result.data) { data = result.data; window.currentViewData = data; }
                 } catch (err) {
-                    container.innerHTML = '<p style="text-align:center;color:#dc3545;padding:50px;">❌ Failed to load data. Check internet connection.</p>';
+                    container.innerHTML = '<p style="text-align:center;color:#dc3545;padding:50px;">❌ Failed to load. Check connection.</p>';
                     return;
                 }
             }
             
-            const fields = state.fields.filter(f => f.type !== 'section');
-            
-            // Build full container with filter panel
             container.innerHTML = `
                 <div class="data-fullscreen-container">
                     <div class="data-header-bar">
-                        <h2>📊 ${escapeHtml(state.settings.title)} - Data View</h2>
+                        <h2>📊 ${escapeHtml(state.settings.title)}</h2>
                         <div class="data-header-actions">
-                            <button onclick="refreshData()" style="padding:10px 20px;background:#17a2b8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">🔄 Refresh</button>
-                            <button onclick="downloadFilteredData()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">📥 Download CSV</button>
+                            <button onclick="refreshData()" style="background:#17a2b8;color:#fff;">🔄 Refresh</button>
+                            <button onclick="downloadFilteredData()" style="background:#28a745;color:#fff;">📥 CSV</button>
                         </div>
                     </div>
                     ${buildFilterPanel()}
@@ -1196,11 +1210,9 @@
                 </div>
             `;
             
-            // Populate filter options and render table
             populateFilterOptions(data);
             applyFilters();
             
-            // Also update dashboard filter panel
             const dashFilterPanel = document.getElementById('dashboardFilterPanel');
             if (dashFilterPanel) {
                 dashFilterPanel.innerHTML = buildFilterPanel();
@@ -1229,8 +1241,7 @@
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url;
-            const filterSuffix = Object.keys(state.filters).length > 0 ? '_filtered' : '';
-            a.download = `${state.settings.title.replace(/\s+/g, '_')}${filterSuffix}_data.csv`;
+            a.download = `${state.settings.title.replace(/\s+/g, '_')}_data.csv`;
             a.click(); URL.revokeObjectURL(url);
             notify('✅ Downloaded!');
         };
@@ -1238,26 +1249,28 @@
         function goToPage(pageIndex) {
             if (pageIndex > window.currentPageIndex) {
                 const currentPageEl = document.querySelector(`.form-page[data-page="${window.currentPageIndex}"]`);
-                const allFields = currentPageEl.querySelectorAll('input[required], select[required], textarea[required]');
-                let valid = true, firstInvalid = null;
-                currentPageEl.querySelectorAll('.field-error-msg').forEach(el => el.remove());
-                
-                allFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        valid = false;
-                        field.classList.add('error');
-                        const container = field.closest('.viewer-field');
-                        if (container && !container.querySelector('.field-error-msg')) {
-                            const err = document.createElement('div');
-                            err.className = 'field-error-msg';
-                            err.textContent = '⚠️ This field is required';
-                            container.appendChild(err);
-                        }
-                        if (!firstInvalid) firstInvalid = field;
-                    } else { field.classList.remove('error'); }
-                });
-                
-                if (!valid) { notify('⚠️ Please fix errors', 'error'); if (firstInvalid) firstInvalid.focus(); return; }
+                if (currentPageEl) {
+                    const allFields = currentPageEl.querySelectorAll('input[required], select[required], textarea[required]');
+                    let valid = true, firstInvalid = null;
+                    currentPageEl.querySelectorAll('.field-error-msg').forEach(el => el.remove());
+                    
+                    allFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            valid = false;
+                            field.classList.add('error');
+                            const container = field.closest('.viewer-field');
+                            if (container && !container.querySelector('.field-error-msg')) {
+                                const err = document.createElement('div');
+                                err.className = 'field-error-msg';
+                                err.textContent = '⚠️ Required';
+                                container.appendChild(err);
+                            }
+                            if (!firstInvalid) firstInvalid = field;
+                        } else { field.classList.remove('error'); }
+                    });
+                    
+                    if (!valid) { notify('⚠️ Fix errors', 'error'); if (firstInvalid) firstInvalid.focus(); return; }
+                }
             }
             
             document.querySelectorAll('.form-page').forEach(p => p.style.display = 'none');
@@ -1265,8 +1278,8 @@
             if (targetPage) {
                 targetPage.style.display = 'block';
                 window.currentPageIndex = pageIndex;
-                document.getElementById('formProgress').style.width = ((pageIndex + 1) / window.totalPages * 100) + '%';
-                document.querySelector('.viewer-form-box')?.scrollIntoView({ behavior: 'smooth' });
+                const progress = document.getElementById('formProgress');
+                if (progress) progress.style.width = ((pageIndex + 1) / window.totalPages * 100) + '%';
             }
         }
         
@@ -1276,17 +1289,7 @@
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
             if (btn) btn.classList.add('active');
             
-            if (tab === 'data') {
-                // Sync filters and refresh
-                applyFilters();
-            }
-            if (tab === 'dashboard') {
-                // Update dashboard filter panel and refresh
-                const dashFilterPanel = document.getElementById('dashboardFilterPanel');
-                if (dashFilterPanel) {
-                    dashFilterPanel.innerHTML = buildFilterPanel();
-                    populateFilterOptions(window.currentViewData || []);
-                }
+            if (tab === 'data' || tab === 'dashboard') {
                 applyFilters();
             }
         }
@@ -1342,7 +1345,6 @@
             container.querySelector('input').value = val;
         };
 
-        // Builder functions
         function setupEventListeners() {
             document.querySelectorAll('.auth-tab').forEach(tab => tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab)));
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -1412,7 +1414,7 @@
             renderFields();
             selectField(field.id);
             saveToStorage();
-            notify('✅ Field added!');
+            notify('✅ Added!');
         }
 
         function removeField(id) { event?.stopPropagation(); if (!confirm('Delete?')) return; state.fields = state.fields.filter(f => f.id !== id); if (state.selectedFieldId === id) { state.selectedFieldId = null; renderProperties(); } renderFields(); saveToStorage(); notify('🗑️ Deleted'); }
@@ -1440,9 +1442,9 @@
             if (!state.selectedFieldId) { container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;">👆</p><p>Select a field</p></div>'; return; }
             const field = state.fields.find(f => f.id === state.selectedFieldId);
             if (!field) return;
-            let html = `<div class="prop-section"><div class="prop-section-title">📝 Basic Properties</div><div class="property-group"><label class="property-label">Label</label><input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}"></div><div class="property-group"><label class="property-label">Field Name</label><input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}"></div>${field.type !== 'section' ? `<div class="property-group"><label class="property-checkbox"><input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}><span>Required</span></label></div>` : ''}</div>`;
-            if (['select', 'radio', 'checkbox'].includes(field.type)) { html += `<div class="prop-section"><div class="prop-section-title">📋 Options</div><div class="property-group"><label class="property-label">Options (one per line)</label><textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea></div></div>`; }
-            if (field.type === 'rating') { html += `<div class="prop-section"><div class="prop-section-title">⭐ Rating</div><div class="property-group"><label class="property-label">Max Stars</label><select class="property-select" id="propMax">${[3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${field.max === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>`; }
+            let html = `<div class="prop-section"><div class="prop-section-title">📝 Basic</div><div class="property-group"><label class="property-label">Label</label><input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}"></div><div class="property-group"><label class="property-label">Name</label><input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}"></div>${field.type !== 'section' ? `<div class="property-group"><label class="property-checkbox"><input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}><span>Required</span></label></div>` : ''}</div>`;
+            if (['select', 'radio', 'checkbox'].includes(field.type)) { html += `<div class="prop-section"><div class="prop-section-title">📋 Options</div><div class="property-group"><label class="property-label">One per line</label><textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea></div></div>`; }
+            if (field.type === 'rating') { html += `<div class="prop-section"><div class="prop-section-title">⭐ Rating</div><div class="property-group"><label class="property-label">Max</label><select class="property-select" id="propMax">${[3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${field.max === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>`; }
             container.innerHTML = html;
             document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
             document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
@@ -1451,60 +1453,15 @@
             document.getElementById('propMax')?.addEventListener('change', (e) => updateField('max', parseInt(e.target.value) || 5));
         }
 
-        function newForm() { if (state.fields.length > 0 && !confirm('Create new form?')) return; state.fields = []; state.selectedFieldId = null; state.fieldCounter = 0; const title = prompt('Form title:', 'New Form'); if (title) { state.settings.title = title; document.getElementById('formTitle').value = title; document.getElementById('previewTitle').textContent = title; } saveToStorage(); renderFields(); renderProperties(); notify('📄 New form!'); }
-        function previewForm() { if (state.fields.length === 0) { notify('Add fields first!', 'error'); return; } state.isSharedMode = false; document.querySelector('.header').style.display = 'none'; document.getElementById('mainContainer').classList.remove('show'); document.querySelector('.footer').style.display = 'none'; document.getElementById('viewerContainer').classList.add('show'); renderFormViewer(); }
+        function newForm() { if (state.fields.length > 0 && !confirm('Create new?')) return; state.fields = []; state.selectedFieldId = null; state.fieldCounter = 0; const title = prompt('Title:', 'New Form'); if (title) { state.settings.title = title; document.getElementById('formTitle').value = title; document.getElementById('previewTitle').textContent = title; } saveToStorage(); renderFields(); renderProperties(); notify('📄 New!'); }
+        function previewForm() { if (state.fields.length === 0) { notify('Add fields!', 'error'); return; } state.isSharedMode = false; document.querySelector('.header').style.display = 'none'; document.getElementById('mainContainer').classList.remove('show'); document.querySelector('.footer').style.display = 'none'; document.getElementById('viewerContainer').classList.add('show'); renderSharedFormViewer(); }
         function closeViewer() { document.getElementById('viewerContainer').classList.remove('show'); document.querySelector('.header').style.display = ''; document.getElementById('mainContainer').classList.add('show'); document.querySelector('.footer').style.display = ''; }
-        
-        function renderFormViewer() {
-            const s = state.settings;
-            let pages = [], currentPage = { title: 'Page 1', fields: [] };
-            state.fields.forEach(field => { if (field.type === 'section') { if (currentPage.fields.length > 0) pages.push(currentPage); currentPage = { title: field.label, fields: [] }; } else { currentPage.fields.push(field); } });
-            if (currentPage.fields.length > 0) pages.push(currentPage);
-            if (pages.length === 0) pages = [{ title: s.title, fields: state.fields.filter(f => f.type !== 'section') }];
-            
-            let pagesHtml = pages.map((page, pageIndex) => {
-                let fieldsHtml = page.fields.map(field => {
-                    const req = field.required ? '<span style="color:#dc3545;">*</span>' : '';
-                    const reqAttr = field.required ? 'required' : '';
-                    let input = '';
-                    switch (field.type) {
-                        case 'text': case 'email': case 'phone': case 'number': case 'date': case 'time': input = `<input type="${field.type === 'phone' ? 'tel' : field.type}" name="${field.name}" class="viewer-input" ${reqAttr}>`; break;
-                        case 'textarea': input = `<textarea name="${field.name}" class="viewer-input" rows="3" ${reqAttr}></textarea>`; break;
-                        case 'select': input = `<select name="${field.name}" class="viewer-input" ${reqAttr}><option value="">-- Select --</option>${(field.options||[]).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`; break;
-                        case 'radio': case 'yesno': const opts = field.type === 'yesno' ? ['Yes','No'] : (field.options||[]); input = `<div class="viewer-radio-group">${opts.map(o => `<label class="viewer-radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
-                        case 'checkbox': input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`; break;
-                        case 'gps': input = `<div style="text-align:center;"><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;">📍 Capture GPS</button><input type="hidden" name="${field.name}_lat"><input type="hidden" name="${field.name}_lng"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`; break;
-                        case 'signature': input = `<div style="text-align:center;"><canvas class="sig-canvas" width="280" height="100" style="border:2px solid #004080;border-radius:6px;background:#fff;cursor:crosshair;touch-action:none;"></canvas><input type="hidden" name="${field.name}" class="sig-data"><button type="button" onclick="clearSig(this)" style="margin-top:6px;padding:6px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;">Clear</button></div>`; break;
-                        case 'rating': input = `<div class="rating-container">${Array(field.max || 5).fill().map((_, i) => `<span class="rating-star" onclick="setRating(this,${i+1})" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`; break;
-                        default: input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
-                    }
-                    return `<div class="viewer-field"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
-                }).join('');
-                const isFirst = pageIndex === 0, isLast = pageIndex === pages.length - 1;
-                return `<div class="form-page" data-page="${pageIndex}" style="${pageIndex === 0 ? '' : 'display:none;'}"><div class="page-header"><span class="page-indicator">Page ${pageIndex + 1} of ${pages.length}</span><h3 class="page-title">${escapeHtml(page.title)}</h3></div>${fieldsHtml}<div class="page-navigation">${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}${isLast ? `<button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}</div></div>`;
-            }).join('');
-            
-            document.getElementById('viewerContainer').innerHTML = `
-                <button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back to Builder</button>
-                <div class="viewer-nav">
-                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showViewerTab('form',this)">📝 Form</button>
-                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showViewerTab('data',this)">📊 Data</button>
-                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showViewerTab('dashboard',this)">📈 Dashboard</button>
-                    <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}" id="connectionStatus"><span>${navigator.onLine ? '🟢 Online' : '🔴 Offline'}</span></div>
-                </div>
-                <div id="tabForm" class="viewer-tab active"><div class="viewer-form"><div class="viewer-form-box"><div class="viewer-header"><img src="${s.logo}" alt="Logo"><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.subtitle)}</p></div><div class="viewer-body"><form id="viewerForm"><div class="progress-bar-container"><div class="progress-bar" id="formProgress" style="width: ${100/pages.length}%"></div></div>${pagesHtml}</form></div></div></div></div>
-                <div id="tabData" class="viewer-tab data-tab-fullscreen"><div id="dataContainer"><p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading...</p></div></div>
-                <div id="tabDashboard" class="viewer-tab"><div id="dashboardFilterPanel"></div><div style="max-width:900px;margin:0 auto;padding:0 15px;"><div class="viewer-form-box" style="margin-bottom:20px;"><div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><h1>📈 Dashboard</h1></div><div class="viewer-body"><div class="dashboard-stats" id="dashboardStats"></div></div></div><div id="dashboardCharts"></div></div></div>
-            `;
-            window.totalPages = pages.length; window.currentPageIndex = 0;
-            initSignaturePads(); setupFormSubmit(); loadViewerData();
-        }
 
         function shareForm() {
-            if (state.fields.length === 0) { notify('Add fields first!', 'error'); return; }
+            if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
             const formData = {
                 s: { t: state.settings.title, st: state.settings.subtitle, o: state.settings.organization, l: state.settings.logo, u: CONFIG.SCRIPT_URL, g: CONFIG.SHEET_ID },
-                f: state.fields.map(f => { const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required }; if (f.placeholder) field.p = f.placeholder; if (f.options?.length) field.o = f.options; if (f.max !== 5) field.mx = f.max; if (f.duplicateCheck) field.dc = true; return field; })
+                f: state.fields.map(f => { const field = { i: f.id, y: f.type, l: f.label, n: f.name, r: f.required }; if (f.placeholder) field.p = f.placeholder; if (f.options?.length) field.o = f.options; if (f.max !== 5) field.mx = f.max; return field; })
             };
             try {
                 const jsonStr = JSON.stringify(formData);
@@ -1521,10 +1478,38 @@
             } catch (err) { notify('Error: ' + err.message, 'error'); }
         }
         
-        function copyShareUrl() { navigator.clipboard.writeText(document.getElementById('shareUrl').textContent); notify('📋 Copied!'); }
+        function copyShareUrl() { 
+            const urlText = document.getElementById('shareUrl').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(urlText).then(() => {
+                    notify('📋 Copied!');
+                }).catch(err => {
+                    fallbackCopy(urlText);
+                });
+            } else {
+                fallbackCopy(urlText);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                notify('📋 Copied!');
+            } catch (err) {
+                notify('❌ Copy failed', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
         function downloadQR() { const canvas = document.querySelector('#qrCode canvas'); if (canvas) { const link = document.createElement('a'); link.download = state.settings.title.replace(/[^a-z0-9]/gi, '_') + '_QR.png'; link.href = canvas.toDataURL(); link.click(); notify('⬇️ Downloaded!'); } }
 
-        function saveCurrentForm() { if (state.fields.length === 0) { notify('Add fields first!', 'error'); return; } saveFormToList(); notify('💾 Saved!'); }
+        function saveCurrentForm() { if (state.fields.length === 0) { notify('Add fields!', 'error'); return; } saveFormToList(); notify('💾 Saved!'); }
         function saveFormToList() { const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]'); const existingIndex = forms.findIndex(f => f.title === state.settings.title); const formEntry = { id: existingIndex >= 0 ? forms[existingIndex].id : 'form_' + Date.now(), title: state.settings.title, subtitle: state.settings.subtitle, organization: state.settings.organization, logo: state.settings.logo, fieldCount: state.fields.length, updatedAt: new Date().toISOString(), fields: state.fields, settings: state.settings }; if (existingIndex >= 0) forms[existingIndex] = formEntry; else forms.push(formEntry); localStorage.setItem('formBuilderForms', JSON.stringify(forms)); }
         function showHome() { const forms = JSON.parse(localStorage.getItem('formBuilderForms') || '[]'); let formsHtml = forms.length === 0 ? `<div style="text-align:center;padding:60px;color:#868e96;"><p style="font-size:64px;">📭</p><h3 style="color:#004080;">No Forms</h3><button onclick="closeHome()" style="padding:15px 30px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:20px;">➕ Create</button></div>` : forms.map((f, i) => `<div style="background:#fff;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);overflow:hidden;"><div style="background:linear-gradient(135deg,#004080,#002855);color:#fff;padding:15px 20px;"><h3 style="margin:0;">📋 ${escapeHtml(f.title)}</h3></div><div style="padding:15px 20px;"><div style="font-size:11px;color:#666;margin-bottom:15px;">📊 ${f.fieldCount} fields</div><div style="display:flex;gap:8px;"><button onclick="editForm(${i})" style="flex:1;padding:10px;background:#004080;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">✏️ Edit</button><button onclick="shareFormFromHome(${i})" style="flex:1;padding:10px;background:#17a2b8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🔗 Share</button><button onclick="deleteForm(${i})" style="padding:10px 15px;background:#dc3545;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🗑️</button></div></div></div>`).join(''); document.getElementById('homeContainer').innerHTML = `<div style="max-width:900px;margin:0 auto;padding:20px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;"><h2 style="color:#004080;">🏠 My Forms</h2><button onclick="closeHome()" style="padding:12px 25px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">➕ New</button></div>${formsHtml}</div>`; document.querySelector('.header').style.display = 'none'; document.getElementById('mainContainer').classList.remove('show'); document.querySelector('.footer').style.display = 'none'; document.getElementById('homeContainer').classList.add('show'); }
         function closeHome() { document.getElementById('homeContainer').classList.remove('show'); document.querySelector('.header').style.display = 'flex'; document.getElementById('mainContainer').classList.add('show'); document.querySelector('.footer').style.display = 'block'; }
