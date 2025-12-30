@@ -139,8 +139,9 @@
         .viewer-back-btn { position: fixed; top: 15px; left: 20px; background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; cursor: pointer; z-index: 200; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
         .data-table th, .data-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
-        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; }
+        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; position: sticky; top: 0; }
         .data-table tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tr:hover { background: #e8f4fc; }
         .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
         .stat-card .stat-value { font-size: 32px; font-weight: 700; }
@@ -162,6 +163,96 @@
         .next-btn { background: #004080; color: white; }
         .submit-btn { background: #28a745; color: white; }
         
+        /* FULL SCREEN DATA VIEW STYLES */
+        .data-tab-fullscreen { padding: 0 !important; }
+        .data-fullscreen-container { 
+            position: fixed; 
+            top: 50px; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: #f5f5f5; 
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .data-header-bar {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .data-header-bar h2 { margin: 0; font-size: 18px; }
+        .data-header-actions { display: flex; gap: 10px; align-items: center; }
+        .data-table-wrapper {
+            flex: 1;
+            overflow: auto;
+            padding: 15px;
+            background: white;
+            margin: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        .data-table-fullscreen { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 12px;
+        }
+        .data-table-fullscreen th { 
+            background: #004080; 
+            color: white; 
+            font-weight: 700; 
+            font-size: 11px; 
+            position: sticky; 
+            top: 0; 
+            padding: 12px 10px;
+            text-align: left;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .data-table-fullscreen td { 
+            border: 1px solid #dee2e6; 
+            padding: 10px; 
+            text-align: left;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .data-table-fullscreen td:hover {
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: none;
+        }
+        .data-table-fullscreen tr:nth-child(even) { background: #f8f9fa; }
+        .data-table-fullscreen tr:hover { background: #e8f4fc; }
+        .data-stats-bar {
+            background: white;
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #004080;
+        }
+        .data-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .data-stat-value {
+            background: #004080;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: 700;
+        }
+        
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
@@ -169,6 +260,7 @@
             .viewer-nav { padding: 10px; }
             .page-navigation { flex-direction: column; }
             .nav-btn { width: 100%; }
+            .data-header-bar { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -373,7 +465,6 @@
 
         function init() {
             const urlParams = new URLSearchParams(window.location.search);
-            // FIX: Check for 'd' parameter (used by shareForm)
             const compressedData = urlParams.get('d');
             
             if (compressedData) {
@@ -394,7 +485,6 @@
             checkAuth();
         }
         
-        // FIX: Shared form shows ONLY the viewer - no builder access
         function renderSharedForm(data) {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainContainer').classList.remove('show');
@@ -480,7 +570,6 @@
                 `;
             }).join('');
             
-            // NO BACK TO BUILDER BUTTON in shared mode
             document.getElementById('viewerContainer').innerHTML = `
                 <div class="viewer-nav">
                     <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showViewerTab('form',this)">📝 Form</button>
@@ -509,16 +598,8 @@
                     </div>
                 </div>
                 
-                <div id="tabData" class="viewer-tab">
-                    <div class="viewer-form">
-                        <div class="viewer-form-box">
-                            <div class="viewer-header" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);">
-                                <h1>📊 Submitted Data</h1>
-                                <p>${escapeHtml(s.title)}</p>
-                            </div>
-                            <div class="viewer-body" id="dataContainer"><p style="text-align:center;color:#868e96;">⏳ Loading from Google Sheets...</p></div>
-                        </div>
-                    </div>
+                <div id="tabData" class="viewer-tab data-tab-fullscreen">
+                    <div id="dataContainer"><p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading from Google Sheets...</p></div>
                 </div>
                 
                 <div id="tabDashboard" class="viewer-tab">
@@ -584,11 +665,11 @@
             };
         }
 
-        // FIX: Always load data from Google Sheets
+        // UPDATED: Full screen data view with ALL variables
         async function loadViewerData() {
             const container = document.getElementById('dataContainer');
             if (!container) return;
-            container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">⏳ Loading data from Google Sheets...</p>';
+            container.innerHTML = '<p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading data from Google Sheets...</p>';
             
             let data = [];
             const scriptUrl = state.settings.scriptUrl || CONFIG.SCRIPT_URL;
@@ -600,29 +681,102 @@
                     const result = await response.json();
                     if (result.success && result.data) { data = result.data; window.currentViewData = data; }
                 } catch (err) {
-                    container.innerHTML = '<p style="text-align:center;color:#dc3545;padding:30px;">❌ Failed to load data. Check internet connection.</p>';
+                    container.innerHTML = '<p style="text-align:center;color:#dc3545;padding:50px;">❌ Failed to load data. Check internet connection.</p>';
                     return;
                 }
             }
             
             if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">📭 No submissions yet</p>';
+                container.innerHTML = `
+                    <div class="data-fullscreen-container">
+                        <div class="data-header-bar">
+                            <h2>📊 ${escapeHtml(state.settings.title)} - Data View</h2>
+                        </div>
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                            <p style="text-align:center;color:#868e96;font-size:18px;">📭 No submissions yet</p>
+                        </div>
+                    </div>
+                `;
                 return;
             }
             
+            // Get ALL fields (not just first 5)
             const fields = state.fields.filter(f => f.type !== 'section');
-            let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                <p style="font-weight:600;">📊 ${data.length} submission(s) from Google Sheets</p>
-                <button onclick="downloadData()" style="padding:8px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">📥 Download CSV</button>
-            </div>`;
-            html += `<div style="overflow-x:auto;"><table class="data-table"><tr><th>#</th><th>Time</th>${fields.slice(0,5).map(f => `<th>${escapeHtml(f.label)}</th>`).join('')}</tr>`;
+            
+            // Calculate statistics
+            const today = data.filter(d => {
+                const ts = d._timestamp || d.timestamp || d.Timestamp;
+                return ts && new Date(ts).toDateString() === new Date().toDateString();
+            }).length;
+            
+            const thisWeek = data.filter(d => {
+                const ts = d._timestamp || d.timestamp || d.Timestamp;
+                if (!ts) return false;
+                const date = new Date(ts);
+                const now = new Date();
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return date >= weekAgo;
+            }).length;
+            
+            // Build full-screen data table with ALL columns
+            let tableHeaders = `<th style="min-width:50px;">#</th><th style="min-width:150px;">📅 Timestamp</th>`;
+            fields.forEach(f => {
+                tableHeaders += `<th style="min-width:120px;">${escapeHtml(f.label)}</th>`;
+            });
+            
+            let tableRows = '';
             data.forEach((row, i) => {
                 const ts = row._timestamp || row.timestamp || row.Timestamp || '';
-                html += `<tr><td>${i+1}</td><td>${ts ? new Date(ts).toLocaleString() : '-'}</td>${fields.slice(0,5).map(f => `<td>${row[f.name] || row[f.label] || '-'}</td>`).join('')}</tr>`;
+                let cells = `<td>${i + 1}</td><td>${ts ? new Date(ts).toLocaleString() : '-'}</td>`;
+                fields.forEach(f => {
+                    const value = row[f.name] || row[f.label] || '-';
+                    cells += `<td title="${escapeHtml(String(value))}">${escapeHtml(String(value))}</td>`;
+                });
+                tableRows += `<tr>${cells}</tr>`;
             });
-            html += `</table></div>`;
-            container.innerHTML = html;
+            
+            container.innerHTML = `
+                <div class="data-fullscreen-container">
+                    <div class="data-header-bar">
+                        <h2>📊 ${escapeHtml(state.settings.title)} - Data View</h2>
+                        <div class="data-header-actions">
+                            <button onclick="refreshData()" style="padding:10px 20px;background:#17a2b8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">🔄 Refresh</button>
+                            <button onclick="downloadData()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">📥 Download CSV</button>
+                        </div>
+                    </div>
+                    <div class="data-stats-bar">
+                        <div class="data-stat-item">
+                            <span>📊 Total Records:</span>
+                            <span class="data-stat-value">${data.length}</span>
+                        </div>
+                        <div class="data-stat-item">
+                            <span>📅 Today:</span>
+                            <span class="data-stat-value" style="background:#28a745;">${today}</span>
+                        </div>
+                        <div class="data-stat-item">
+                            <span>📆 This Week:</span>
+                            <span class="data-stat-value" style="background:#17a2b8;">${thisWeek}</span>
+                        </div>
+                        <div class="data-stat-item">
+                            <span>📋 Variables:</span>
+                            <span class="data-stat-value" style="background:#6f42c1;">${fields.length}</span>
+                        </div>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table-fullscreen">
+                            <thead><tr>${tableHeaders}</tr></thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
         }
+        
+        window.refreshData = function() {
+            notify('🔄 Refreshing...');
+            loadViewerData();
+            loadViewerDashboard();
+        };
         
         window.downloadData = function() {
             let data = window.currentViewData || [];
@@ -643,7 +797,6 @@
             notify('✅ Downloaded!');
         };
         
-        // FIX: Dashboard with bar and pie charts for categorical variables only
         async function loadViewerDashboard() {
             if (!window.currentViewData || window.currentViewData.length === 0) {
                 const scriptUrl = state.settings.scriptUrl || CONFIG.SCRIPT_URL;
@@ -682,7 +835,6 @@
                     return;
                 }
                 
-                // Find categorical fields only (no numeric analysis)
                 const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating'];
                 const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
                 
@@ -715,7 +867,6 @@
                 
                 chartsContainer.innerHTML = chartsHtml || '<div style="text-align:center;color:#868e96;padding:40px;">📊 No data for categorical fields</div>';
                 
-                // Create charts
                 setTimeout(() => {
                     categoricalFields.forEach((field, index) => {
                         const valueCounts = {};
@@ -731,7 +882,6 @@
                             const percentages = values.map(v => ((v / total) * 100).toFixed(1));
                             const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'];
                             
-                            // Bar Chart
                             const barCtx = document.getElementById(`barChart_${index}`);
                             if (barCtx) {
                                 chartInstances[`bar_${index}`] = new Chart(barCtx, {
@@ -749,7 +899,6 @@
                                 });
                             }
                             
-                            // Pie Chart with percentages
                             const pieCtx = document.getElementById(`pieChart_${index}`);
                             if (pieCtx) {
                                 chartInstances[`pie_${index}`] = new Chart(pieCtx, {
@@ -1008,7 +1157,6 @@
                 return `<div class="form-page" data-page="${pageIndex}" style="${pageIndex === 0 ? '' : 'display:none;'}"><div class="page-header"><span class="page-indicator">Page ${pageIndex + 1} of ${pages.length}</span><h3 class="page-title">${escapeHtml(page.title)}</h3></div>${fieldsHtml}<div class="page-navigation">${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}${isLast ? `<button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}</div></div>`;
             }).join('');
             
-            // Has back button since NOT shared mode
             document.getElementById('viewerContainer').innerHTML = `
                 <button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back to Builder</button>
                 <div class="viewer-nav">
@@ -1018,7 +1166,7 @@
                     <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}" id="connectionStatus"><span>${navigator.onLine ? '🟢 Online' : '🔴 Offline'}</span></div>
                 </div>
                 <div id="tabForm" class="viewer-tab active"><div class="viewer-form"><div class="viewer-form-box"><div class="viewer-header"><img src="${s.logo}" alt="Logo"><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.subtitle)}</p></div><div class="viewer-body"><form id="viewerForm"><div class="progress-bar-container"><div class="progress-bar" id="formProgress" style="width: ${100/pages.length}%"></div></div>${pagesHtml}</form></div></div></div></div>
-                <div id="tabData" class="viewer-tab"><div class="viewer-form"><div class="viewer-form-box"><div class="viewer-header" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><h1>📊 Data</h1></div><div class="viewer-body" id="dataContainer"><p style="text-align:center;color:#868e96;">⏳ Loading...</p></div></div></div></div>
+                <div id="tabData" class="viewer-tab data-tab-fullscreen"><div id="dataContainer"><p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading...</p></div></div>
                 <div id="tabDashboard" class="viewer-tab"><div style="max-width:900px;margin:0 auto;"><div class="viewer-form-box" style="margin-bottom:20px;"><div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><h1>📈 Dashboard</h1></div><div class="viewer-body"><div class="dashboard-stats" id="dashboardStats"></div></div></div><div id="dashboardCharts"></div></div></div>
             `;
             window.totalPages = pages.length; window.currentPageIndex = 0;
