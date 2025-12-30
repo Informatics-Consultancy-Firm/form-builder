@@ -253,6 +253,118 @@
             font-weight: 700;
         }
         
+        /* FILTER PANEL STYLES */
+        .filter-panel {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            padding: 15px 20px;
+            border-bottom: 3px solid #4a2a8a;
+        }
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .filter-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-toggle-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .filter-toggle-btn:hover { background: rgba(255,255,255,0.3); }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 150px;
+        }
+        .filter-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .filter-select {
+            padding: 10px 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            background: white;
+            min-width: 150px;
+            cursor: pointer;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: white;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .filter-btn.apply { background: #28a745; color: white; }
+        .filter-btn.clear { background: #dc3545; color: white; }
+        .filter-btn:hover { transform: translateY(-2px); }
+        .filter-active-count {
+            background: #ffc107;
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .filter-collapsed .filter-controls { display: none; }
+        .no-filters-msg {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        /* Date range filter */
+        .filter-date-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .filter-date-range input {
+            padding: 10px 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            background: white;
+        }
+        
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
@@ -261,6 +373,8 @@
             .page-navigation { flex-direction: column; }
             .nav-btn { width: 100%; }
             .data-header-bar { flex-direction: column; text-align: center; }
+            .filter-controls { flex-direction: column; }
+            .filter-group { width: 100%; }
         }
     </style>
 </head>
@@ -440,7 +554,10 @@
                 title: 'My Data Collection Form', subtitle: 'Data Collection System', organization: 'ICF-SL',
                 logo: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg',
                 scriptUrl: CONFIG.SCRIPT_URL, sheetId: CONFIG.SHEET_ID
-            }
+            },
+            // Filter state - shared between Data and Dashboard
+            filters: {},
+            dateFilter: { start: '', end: '' }
         };
 
         const fieldDefs = {
@@ -505,6 +622,382 @@
             
             document.getElementById('viewerContainer').classList.add('show');
             renderSharedFormViewer();
+        }
+        
+        // Get filterable fields (categorical types)
+        function getFilterableFields() {
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating'];
+            return state.fields.filter(f => categoricalTypes.includes(f.type));
+        }
+        
+        // Build filter panel HTML
+        function buildFilterPanel() {
+            const filterableFields = getFilterableFields();
+            const activeFilterCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
+                                     (state.dateFilter.start || state.dateFilter.end ? 1 : 0);
+            
+            let filtersHtml = '';
+            
+            // Date range filter
+            filtersHtml += `
+                <div class="filter-group">
+                    <label class="filter-label">📅 Date From</label>
+                    <input type="date" class="filter-select" id="filterDateStart" value="${state.dateFilter.start}" onchange="updateDateFilter('start', this.value)">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">📅 Date To</label>
+                    <input type="date" class="filter-select" id="filterDateEnd" value="${state.dateFilter.end}" onchange="updateDateFilter('end', this.value)">
+                </div>
+            `;
+            
+            // Categorical field filters
+            filterableFields.forEach(field => {
+                filtersHtml += `
+                    <div class="filter-group">
+                        <label class="filter-label">${escapeHtml(field.label)}</label>
+                        <select class="filter-select" id="filter_${field.name}" onchange="updateFilter('${field.name}', this.value)">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                `;
+            });
+            
+            return `
+                <div class="filter-panel" id="filterPanel">
+                    <div class="filter-header">
+                        <div class="filter-title">
+                            🔍 Filters
+                            ${activeFilterCount > 0 ? `<span class="filter-active-count">${activeFilterCount} active</span>` : ''}
+                        </div>
+                        <div class="filter-actions">
+                            <button class="filter-btn clear" onclick="clearAllFilters()">🗑️ Clear All</button>
+                            <button class="filter-toggle-btn" onclick="toggleFilterPanel()">▼ Hide</button>
+                        </div>
+                    </div>
+                    <div class="filter-controls" id="filterControls">
+                        ${filterableFields.length > 0 || true ? filtersHtml : '<p class="no-filters-msg">No filterable fields available</p>'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Populate filter dropdowns with actual data values
+        function populateFilterOptions(data) {
+            const filterableFields = getFilterableFields();
+            
+            filterableFields.forEach(field => {
+                const selectEl = document.getElementById(`filter_${field.name}`);
+                if (!selectEl) return;
+                
+                // Get unique values from data
+                const uniqueValues = new Set();
+                data.forEach(row => {
+                    const value = row[field.name] || row[field.label];
+                    if (value && value.toString().trim()) {
+                        uniqueValues.add(value.toString().trim());
+                    }
+                });
+                
+                // Sort and add options
+                const sortedValues = Array.from(uniqueValues).sort();
+                const currentValue = state.filters[field.name] || '';
+                
+                selectEl.innerHTML = '<option value="">All</option>';
+                sortedValues.forEach(val => {
+                    const selected = val === currentValue ? 'selected' : '';
+                    selectEl.innerHTML += `<option value="${escapeHtml(val)}" ${selected}>${escapeHtml(val)}</option>`;
+                });
+            });
+        }
+        
+        // Update filter state
+        window.updateFilter = function(fieldName, value) {
+            if (value) {
+                state.filters[fieldName] = value;
+            } else {
+                delete state.filters[fieldName];
+            }
+            applyFilters();
+        };
+        
+        window.updateDateFilter = function(type, value) {
+            state.dateFilter[type] = value;
+            applyFilters();
+        };
+        
+        window.clearAllFilters = function() {
+            state.filters = {};
+            state.dateFilter = { start: '', end: '' };
+            
+            // Reset all filter dropdowns
+            document.querySelectorAll('.filter-select').forEach(el => {
+                if (el.type === 'date') {
+                    el.value = '';
+                } else {
+                    el.value = '';
+                }
+            });
+            
+            applyFilters();
+            notify('🗑️ Filters cleared');
+        };
+        
+        window.toggleFilterPanel = function() {
+            const panel = document.getElementById('filterPanel');
+            const btn = panel.querySelector('.filter-toggle-btn');
+            panel.classList.toggle('filter-collapsed');
+            btn.textContent = panel.classList.contains('filter-collapsed') ? '▶ Show' : '▼ Hide';
+        };
+        
+        // Apply filters and update both Data and Dashboard
+        function applyFilters() {
+            const filteredData = getFilteredData();
+            window.filteredViewData = filteredData;
+            
+            // Update active filter count display
+            const activeCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
+                               (state.dateFilter.start || state.dateFilter.end ? 1 : 0);
+            const countEl = document.querySelector('.filter-active-count');
+            if (countEl) {
+                countEl.textContent = `${activeCount} active`;
+                countEl.style.display = activeCount > 0 ? 'inline' : 'none';
+            }
+            
+            // Refresh both views
+            renderDataTable(filteredData);
+            renderDashboardCharts(filteredData);
+        }
+        
+        // Get filtered data based on current filter state
+        function getFilteredData() {
+            let data = window.currentViewData || [];
+            
+            // Apply date filters
+            if (state.dateFilter.start || state.dateFilter.end) {
+                data = data.filter(row => {
+                    const ts = row._timestamp || row.timestamp || row.Timestamp;
+                    if (!ts) return true;
+                    const rowDate = new Date(ts);
+                    
+                    if (state.dateFilter.start) {
+                        const startDate = new Date(state.dateFilter.start);
+                        if (rowDate < startDate) return false;
+                    }
+                    if (state.dateFilter.end) {
+                        const endDate = new Date(state.dateFilter.end);
+                        endDate.setHours(23, 59, 59, 999);
+                        if (rowDate > endDate) return false;
+                    }
+                    return true;
+                });
+            }
+            
+            // Apply categorical filters
+            Object.keys(state.filters).forEach(fieldName => {
+                const filterValue = state.filters[fieldName];
+                if (filterValue) {
+                    const field = state.fields.find(f => f.name === fieldName);
+                    data = data.filter(row => {
+                        const rowValue = row[fieldName] || (field ? row[field.label] : '');
+                        return rowValue && rowValue.toString().trim() === filterValue;
+                    });
+                }
+            });
+            
+            return data;
+        }
+        
+        // Render data table with filtered data
+        function renderDataTable(data) {
+            const wrapper = document.querySelector('.data-table-wrapper');
+            if (!wrapper) return;
+            
+            const fields = state.fields.filter(f => f.type !== 'section');
+            
+            if (data.length === 0) {
+                wrapper.innerHTML = '<p style="text-align:center;color:#868e96;padding:50px;">📭 No records match the current filters</p>';
+                updateDataStats(data);
+                return;
+            }
+            
+            let tableHeaders = `<th style="min-width:50px;">#</th><th style="min-width:150px;">📅 Timestamp</th>`;
+            fields.forEach(f => {
+                tableHeaders += `<th style="min-width:120px;">${escapeHtml(f.label)}</th>`;
+            });
+            
+            let tableRows = '';
+            data.forEach((row, i) => {
+                const ts = row._timestamp || row.timestamp || row.Timestamp || '';
+                let cells = `<td>${i + 1}</td><td>${ts ? new Date(ts).toLocaleString() : '-'}</td>`;
+                fields.forEach(f => {
+                    const value = row[f.name] || row[f.label] || '-';
+                    cells += `<td title="${escapeHtml(String(value))}">${escapeHtml(String(value))}</td>`;
+                });
+                tableRows += `<tr>${cells}</tr>`;
+            });
+            
+            wrapper.innerHTML = `
+                <table class="data-table-fullscreen">
+                    <thead><tr>${tableHeaders}</tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+            
+            updateDataStats(data);
+        }
+        
+        // Update data statistics
+        function updateDataStats(data) {
+            const totalData = window.currentViewData || [];
+            const statsContainer = document.querySelector('.data-stats-bar');
+            if (!statsContainer) return;
+            
+            const today = data.filter(d => {
+                const ts = d._timestamp || d.timestamp || d.Timestamp;
+                return ts && new Date(ts).toDateString() === new Date().toDateString();
+            }).length;
+            
+            const thisWeek = data.filter(d => {
+                const ts = d._timestamp || d.timestamp || d.Timestamp;
+                if (!ts) return false;
+                const date = new Date(ts);
+                const now = new Date();
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return date >= weekAgo;
+            }).length;
+            
+            const fields = state.fields.filter(f => f.type !== 'section');
+            
+            statsContainer.innerHTML = `
+                <div class="data-stat-item">
+                    <span>📊 Showing:</span>
+                    <span class="data-stat-value">${data.length} of ${totalData.length}</span>
+                </div>
+                <div class="data-stat-item">
+                    <span>📅 Today:</span>
+                    <span class="data-stat-value" style="background:#28a745;">${today}</span>
+                </div>
+                <div class="data-stat-item">
+                    <span>📆 This Week:</span>
+                    <span class="data-stat-value" style="background:#17a2b8;">${thisWeek}</span>
+                </div>
+                <div class="data-stat-item">
+                    <span>📋 Variables:</span>
+                    <span class="data-stat-value" style="background:#6f42c1;">${fields.length}</span>
+                </div>
+            `;
+        }
+        
+        // Render dashboard charts with filtered data
+        function renderDashboardCharts(data) {
+            const container = document.getElementById('dashboardStats');
+            const chartsContainer = document.getElementById('dashboardCharts');
+            if (!container) return;
+            
+            const totalData = window.currentViewData || [];
+            const today = data.filter(d => {
+                const ts = d._timestamp || d.timestamp || d.Timestamp;
+                return ts && new Date(ts).toDateString() === new Date().toDateString();
+            }).length;
+            
+            container.innerHTML = `
+                <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Filtered Results (of ${totalData.length})</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><div class="stat-value">${today}</div><div class="stat-label">Today</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">${state.fields.length}</div><div class="stat-label">Fields</div></div>
+            `;
+            
+            if (chartsContainer) {
+                Object.values(chartInstances).forEach(chart => { if (chart) chart.destroy(); });
+                chartInstances = {};
+                
+                if (data.length === 0) {
+                    chartsContainer.innerHTML = '<div style="text-align:center;color:#868e96;padding:40px;">📭 No data matches the current filters</div>';
+                    return;
+                }
+                
+                const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating'];
+                const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
+                
+                if (categoricalFields.length === 0) {
+                    chartsContainer.innerHTML = '<div style="text-align:center;color:#868e96;padding:40px;">📊 No categorical fields for charts</div>';
+                    return;
+                }
+                
+                let chartsHtml = '';
+                categoricalFields.forEach((field, index) => {
+                    const valueCounts = {};
+                    let total = 0;
+                    data.forEach(row => {
+                        const value = row[field.name] || row[field.label];
+                        if (value && value.toString().trim()) { valueCounts[value] = (valueCounts[value] || 0) + 1; total++; }
+                    });
+                    
+                    if (total > 0) {
+                        chartsHtml += `
+                            <div class="chart-container">
+                                <h4>📊 ${escapeHtml(field.label)}</h4>
+                                <div class="chart-wrapper">
+                                    <div class="chart-box"><canvas id="barChart_${index}"></canvas></div>
+                                    <div class="chart-box"><canvas id="pieChart_${index}"></canvas></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                chartsContainer.innerHTML = chartsHtml || '<div style="text-align:center;color:#868e96;padding:40px;">📊 No data for categorical fields</div>';
+                
+                setTimeout(() => {
+                    categoricalFields.forEach((field, index) => {
+                        const valueCounts = {};
+                        let total = 0;
+                        data.forEach(row => {
+                            const value = row[field.name] || row[field.label];
+                            if (value && value.toString().trim()) { valueCounts[value] = (valueCounts[value] || 0) + 1; total++; }
+                        });
+                        
+                        if (total > 0) {
+                            const labels = Object.keys(valueCounts);
+                            const values = Object.values(valueCounts);
+                            const percentages = values.map(v => ((v / total) * 100).toFixed(1));
+                            const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'];
+                            
+                            const barCtx = document.getElementById(`barChart_${index}`);
+                            if (barCtx) {
+                                chartInstances[`bar_${index}`] = new Chart(barCtx, {
+                                    type: 'bar',
+                                    data: { labels: labels, datasets: [{ label: 'Count', data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2 }] },
+                                    options: {
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { display: false },
+                                            title: { display: true, text: 'Bar Chart - Counts', font: { family: 'Oswald', size: 14, weight: 'bold' } },
+                                            tooltip: { callbacks: { label: ctx => `${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)` } }
+                                        },
+                                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                                    }
+                                });
+                            }
+                            
+                            const pieCtx = document.getElementById(`pieChart_${index}`);
+                            if (pieCtx) {
+                                chartInstances[`pie_${index}`] = new Chart(pieCtx, {
+                                    type: 'pie',
+                                    data: { labels: labels.map((l, i) => `${l} (${percentages[i]}%)`), datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderColor: '#fff', borderWidth: 2 }] },
+                                    options: {
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { position: 'bottom', labels: { font: { family: 'Oswald', size: 11 } } },
+                                            title: { display: true, text: 'Pie Chart - Percentages', font: { family: 'Oswald', size: 14, weight: 'bold' } },
+                                            tooltip: { callbacks: { label: ctx => `${ctx.label.split(' (')[0]}: ${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)` } }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }, 100);
+            }
         }
         
         function renderSharedFormViewer() {
@@ -603,7 +1096,8 @@
                 </div>
                 
                 <div id="tabDashboard" class="viewer-tab">
-                    <div style="max-width:900px;margin:0 auto;">
+                    <div id="dashboardFilterPanel"></div>
+                    <div style="max-width:900px;margin:0 auto;padding:0 15px;">
                         <div class="viewer-form-box" style="margin-bottom:20px;">
                             <div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);">
                                 <h1>📈 Dashboard</h1>
@@ -623,7 +1117,6 @@
             initSignaturePads();
             setupFormSubmit();
             loadViewerData();
-            loadViewerDashboard();
         }
 
         function initSignaturePads() {
@@ -658,14 +1151,13 @@
                     window.currentPageIndex = 0;
                     goToPage(0);
                     notify(result.offline ? '💾 Saved offline' : '✅ Submitted!');
-                    setTimeout(() => { loadViewerData(); loadViewerDashboard(); }, 1000);
+                    setTimeout(() => { loadViewerData(); }, 1000);
                 } else { notify('⚠️ Saved offline'); }
                 
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✅ Submit'; }
             };
         }
 
-        // UPDATED: Full screen data view with ALL variables
         async function loadViewerData() {
             const container = document.getElementById('dataContainer');
             if (!container) return;
@@ -686,100 +1178,45 @@
                 }
             }
             
-            if (data.length === 0) {
-                container.innerHTML = `
-                    <div class="data-fullscreen-container">
-                        <div class="data-header-bar">
-                            <h2>📊 ${escapeHtml(state.settings.title)} - Data View</h2>
-                        </div>
-                        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-                            <p style="text-align:center;color:#868e96;font-size:18px;">📭 No submissions yet</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Get ALL fields (not just first 5)
             const fields = state.fields.filter(f => f.type !== 'section');
             
-            // Calculate statistics
-            const today = data.filter(d => {
-                const ts = d._timestamp || d.timestamp || d.Timestamp;
-                return ts && new Date(ts).toDateString() === new Date().toDateString();
-            }).length;
-            
-            const thisWeek = data.filter(d => {
-                const ts = d._timestamp || d.timestamp || d.Timestamp;
-                if (!ts) return false;
-                const date = new Date(ts);
-                const now = new Date();
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return date >= weekAgo;
-            }).length;
-            
-            // Build full-screen data table with ALL columns
-            let tableHeaders = `<th style="min-width:50px;">#</th><th style="min-width:150px;">📅 Timestamp</th>`;
-            fields.forEach(f => {
-                tableHeaders += `<th style="min-width:120px;">${escapeHtml(f.label)}</th>`;
-            });
-            
-            let tableRows = '';
-            data.forEach((row, i) => {
-                const ts = row._timestamp || row.timestamp || row.Timestamp || '';
-                let cells = `<td>${i + 1}</td><td>${ts ? new Date(ts).toLocaleString() : '-'}</td>`;
-                fields.forEach(f => {
-                    const value = row[f.name] || row[f.label] || '-';
-                    cells += `<td title="${escapeHtml(String(value))}">${escapeHtml(String(value))}</td>`;
-                });
-                tableRows += `<tr>${cells}</tr>`;
-            });
-            
+            // Build full container with filter panel
             container.innerHTML = `
                 <div class="data-fullscreen-container">
                     <div class="data-header-bar">
                         <h2>📊 ${escapeHtml(state.settings.title)} - Data View</h2>
                         <div class="data-header-actions">
                             <button onclick="refreshData()" style="padding:10px 20px;background:#17a2b8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">🔄 Refresh</button>
-                            <button onclick="downloadData()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">📥 Download CSV</button>
+                            <button onclick="downloadFilteredData()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-family:'Oswald',sans-serif;">📥 Download CSV</button>
                         </div>
                     </div>
-                    <div class="data-stats-bar">
-                        <div class="data-stat-item">
-                            <span>📊 Total Records:</span>
-                            <span class="data-stat-value">${data.length}</span>
-                        </div>
-                        <div class="data-stat-item">
-                            <span>📅 Today:</span>
-                            <span class="data-stat-value" style="background:#28a745;">${today}</span>
-                        </div>
-                        <div class="data-stat-item">
-                            <span>📆 This Week:</span>
-                            <span class="data-stat-value" style="background:#17a2b8;">${thisWeek}</span>
-                        </div>
-                        <div class="data-stat-item">
-                            <span>📋 Variables:</span>
-                            <span class="data-stat-value" style="background:#6f42c1;">${fields.length}</span>
-                        </div>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table-fullscreen">
-                            <thead><tr>${tableHeaders}</tr></thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                    </div>
+                    ${buildFilterPanel()}
+                    <div class="data-stats-bar"></div>
+                    <div class="data-table-wrapper"></div>
                 </div>
             `;
+            
+            // Populate filter options and render table
+            populateFilterOptions(data);
+            applyFilters();
+            
+            // Also update dashboard filter panel
+            const dashFilterPanel = document.getElementById('dashboardFilterPanel');
+            if (dashFilterPanel) {
+                dashFilterPanel.innerHTML = buildFilterPanel();
+                populateFilterOptions(data);
+            }
         }
         
         window.refreshData = function() {
             notify('🔄 Refreshing...');
+            state.filters = {};
+            state.dateFilter = { start: '', end: '' };
             loadViewerData();
-            loadViewerDashboard();
         };
         
-        window.downloadData = function() {
-            let data = window.currentViewData || [];
+        window.downloadFilteredData = function() {
+            let data = window.filteredViewData || window.currentViewData || [];
             if (data.length === 0) { notify('No data', 'error'); return; }
             const fields = state.fields.filter(f => f.type !== 'section');
             const headers = ['Timestamp', ...fields.map(f => f.label)];
@@ -792,133 +1229,11 @@
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url;
-            a.download = `${state.settings.title.replace(/\s+/g, '_')}_data.csv`;
+            const filterSuffix = Object.keys(state.filters).length > 0 ? '_filtered' : '';
+            a.download = `${state.settings.title.replace(/\s+/g, '_')}${filterSuffix}_data.csv`;
             a.click(); URL.revokeObjectURL(url);
             notify('✅ Downloaded!');
         };
-        
-        async function loadViewerDashboard() {
-            if (!window.currentViewData || window.currentViewData.length === 0) {
-                const scriptUrl = state.settings.scriptUrl || CONFIG.SCRIPT_URL;
-                const sheetId = state.settings.sheetId || CONFIG.SHEET_ID;
-                if (scriptUrl) {
-                    try {
-                        const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=500&sheetId=${encodeURIComponent(sheetId)}`);
-                        const result = await response.json();
-                        if (result.success && result.data) window.currentViewData = result.data;
-                    } catch (err) { console.log('Dashboard load error:', err); }
-                }
-            }
-            
-            const data = window.currentViewData || [];
-            const container = document.getElementById('dashboardStats');
-            const chartsContainer = document.getElementById('dashboardCharts');
-            if (!container) return;
-            
-            const today = data.filter(d => {
-                const ts = d._timestamp || d.timestamp || d.Timestamp;
-                return ts && new Date(ts).toDateString() === new Date().toDateString();
-            }).length;
-            
-            container.innerHTML = `
-                <div class="stat-card"><div class="stat-value">${data.length}</div><div class="stat-label">Total Submissions</div></div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#28a745 0%,#218838 100%);"><div class="stat-value">${today}</div><div class="stat-label">Today</div></div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><div class="stat-value">${state.fields.length}</div><div class="stat-label">Fields</div></div>
-            `;
-            
-            if (chartsContainer) {
-                Object.values(chartInstances).forEach(chart => { if (chart) chart.destroy(); });
-                chartInstances = {};
-                
-                if (data.length === 0) {
-                    chartsContainer.innerHTML = '<div style="text-align:center;color:#868e96;padding:40px;">📭 No data for charts</div>';
-                    return;
-                }
-                
-                const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating'];
-                const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
-                
-                if (categoricalFields.length === 0) {
-                    chartsContainer.innerHTML = '<div style="text-align:center;color:#868e96;padding:40px;">📊 No categorical fields for charts</div>';
-                    return;
-                }
-                
-                let chartsHtml = '';
-                categoricalFields.forEach((field, index) => {
-                    const valueCounts = {};
-                    let total = 0;
-                    data.forEach(row => {
-                        const value = row[field.name] || row[field.label];
-                        if (value && value.toString().trim()) { valueCounts[value] = (valueCounts[value] || 0) + 1; total++; }
-                    });
-                    
-                    if (total > 0) {
-                        chartsHtml += `
-                            <div class="chart-container">
-                                <h4>📊 ${escapeHtml(field.label)}</h4>
-                                <div class="chart-wrapper">
-                                    <div class="chart-box"><canvas id="barChart_${index}"></canvas></div>
-                                    <div class="chart-box"><canvas id="pieChart_${index}"></canvas></div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                
-                chartsContainer.innerHTML = chartsHtml || '<div style="text-align:center;color:#868e96;padding:40px;">📊 No data for categorical fields</div>';
-                
-                setTimeout(() => {
-                    categoricalFields.forEach((field, index) => {
-                        const valueCounts = {};
-                        let total = 0;
-                        data.forEach(row => {
-                            const value = row[field.name] || row[field.label];
-                            if (value && value.toString().trim()) { valueCounts[value] = (valueCounts[value] || 0) + 1; total++; }
-                        });
-                        
-                        if (total > 0) {
-                            const labels = Object.keys(valueCounts);
-                            const values = Object.values(valueCounts);
-                            const percentages = values.map(v => ((v / total) * 100).toFixed(1));
-                            const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'];
-                            
-                            const barCtx = document.getElementById(`barChart_${index}`);
-                            if (barCtx) {
-                                chartInstances[`bar_${index}`] = new Chart(barCtx, {
-                                    type: 'bar',
-                                    data: { labels: labels, datasets: [{ label: 'Count', data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2 }] },
-                                    options: {
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { display: false },
-                                            title: { display: true, text: 'Bar Chart - Counts', font: { family: 'Oswald', size: 14, weight: 'bold' } },
-                                            tooltip: { callbacks: { label: ctx => `${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)` } }
-                                        },
-                                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-                                    }
-                                });
-                            }
-                            
-                            const pieCtx = document.getElementById(`pieChart_${index}`);
-                            if (pieCtx) {
-                                chartInstances[`pie_${index}`] = new Chart(pieCtx, {
-                                    type: 'pie',
-                                    data: { labels: labels.map((l, i) => `${l} (${percentages[i]}%)`), datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderColor: '#fff', borderWidth: 2 }] },
-                                    options: {
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { position: 'bottom', labels: { font: { family: 'Oswald', size: 11 } } },
-                                            title: { display: true, text: 'Pie Chart - Percentages', font: { family: 'Oswald', size: 14, weight: 'bold' } },
-                                            tooltip: { callbacks: { label: ctx => `${ctx.label.split(' (')[0]}: ${ctx.raw} (${((ctx.raw / total) * 100).toFixed(1)}%)` } }
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }, 100);
-            }
-        }
 
         function goToPage(pageIndex) {
             if (pageIndex > window.currentPageIndex) {
@@ -960,8 +1275,20 @@
             document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
             if (btn) btn.classList.add('active');
-            if (tab === 'data') loadViewerData();
-            if (tab === 'dashboard') loadViewerDashboard();
+            
+            if (tab === 'data') {
+                // Sync filters and refresh
+                applyFilters();
+            }
+            if (tab === 'dashboard') {
+                // Update dashboard filter panel and refresh
+                const dashFilterPanel = document.getElementById('dashboardFilterPanel');
+                if (dashFilterPanel) {
+                    dashFilterPanel.innerHTML = buildFilterPanel();
+                    populateFilterOptions(window.currentViewData || []);
+                }
+                applyFilters();
+            }
         }
 
         async function submitToGoogleSheets(data) {
@@ -1167,10 +1494,10 @@
                 </div>
                 <div id="tabForm" class="viewer-tab active"><div class="viewer-form"><div class="viewer-form-box"><div class="viewer-header"><img src="${s.logo}" alt="Logo"><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.subtitle)}</p></div><div class="viewer-body"><form id="viewerForm"><div class="progress-bar-container"><div class="progress-bar" id="formProgress" style="width: ${100/pages.length}%"></div></div>${pagesHtml}</form></div></div></div></div>
                 <div id="tabData" class="viewer-tab data-tab-fullscreen"><div id="dataContainer"><p style="text-align:center;color:#868e96;padding:50px;">⏳ Loading...</p></div></div>
-                <div id="tabDashboard" class="viewer-tab"><div style="max-width:900px;margin:0 auto;"><div class="viewer-form-box" style="margin-bottom:20px;"><div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><h1>📈 Dashboard</h1></div><div class="viewer-body"><div class="dashboard-stats" id="dashboardStats"></div></div></div><div id="dashboardCharts"></div></div></div>
+                <div id="tabDashboard" class="viewer-tab"><div id="dashboardFilterPanel"></div><div style="max-width:900px;margin:0 auto;padding:0 15px;"><div class="viewer-form-box" style="margin-bottom:20px;"><div class="viewer-header" style="background:linear-gradient(135deg,#17a2b8 0%,#138496 100%);"><h1>📈 Dashboard</h1></div><div class="viewer-body"><div class="dashboard-stats" id="dashboardStats"></div></div></div><div id="dashboardCharts"></div></div></div>
             `;
             window.totalPages = pages.length; window.currentPageIndex = 0;
-            initSignaturePads(); setupFormSubmit(); loadViewerData(); loadViewerDashboard();
+            initSignaturePads(); setupFormSubmit(); loadViewerData();
         }
 
         function shareForm() {
