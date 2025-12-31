@@ -578,8 +578,138 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-        // ==================== GOOGLE APPS SCRIPT PROXY ====================
-        const PROXY_URL = 'https://script.google.com/macros/s/AKfycbyFerPTDjmYuCuBqfKqvdmfQ-ZozR4_wxwt4ScoPwweNHtWm-HZlyqZPzJs7_9XH7GD/exec';
+        // ==================== PROXY CONFIGURATION ====================
+        const PROXIES = [
+            { 
+                name: 'GAS Proxy',
+                url: 'https://script.google.com/macros/s/AKfycbyRXc68PYSmDSCYPakAS8Gc9R00kRjmsMYoDujPYMItyquXfwMAJUtRqXLiDlNWbSfDQQ/exec',
+                type: 'gas'  // Google Apps Script - passes auth as parameter
+            },
+            { 
+                name: 'CORS Proxy 1',
+                url: 'https://corsproxy.io/?',
+                type: 'cors'  // Standard CORS proxy - passes auth as header
+            },
+            { 
+                name: 'CORS Proxy 2',
+                url: 'https://api.allorigins.win/raw?url=',
+                type: 'cors'
+            }
+        ];
+
+        function buildProxyUrl(proxy, targetUrl, auth, method) {
+            if (proxy.type === 'gas') {
+                // Google Apps Script proxy - auth as URL parameter
+                let proxyUrl = proxy.url + '?url=' + encodeURIComponent(targetUrl);
+                if (auth) {
+                    proxyUrl += '&auth=' + encodeURIComponent(auth);
+                }
+                if (method && method !== 'GET') {
+                    proxyUrl += '&method=' + method;
+                }
+                return proxyUrl;
+            } else {
+                // Standard CORS proxy - just encode URL
+                return proxy.url + encodeURIComponent(targetUrl);
+            }
+        }
+
+        async function dhis2Request(endpoint, method = 'GET', payload = null) {
+            const { url, username, password } = state.dhis2;
+            if (!url || !username || !password) {
+                throw new Error('DHIS2 not configured');
+            }
+
+            const serverUrl = url.replace(/\/$/, '');
+            const apiUrl = `${serverUrl}/api/${endpoint}`;
+            const auth = btoa(`${username}:${password}`);
+            
+            let lastError = null;
+            
+            // Try each proxy in order
+            for (let i = 0; i < PROXIES.length; i++) {
+                const proxy = PROXIES[i];
+                const proxiedUrl = buildProxyUrl(proxy, apiUrl, auth, method);
+                
+                // For GET, use GET. For everything else, use POST (for GAS) or actual method (for CORS)
+                const fetchMethod = proxy.type === 'gas' ? (method === 'GET' ? 'GET' : 'POST') : method;
+                
+                const options = {
+                    method: fetchMethod,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+                
+                // For CORS proxies, add auth header
+                if (proxy.type === 'cors') {
+                    options.headers['Authorization'] = 'Basic ' + auth;
+                }
+                
+                if (payload && method !== 'GET') {
+                    options.body = JSON.stringify(payload);
+                }
+                
+                try {
+                    const response = await fetch(proxiedUrl, options);
+                    const text = await response.text();
+                    
+                    let data;
+                    try { data = JSON.parse(text); } catch (e) { data = text; }
+                    
+                    // Check for proxy error - try next proxy
+                    if (data && data.error && typeof data.error === 'string' && data.error.includes('Exception')) {
+                        lastError = data.error;
+                        continue; // Try next proxy
+                    }
+                    
+                    // Check for DHIS2 error responses
+                    if (data && (data.httpStatus === 'Unauthorized' || data.httpStatusCode === 401)) {
+                        return { success: false, status: 401, error: 'Unauthorized - check credentials' };
+                    }
+                    if (data && (data.httpStatus === 'Not Found' || data.httpStatusCode === 404)) {
+                        return { success: false, status: 404, error: 'Not found' };
+                    }
+                    if (data && data.httpStatusCode && data.httpStatusCode >= 400) {
+                        return { success: false, status: data.httpStatusCode, error: data.message || 'Request failed' };
+                    }
+                    
+                    // Success check
+                    const isSuccess = data && (
+                        typeof data === 'object' && !data.error ||
+                        data.response?.uid ||
+                        data.status === 'OK' ||
+                        data.status === 'SUCCESS' ||
+                        Array.isArray(data) ||
+                        (data.organisationUnits !== undefined) ||
+                        (data.dataSets !== undefined) ||
+                        (data.dataElements !== undefined) ||
+                        (data.systemName !== undefined)
+                    );
+                    
+                    if (isSuccess) {
+                        return { success: true, status: 200, data: data };
+                    }
+                    
+                    // If we got data but it's not clearly success, still return it
+                    if (data && typeof data === 'object') {
+                        return { success: true, status: 200, data: data };
+                    }
+                    
+                    // Not successful, try next proxy
+                    lastError = 'Invalid response';
+                    
+                } catch (error) {
+                    // Network error - try next proxy silently
+                    lastError = error.message;
+                    continue;
+                }
+            }
+            
+            // All proxies failed
+            return { success: false, status: 0, error: 'All proxies failed: ' + lastError };
+        }
 
         // ==================== GENERATE PERIODS ====================
         function generatePeriods() {
@@ -681,47 +811,6 @@
             });
         }
 
-        // ==================== DHIS2 API WITH PROXY ====================
-        function getProxiedUrl(url) {
-            return PROXY_URL + '?url=' + encodeURIComponent(url);
-        }
-
-        async function dhis2Request(endpoint, method = 'GET', payload = null) {
-            const { url, username, password } = state.dhis2;
-            if (!url || !username || !password) {
-                throw new Error('DHIS2 not configured');
-            }
-
-            const serverUrl = url.replace(/\/$/, '');
-            const apiUrl = `${serverUrl}/api/${endpoint}`;
-            const proxiedUrl = getProxiedUrl(apiUrl);
-            
-            const options = {
-                method: method,
-                headers: {
-                    'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            };
-            
-            if (payload && method !== 'GET') {
-                options.body = JSON.stringify(payload);
-            }
-            
-            try {
-                const response = await fetch(proxiedUrl, options);
-                const text = await response.text();
-                
-                let data;
-                try { data = JSON.parse(text); } catch (e) { data = text; }
-                
-                return { success: response.ok, status: response.status, data: data };
-            } catch (error) {
-                return { success: false, status: 0, error: error.message };
-            }
-        }
-
         async function testConnection() {
             const url = document.getElementById('dhis2Url').value.trim();
             const username = document.getElementById('dhis2Username').value.trim();
@@ -743,7 +832,7 @@
             try {
                 const result = await dhis2Request('system/info.json');
                 
-                if (result.success && result.data) {
+                if (result.success && result.data && result.data.systemName) {
                     state.dhis2.connected = true;
                     state.dhis2.serverInfo = result.data;
                     updateStatus('connected', `Connected to ${result.data.systemName || 'DHIS2'}`);
@@ -760,8 +849,8 @@
                 } else {
                     state.dhis2.connected = false;
                     updateStatus('disconnected', 'Connection failed');
-                    addLog('error', `✗ Failed: ${result.error || 'Status ' + result.status}`);
-                    notify('Connection failed. Check credentials.', 'error');
+                    addLog('error', `✗ Failed: ${result.error || 'Could not connect'}`);
+                    notify('Connection failed. Check URL and credentials.', 'error');
                 }
             } catch (error) {
                 state.dhis2.connected = false;
