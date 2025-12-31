@@ -974,14 +974,33 @@
                 return;
             }
             
-            const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period');
+            // Get the org unit and period column names (these are for mapping, not data elements)
+            const orgUnitColName = state.dhis2.orgUnitColumn;
+            const periodColName = state.dhis2.periodColumn;
+            
+            // Filter out sections, period type fields, AND the columns used for org unit/period mapping
+            const dataFields = state.fields.filter(f => {
+                // Skip sections
+                if (f.type === 'section') return false;
+                // Skip period type fields
+                if (f.type === 'period') return false;
+                // Skip the field selected as org unit column
+                if (orgUnitColName && f.name === orgUnitColName) return false;
+                // Skip the field selected as period column
+                if (periodColName && f.name === periodColName) return false;
+                return true;
+            });
+            
             if (dataFields.length === 0) {
-                notify('Add data fields to your form first', 'error');
+                notify('Add data fields to your form first (excluding org unit and period columns)', 'error');
                 return;
             }
             
             clearLog();
             addLog('info', 'Setting up DHIS2...');
+            addLog('info', `Org Unit Column: ${orgUnitColName || 'Not set'} (for mapping)`);
+            addLog('info', `Period Column: ${periodColName || 'Not set'} (for mapping)`);
+            addLog('info', `Data Elements to create: ${dataFields.length}`);
             updateStatus('syncing', 'Setting up...');
             
             try {
@@ -1143,12 +1162,20 @@
             let success = 0, failed = 0;
             
             for (const record of dataRecords) {
-                // Get period from form data
+                // Get period from form data and normalize to YYYYMM format
                 let period = record[periodColumn];
-                if (!period) {
+                if (period) {
+                    // Remove any dashes, slashes, or spaces to get YYYYMM
+                    period = String(period).replace(/[-\/\s]/g, '');
+                    // Ensure it's 6 digits (YYYYMM)
+                    if (period.length === 7 && period.includes('-')) {
+                        period = period.replace('-', '');
+                    }
+                }
+                if (!period || period.length !== 6) {
                     const ts = new Date(record._timestamp || Date.now());
                     period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
-                    addLog('warning', `  ⚠ No period in record, using: ${period}`);
+                    addLog('warning', `  ⚠ Invalid period in record, using: ${period}`);
                 }
                 
                 // Get org unit from form data and match to DHIS2
@@ -1177,9 +1204,15 @@
                     continue;
                 }
                 
-                // Build data values (exclude period field and non-data fields)
+                // Build data values - exclude org unit column, period column, and non-data fields
                 const dataValues = [];
-                const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period');
+                const dataFields = state.fields.filter(f => {
+                    if (f.type === 'section') return false;
+                    if (f.type === 'period') return false;
+                    if (orgUnitColumn && f.name === orgUnitColumn) return false;
+                    if (periodColumn && f.name === periodColumn) return false;
+                    return true;
+                });
                 
                 dataFields.forEach(field => {
                     const deId = state.dhis2.dataElements[field.id];
@@ -1868,14 +1901,14 @@
                                 <label><i data-lucide="calendar" style="width:12px;height:12px;vertical-align:middle;margin-right:4px;"></i>Period From</label>
                                 <select id="filterPeriodFrom">
                                     <option value="">All</option>
-                                    ${PERIODS.map(p => `<option value="${p}">${p}</option>`).join('')}
+                                    ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
                                 </select>
                             </div>
                             <div class="filter-group">
                                 <label><i data-lucide="calendar" style="width:12px;height:12px;vertical-align:middle;margin-right:4px;"></i>Period To</label>
                                 <select id="filterPeriodTo">
                                     <option value="">All</option>
-                                    ${PERIODS.map(p => `<option value="${p}">${p}</option>`).join('')}
+                                    ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
                                 </select>
                             </div>
                             <button class="filter-btn" onclick="applyFilters()"><i data-lucide="search" style="width:12px;height:12px;vertical-align:middle;margin-right:4px;"></i>Apply</button>
