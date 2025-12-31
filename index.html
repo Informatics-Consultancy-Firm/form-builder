@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Builder Pro - ICF-SL | Auto DHIS2 Sync</title>
+    <title>Form Builder Pro - ICF-SL | DHIS2 Integration</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
@@ -103,6 +103,7 @@
         .modal-btn.success { background: #28a745; color: white; }
         .modal-btn.danger { background: #dc3545; color: white; }
         .modal-btn.dhis2 { background: #17a2b8; color: white; }
+        .modal-btn.purple { background: #6f42c1; color: white; }
         
         .dhis2-config-section { background: #e8f4fc; border: 2px solid #17a2b8; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .dhis2-config-title { font-size: 13px; font-weight: 700; color: #17a2b8; margin-bottom: 12px; }
@@ -205,6 +206,8 @@
         .filter-group select, .filter-group input { padding: 8px 12px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; }
         .filter-btn { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Oswald', sans-serif; font-weight: 700; }
         
+        .help-text { font-size: 10px; color: #666; margin-top: 3px; font-style: italic; }
+        
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
@@ -224,7 +227,7 @@
             <div class="auth-header">
                 <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL">
                 <h1>Form Builder Pro</h1>
-                <p>Auto DHIS2 Sync</p>
+                <p>DHIS2 Integration</p>
             </div>
             <div class="auth-body">
                 <div class="auth-tabs">
@@ -287,7 +290,6 @@
             <div class="sidebar-section">
                 <h3 class="sidebar-title">🔗 DHIS2 Fields</h3>
                 <div class="field-type special" data-type="period">📅 Period (YYYYMM)</div>
-                <div class="field-type special" data-type="orgunit">🏥 Org Unit / Facility</div>
             </div>
             <div class="sidebar-section">
                 <h3 class="sidebar-title">📝 Basic Fields</h3>
@@ -337,7 +339,7 @@
                         <div class="drop-zone" id="dropZone">
                             <p style="font-size:36px;margin-bottom:12px;">📥</p>
                             <p style="font-weight:600;">Click field types to add them</p>
-                            <p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period & Org Unit fields for DHIS2 sync</p>
+                            <p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period field for DHIS2 sync</p>
                         </div>
                     </div>
                 </div>
@@ -392,6 +394,13 @@
                 </div>
                 
                 <div class="dhis2-config-section">
+                    <div class="dhis2-config-title">🔄 CORS Proxy (Optional)</div>
+                    <label class="dhis2-label">Custom Proxy URL (Google Apps Script)</label>
+                    <input type="url" class="dhis2-input" id="dhis2ProxyUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" autocomplete="off">
+                    <p class="help-text">Leave empty to use default proxies. Provide your Google Apps Script proxy URL for reliable connection.</p>
+                </div>
+                
+                <div class="dhis2-config-section">
                     <div class="dhis2-config-title">📋 Field Mapping</div>
                     <div class="dhis2-row">
                         <div>
@@ -410,6 +419,7 @@
                             <select class="dhis2-input" id="dhis2OrgUnitColumn">
                                 <option value="">-- Select Field --</option>
                             </select>
+                            <p class="help-text">Field containing facility names (e.g., "ALIE CHC")</p>
                         </div>
                     </div>
                     <div class="dhis2-row">
@@ -438,22 +448,23 @@
                 </div>
                 
                 <div class="dhis2-config-section">
-                    <div class="dhis2-config-title">🚀 Auto Setup & Sync</div>
+                    <div class="dhis2-config-title">🚀 Setup & Sync Actions</div>
                     <p style="font-size:11px;color:#666;margin-bottom:15px;">
-                        This will automatically:<br>
-                        ✓ Create Dataset using Form Name<br>
-                        ✓ Create Data Elements from Form Fields<br>
-                        ✓ Assign ALL org units at selected level<br>
-                        ✓ Match form org unit column to DHIS2 org units<br>
-                        ✓ Sync data using period from form
+                        <strong>Setup DHIS2:</strong> Creates Dataset (from form name) and Data Elements (from fields)<br>
+                        <strong>Sync Data:</strong> Pushes collected data to DHIS2 matching org units at selected level
                     </p>
-                    <button class="modal-btn success" onclick="autoSetupAndSync()" style="width:100%;">
-                        🚀 Auto Setup & Sync to DHIS2
-                    </button>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button class="modal-btn success" onclick="setupDhis2()" style="flex:1;">
+                            ⚙️ Setup DHIS2
+                        </button>
+                        <button class="modal-btn purple" onclick="syncDataToDhis2All()" style="flex:1;">
+                            🔄 Sync Data
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="sync-log" id="syncLog">
-                    <div class="log-entry info">Ready for setup...</div>
+                    <div class="log-entry info">Ready...</div>
                 </div>
             </div>
         </div>
@@ -486,10 +497,9 @@
 
     <script>
         // ==================== CORS PROXIES ====================
-        const CORS_PROXIES = [
+        const DEFAULT_PROXIES = [
             'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url=',
-            'https://cors-anywhere.herokuapp.com/'
+            'https://api.allorigins.win/raw?url='
         ];
         let currentProxyIndex = 0;
 
@@ -520,6 +530,7 @@
                 url: '',
                 username: '',
                 password: '',
+                proxyUrl: '',
                 orgUnitLevel: 5,
                 orgUnitColumn: '',
                 periodColumn: '',
@@ -537,8 +548,7 @@
         };
 
         const fieldDefs = {
-            period: { label: 'Period', icon: '📅', defaultLabel: 'Period', valueType: 'TEXT', isDhis2: true },
-            orgunit: { label: 'Org Unit', icon: '🏥', defaultLabel: 'Health Facility', valueType: 'TEXT', isDhis2: true },
+            period: { label: 'Period', icon: '📅', defaultLabel: 'Reporting Period', valueType: 'TEXT', isDhis2: true },
             text: { label: 'Text', icon: '📄', defaultLabel: 'Text Field', valueType: 'TEXT' },
             number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field', valueType: 'NUMBER' },
             date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field', valueType: 'DATE' },
@@ -594,13 +604,18 @@
             });
         }
 
-        // ==================== DHIS2 API WITH CORS PROXY ====================
+        // ==================== DHIS2 API WITH PROXY ====================
         function getProxiedUrl(url) {
-            return CORS_PROXIES[currentProxyIndex] + encodeURIComponent(url);
+            // Use custom proxy if provided
+            if (state.dhis2.proxyUrl) {
+                return state.dhis2.proxyUrl + '?url=' + encodeURIComponent(url);
+            }
+            // Otherwise use default proxies
+            return DEFAULT_PROXIES[currentProxyIndex] + encodeURIComponent(url);
         }
 
         async function dhis2Request(endpoint, method = 'GET', payload = null, retryCount = 0) {
-            const { url, username, password } = state.dhis2;
+            const { url, username, password, proxyUrl } = state.dhis2;
             if (!url || !username || !password) {
                 throw new Error('DHIS2 not configured');
             }
@@ -629,16 +644,18 @@
                 let data;
                 try { data = JSON.parse(text); } catch (e) { data = text; }
                 
-                if (!response.ok && retryCount < CORS_PROXIES.length - 1) {
-                    currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+                // If using custom proxy, don't retry with defaults
+                if (!response.ok && !proxyUrl && retryCount < DEFAULT_PROXIES.length - 1) {
+                    currentProxyIndex = (currentProxyIndex + 1) % DEFAULT_PROXIES.length;
                     addLog('warning', `Trying alternate proxy...`);
                     return dhis2Request(endpoint, method, payload, retryCount + 1);
                 }
                 
                 return { success: response.ok, status: response.status, data: data };
             } catch (error) {
-                if (retryCount < CORS_PROXIES.length - 1) {
-                    currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+                // If using custom proxy, don't retry with defaults
+                if (!proxyUrl && retryCount < DEFAULT_PROXIES.length - 1) {
+                    currentProxyIndex = (currentProxyIndex + 1) % DEFAULT_PROXIES.length;
                     addLog('warning', `Proxy failed, trying next...`);
                     return dhis2Request(endpoint, method, payload, retryCount + 1);
                 }
@@ -650,19 +667,24 @@
             const url = document.getElementById('dhis2Url').value.trim();
             const username = document.getElementById('dhis2Username').value.trim();
             const password = document.getElementById('dhis2Password').value;
+            const proxyUrl = document.getElementById('dhis2ProxyUrl').value.trim();
             
             if (!url || !username || !password) {
-                notify('Please fill all fields', 'error');
+                notify('Please fill server URL, username and password', 'error');
                 return;
             }
             
             state.dhis2.url = url;
             state.dhis2.username = username;
             state.dhis2.password = password;
+            state.dhis2.proxyUrl = proxyUrl;
             state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
             
             updateStatus('syncing', 'Testing connection...');
             addLog('info', 'Connecting to DHIS2...');
+            if (proxyUrl) {
+                addLog('info', 'Using custom proxy: ' + proxyUrl.substring(0, 50) + '...');
+            }
             
             try {
                 const result = await dhis2Request('system/info.json');
@@ -670,10 +692,10 @@
                 if (result.success && result.data) {
                     state.dhis2.connected = true;
                     state.dhis2.serverInfo = result.data;
-                    updateStatus('connected', `Connected to ${result.data.systemName}`);
-                    addLog('success', `✓ Connected: ${result.data.systemName} v${result.data.version}`);
+                    updateStatus('connected', `Connected to ${result.data.systemName || 'DHIS2'}`);
+                    addLog('success', `✓ Connected: ${result.data.systemName || 'DHIS2'} v${result.data.version || ''}`);
                     
-                    document.getElementById('dhis2ServerName').textContent = result.data.systemName;
+                    document.getElementById('dhis2ServerName').textContent = result.data.systemName || 'DHIS2';
                     document.getElementById('dhis2InfoBar').style.display = 'flex';
                     
                     // Fetch org units for the selected level
@@ -684,14 +706,14 @@
                 } else {
                     state.dhis2.connected = false;
                     updateStatus('disconnected', 'Connection failed');
-                    addLog('error', `✗ Failed: ${result.error || result.status}`);
-                    notify('Connection failed', 'error');
+                    addLog('error', `✗ Failed: ${result.error || 'Status ' + result.status}`);
+                    notify('Connection failed. Check credentials or proxy.', 'error');
                 }
             } catch (error) {
                 state.dhis2.connected = false;
                 updateStatus('disconnected', 'Connection error');
                 addLog('error', `✗ Error: ${error.message}`);
-                notify('Connection error', 'error');
+                notify('Connection error: ' + error.message, 'error');
             }
         }
 
@@ -719,6 +741,8 @@
                 
                 document.getElementById('dhis2OrgUnitCount').textContent = state.dhis2.orgUnits.length;
                 addLog('success', `✓ Loaded ${state.dhis2.orgUnits.length} org units at level ${level}`);
+            } else {
+                addLog('warning', `Could not load org units: ${result.error || 'Unknown error'}`);
             }
         }
 
@@ -746,6 +770,7 @@
             state.dhis2.url = document.getElementById('dhis2Url').value.trim();
             state.dhis2.username = document.getElementById('dhis2Username').value.trim();
             state.dhis2.password = document.getElementById('dhis2Password').value;
+            state.dhis2.proxyUrl = document.getElementById('dhis2ProxyUrl').value.trim();
             state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
             state.dhis2.orgUnitColumn = document.getElementById('dhis2OrgUnitColumn').value;
             state.dhis2.periodColumn = document.getElementById('dhis2PeriodColumn').value;
@@ -755,6 +780,7 @@
                 url: state.dhis2.url,
                 username: state.dhis2.username,
                 password: state.dhis2.password,
+                proxyUrl: state.dhis2.proxyUrl,
                 orgUnitLevel: state.dhis2.orgUnitLevel,
                 orgUnitColumn: state.dhis2.orgUnitColumn,
                 periodColumn: state.dhis2.periodColumn,
@@ -790,39 +816,33 @@
                 periodSelect.innerHTML += `<option value="${f.name}" ${state.dhis2.periodColumn === f.name ? 'selected' : ''}>${f.label}</option>`;
             });
             
-            // Auto-select period and orgunit fields
+            // Auto-select period field
             const periodField = fields.find(f => f.type === 'period');
-            const orgunitField = fields.find(f => f.type === 'orgunit');
-            
             if (periodField && !state.dhis2.periodColumn) {
                 state.dhis2.periodColumn = periodField.name;
                 periodSelect.value = periodField.name;
             }
-            if (orgunitField && !state.dhis2.orgUnitColumn) {
-                state.dhis2.orgUnitColumn = orgunitField.name;
-                orgUnitSelect.value = orgunitField.name;
-            }
         }
 
-        // ==================== AUTO SETUP & SYNC ====================
-        async function autoSetupAndSync() {
+        // ==================== SETUP DHIS2 (Dataset & Elements Only) ====================
+        async function setupDhis2() {
             if (!state.dhis2.connected) {
                 notify('Connect to DHIS2 first', 'error');
                 return;
             }
             
-            const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit');
+            const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period');
             if (dataFields.length === 0) {
                 notify('Add data fields to your form first', 'error');
                 return;
             }
             
             clearLog();
-            addLog('info', '🚀 Starting Auto Setup...');
+            addLog('info', '⚙️ Setting up DHIS2...');
             updateStatus('syncing', 'Setting up...');
             
             try {
-                // Step 1: Create Data Elements (only for data fields, not period/orgunit)
+                // Step 1: Create Data Elements
                 addLog('info', '📝 Creating Data Elements...');
                 const createdElements = [];
                 
@@ -856,7 +876,7 @@
                             createdElements.push({ id: newId });
                             addLog('success', `  ✓ Created: ${field.label}`);
                         } else {
-                            addLog('error', `  ✗ Failed: ${field.label}`);
+                            addLog('error', `  ✗ Failed: ${field.label} - ${JSON.stringify(createResult.data?.message || createResult.error)}`);
                         }
                     }
                     await sleep(200);
@@ -864,7 +884,7 @@
                 
                 addLog('success', `✓ ${createdElements.length} data elements ready`);
                 
-                // Step 2: Get org units at selected level
+                // Step 2: Get org units at selected level (if not already loaded)
                 if (state.dhis2.orgUnits.length === 0) {
                     await fetchOrgUnitsForLevel();
                 }
@@ -895,8 +915,12 @@
                             organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
                         };
                         
-                        await dhis2Request(`dataSets/${existingDs.id}`, 'PUT', merged);
-                        addLog('success', `  ✓ Dataset updated`);
+                        const updateResult = await dhis2Request(`dataSets/${existingDs.id}`, 'PUT', merged);
+                        if (updateResult.success) {
+                            addLog('success', `  ✓ Dataset updated with ${createdElements.length} elements and ${state.dhis2.orgUnits.length} org units`);
+                        } else {
+                            addLog('warning', `  ⚠ Could not update dataset: ${updateResult.error || 'Unknown'}`);
+                        }
                     }
                 } else {
                     const createPayload = {
@@ -915,23 +939,15 @@
                         state.dhis2.datasetName = datasetName;
                         addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
                     } else {
-                        addLog('error', `  ✗ Failed to create dataset`);
+                        addLog('error', `  ✗ Failed to create dataset: ${JSON.stringify(createResult.data?.message || createResult.error)}`);
                     }
                 }
                 
                 document.getElementById('dhis2DatasetName').textContent = datasetName;
                 
-                // Step 4: Sync collected data
-                const pendingData = state.collectedData.filter(d => !d._synced);
-                if (pendingData.length > 0) {
-                    addLog('info', `📤 Syncing ${pendingData.length} records...`);
-                    await syncDataToDhis2(pendingData);
-                } else {
-                    addLog('info', '📤 No pending data to sync');
-                }
-                
                 updateStatus('connected', 'Setup complete!');
-                addLog('success', '✅ AUTO SETUP COMPLETE!');
+                addLog('success', '✅ DHIS2 SETUP COMPLETE!');
+                addLog('info', 'You can now collect data and sync later.');
                 saveToStorage();
                 notify('✅ DHIS2 setup complete!', 'success');
                 
@@ -942,12 +958,42 @@
             }
         }
 
-        async function syncDataToDhis2(dataRecords) {
-            if (!state.dhis2.datasetId) {
-                addLog('error', 'No dataset configured');
+        // ==================== SYNC DATA TO DHIS2 ====================
+        async function syncDataToDhis2All() {
+            if (!state.dhis2.connected) {
+                notify('Connect to DHIS2 first', 'error');
                 return;
             }
             
+            if (!state.dhis2.datasetId) {
+                notify('Run Setup DHIS2 first to create the dataset', 'error');
+                return;
+            }
+            
+            const pendingData = state.collectedData.filter(d => !d._synced);
+            if (pendingData.length === 0) {
+                notify('No pending data to sync', 'info');
+                addLog('info', 'No pending data to sync');
+                return;
+            }
+            
+            clearLog();
+            addLog('info', `🔄 Syncing ${pendingData.length} records to DHIS2...`);
+            updateStatus('syncing', 'Syncing data...');
+            
+            // Ensure org units are loaded
+            if (state.dhis2.orgUnits.length === 0) {
+                await fetchOrgUnitsForLevel();
+            }
+            
+            await syncDataRecords(pendingData);
+            
+            updateStatus('connected', 'Sync complete');
+            saveToStorage();
+            saveFormToList();
+        }
+
+        async function syncDataRecords(dataRecords) {
             const orgUnitColumn = state.dhis2.orgUnitColumn;
             const periodColumn = state.dhis2.periodColumn;
             
@@ -959,6 +1005,7 @@
                 if (!period) {
                     const ts = new Date(record._timestamp || Date.now());
                     period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
+                    addLog('warning', `  ⚠ No period in record, using: ${period}`);
                 }
                 
                 // Get org unit from form data and match to DHIS2
@@ -981,15 +1028,15 @@
                 }
                 
                 if (!orgUnitId) {
-                    addLog('warning', `  ⚠ No matching org unit for: ${orgUnitValue || 'empty'}`);
-                    record._syncError = 'No matching org unit';
+                    addLog('error', `  ✗ No matching org unit for: "${orgUnitValue || 'empty'}"`);
+                    record._syncError = 'No matching org unit: ' + (orgUnitValue || 'empty');
                     failed++;
                     continue;
                 }
                 
-                // Build data values (exclude period and orgunit fields)
+                // Build data values (exclude period field and non-data fields)
                 const dataValues = [];
-                const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit');
+                const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period');
                 
                 dataFields.forEach(field => {
                     const deId = state.dhis2.dataElements[field.id];
@@ -1017,19 +1064,21 @@
                 if (result.success) {
                     record._synced = true;
                     record._syncedAt = new Date().toISOString();
+                    delete record._syncError;
                     success++;
-                    addLog('success', `  ✓ Synced to ${orgUnitValue} for ${period}`);
+                    addLog('success', `  ✓ Synced: ${orgUnitValue} / ${period} (${dataValues.length} values)`);
                 } else {
-                    record._syncError = result.error || 'Unknown error';
+                    record._syncError = result.error || JSON.stringify(result.data?.message) || 'Unknown error';
                     failed++;
-                    addLog('error', `  ✗ Failed: ${result.error || 'Unknown'}`);
+                    addLog('error', `  ✗ Failed: ${orgUnitValue} / ${period} - ${record._syncError}`);
                 }
                 
                 await sleep(300);
             }
             
             addLog('info', `📊 Sync complete: ${success} success, ${failed} failed`);
-            saveToStorage();
+            if (success > 0) notify(`✅ Synced ${success} records!`, 'success');
+            if (failed > 0) notify(`⚠️ ${failed} records failed`, 'error');
         }
 
         function sleep(ms) {
@@ -1044,6 +1093,7 @@
             document.getElementById('dhis2Url').value = state.dhis2.url || '';
             document.getElementById('dhis2Username').value = state.dhis2.username || '';
             document.getElementById('dhis2Password').value = state.dhis2.password || '';
+            document.getElementById('dhis2ProxyUrl').value = state.dhis2.proxyUrl || '';
             document.getElementById('dhis2OrgLevel').value = state.dhis2.orgUnitLevel || 5;
             document.getElementById('dhis2PeriodType').value = state.dhis2.periodType || 'Monthly';
             
@@ -1123,13 +1173,9 @@
             const def = fieldDefs[type];
             if (!def) return;
             
-            // Check if period or orgunit already exists
+            // Check if period already exists
             if (type === 'period' && state.fields.find(f => f.type === 'period')) {
                 notify('Period field already exists', 'error');
-                return;
-            }
-            if (type === 'orgunit' && state.fields.find(f => f.type === 'orgunit')) {
-                notify('Org Unit field already exists', 'error');
                 return;
             }
             
@@ -1144,14 +1190,10 @@
                 max: def.max || 5
             };
             
-            // Set default names for DHIS2 fields
+            // Set default name for period field
             if (type === 'period') {
                 field.name = 'period';
                 field.label = 'Reporting Period';
-            }
-            if (type === 'orgunit') {
-                field.name = 'facility';
-                field.label = 'Health Facility';
             }
             
             state.fields.push(field);
@@ -1193,21 +1235,19 @@
 
         function renderFields() {
             const dropZone = document.getElementById('dropZone');
-            const dataFieldCount = state.fields.filter(f => f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit').length;
+            const dataFieldCount = state.fields.filter(f => f.type !== 'section' && f.type !== 'period').length;
             document.getElementById('fieldCount').textContent = `📊 ${dataFieldCount} data elements`;
             
             if (state.fields.length === 0) {
                 dropZone.classList.remove('has-fields');
-                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add them</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period & Org Unit fields for DHIS2 sync</p>';
+                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add them</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period field for DHIS2 sync</p>';
                 return;
             }
             
             dropZone.classList.add('has-fields');
-            let currentPage = 1;
             
             dropZone.innerHTML = state.fields.map(f => {
                 if (f.type === 'section') {
-                    currentPage++;
                     return `<div class="section-divider ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
                         <span>📁 ${f.label.toUpperCase()}</span>
                         <div style="display:flex;gap:5px;">
@@ -1219,7 +1259,7 @@
                 }
                 
                 const def = fieldDefs[f.type];
-                const isDhis2Field = f.type === 'period' || f.type === 'orgunit';
+                const isDhis2Field = f.type === 'period';
                 
                 return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''} ${isDhis2Field ? 'dhis2-field' : ''}" data-id="${f.id}">
                     <div class="form-field-header">
@@ -1282,16 +1322,6 @@
                     <div class="prop-section">
                         <div class="prop-section-title">📋 Options (one per line)</div>
                         <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
-                    </div>
-                `;
-            }
-            
-            if (field.type === 'orgunit') {
-                html += `
-                    <div class="prop-section" style="background:#e8f4fc;border-color:#17a2b8;">
-                        <div class="prop-section-title" style="color:#17a2b8;">🏥 Org Unit Options</div>
-                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Options will be loaded from DHIS2 based on selected level</p>
-                        <textarea class="property-textarea" id="propOptions" placeholder="Add custom options or leave empty for DHIS2 org units">${(field.options || []).join('\n')}</textarea>
                     </div>
                 `;
             }
@@ -1588,14 +1618,6 @@
                                 ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
                             </select>`;
                             break;
-                        case 'orgunit':
-                            const orgOptions = field.options?.length > 0 ? field.options : 
-                                state.dhis2.orgUnits.map(ou => ou.displayName || ou.name);
-                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
-                                <option value="">-- Select Facility --</option>
-                                ${orgOptions.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}
-                            </select>`;
-                            break;
                         case 'text': case 'email': case 'phone': case 'date': case 'time':
                             const type = field.type === 'phone' ? 'tel' : field.type;
                             input = `<input type="${type}" name="${field.name}" class="viewer-input" ${reqAttr}>`;
@@ -1652,7 +1674,6 @@
                     <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)">📝 Form</button>
                     <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)">📊 Data</button>
                     <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)">📈 Dashboard</button>
-                    ${state.dhis2.connected ? `<button class="viewer-nav-btn" style="background:#6f42c1;color:#fff;" onclick="syncNow()">🔄 Sync</button>` : ''}
                     <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
                         ${navigator.onLine ? '🟢 Online' : '🔴 Offline'}
                     </div>
@@ -1676,7 +1697,7 @@
                 <div id="tabData" class="viewer-tab">
                     <div style="max-width:1000px;margin:0 auto;">
                         <div style="background:#004080;color:white;padding:15px 20px;border-radius:12px 12px 0 0;">
-                            <h3 style="margin:0;font-size:16px;">📊 Collected Data</h3>
+                            <h3 style="margin:0;font-size:16px;">📊 Collected Data (${state.collectedData.length} records)</h3>
                         </div>
                         <div style="background:white;padding:20px;border-radius:0 0 12px 12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                             <div id="dataTable"></div>
@@ -1707,12 +1728,6 @@
                                     ${PERIODS.map(p => `<option value="${p}">${p}</option>`).join('')}
                                 </select>
                             </div>
-                            <div class="filter-group">
-                                <label>🏥 Facility</label>
-                                <select id="filterFacility">
-                                    <option value="">All Facilities</option>
-                                </select>
-                            </div>
                             <button class="filter-btn" onclick="applyFilters()">🔍 Apply</button>
                             <button class="filter-btn" style="background:#dc3545;" onclick="clearFilters()">🗑️ Clear</button>
                         </div>
@@ -1726,7 +1741,6 @@
             window.totalPages = pages.length;
             setupFormSubmit();
             renderDataTable();
-            populateFacilityFilter();
         }
 
         function setupFormSubmit() {
@@ -1746,16 +1760,9 @@
                 form.reset();
                 goToPage(0);
                 
-                notify('✅ Data saved!');
+                notify('✅ Data saved locally!');
                 renderDataTable();
                 renderDashboard();
-                
-                // Auto-sync if connected
-                if (state.dhis2.connected && state.dhis2.datasetId) {
-                    notify('🔄 Syncing to DHIS2...', 'info');
-                    await syncDataToDhis2([data]);
-                    renderDataTable();
-                }
             };
         }
 
@@ -1777,7 +1784,7 @@
             state.collectedData.slice().reverse().forEach((row, i) => {
                 const syncStatus = row._synced ? 
                     '<span class="sync-badge synced">✓ Synced</span>' : 
-                    (row._syncError ? '<span class="sync-badge failed">✗ Failed</span>' : '<span class="sync-badge pending">⏳ Pending</span>');
+                    (row._syncError ? `<span class="sync-badge failed" title="${escapeHtml(row._syncError)}">✗ Failed</span>` : '<span class="sync-badge pending">⏳ Pending</span>');
                     
                 html += `<tr><td>${state.collectedData.length - i}</td><td style="font-size:10px;">${new Date(row._timestamp).toLocaleString()}</td>`;
                 fields.slice(0, 6).forEach(f => html += `<td>${escapeHtml(String(row[f.name] || '-').substring(0, 25))}</td>`);
@@ -1788,22 +1795,6 @@
             container.innerHTML = html;
         }
 
-        function populateFacilityFilter() {
-            const select = document.getElementById('filterFacility');
-            if (!select) return;
-            
-            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
-            if (!orgUnitField) return;
-            
-            const facilities = [...new Set(state.collectedData.map(d => d[orgUnitField.name]).filter(Boolean))];
-            facilities.sort();
-            
-            select.innerHTML = '<option value="">All Facilities</option>';
-            facilities.forEach(f => {
-                select.innerHTML += `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`;
-            });
-        }
-
         function applyFilters() {
             renderDashboard();
         }
@@ -1811,7 +1802,6 @@
         function clearFilters() {
             document.getElementById('filterPeriodFrom').value = '';
             document.getElementById('filterPeriodTo').value = '';
-            document.getElementById('filterFacility').value = '';
             renderDashboard();
         }
 
@@ -1820,19 +1810,14 @@
             
             const periodFrom = document.getElementById('filterPeriodFrom')?.value;
             const periodTo = document.getElementById('filterPeriodTo')?.value;
-            const facility = document.getElementById('filterFacility')?.value;
             
             const periodField = state.fields.find(f => f.type === 'period');
-            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
             
             if (periodFrom && periodField) {
                 data = data.filter(d => d[periodField.name] >= periodFrom);
             }
             if (periodTo && periodField) {
                 data = data.filter(d => d[periodField.name] <= periodTo);
-            }
-            if (facility && orgUnitField) {
-                data = data.filter(d => d[orgUnitField.name] === facility);
             }
             
             return data;
@@ -1844,7 +1829,6 @@
             if (!statsContainer || !chartsContainer) return;
             
             const filteredData = getFilteredData();
-            const totalData = state.collectedData;
             
             // Stats
             const synced = filteredData.filter(d => d._synced).length;
@@ -1854,15 +1838,12 @@
             const periodField = state.fields.find(f => f.type === 'period');
             const uniquePeriods = periodField ? [...new Set(filteredData.map(d => d[periodField.name]).filter(Boolean))].length : 0;
             
-            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
-            const uniqueFacilities = orgUnitField ? [...new Set(filteredData.map(d => d[orgUnitField.name]).filter(Boolean))].length : 0;
-            
             statsContainer.innerHTML = `
                 <div class="stat-card"><div class="stat-value">${filteredData.length}</div><div class="stat-label">Total Records</div></div>
                 <div class="stat-card success"><div class="stat-value">${synced}</div><div class="stat-label">Synced to DHIS2</div></div>
                 <div class="stat-card warning"><div class="stat-value">${pending}</div><div class="stat-label">Pending Sync</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#dc3545,#c82333);"><div class="stat-value">${failed}</div><div class="stat-label">Failed</div></div>
                 <div class="stat-card info"><div class="stat-value">${uniquePeriods}</div><div class="stat-label">Periods</div></div>
-                <div class="stat-card"><div class="stat-value">${uniqueFacilities}</div><div class="stat-label">Facilities</div></div>
             `;
             
             // Destroy old charts
@@ -1874,21 +1855,18 @@
                 return;
             }
             
-            // Generate charts for categorical fields
+            // Generate charts
             const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
             const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
             const numericFields = state.fields.filter(f => f.type === 'number');
             
             let chartsHtml = '';
             
-            // Chart for each categorical field
             categoricalFields.forEach((field, idx) => {
                 const valueCounts = {};
                 filteredData.forEach(row => {
                     const value = row[field.name];
-                    if (value) {
-                        valueCounts[value] = (valueCounts[value] || 0) + 1;
-                    }
+                    if (value) valueCounts[value] = (valueCounts[value] || 0) + 1;
                 });
                 
                 if (Object.keys(valueCounts).length > 0) {
@@ -1904,7 +1882,6 @@
                 }
             });
             
-            // Numeric summary
             if (numericFields.length > 0) {
                 chartsHtml += `
                     <div class="chart-container">
@@ -1928,7 +1905,6 @@
                 `;
             }
             
-            // Trend by period
             if (periodField && filteredData.length > 1) {
                 chartsHtml += `
                     <div class="chart-container">
@@ -1986,7 +1962,6 @@
                     }
                 });
                 
-                // Trend chart
                 if (periodField && document.getElementById('trendChart')) {
                     const periodCounts = {};
                     filteredData.forEach(row => {
@@ -2025,25 +2000,12 @@
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
             if (btn) btn.classList.add('active');
             
-            if (tab === 'dashboard') {
-                renderDashboard();
-            }
+            if (tab === 'dashboard') renderDashboard();
         }
 
         function goToPage(pageIndex) {
             document.querySelectorAll('.form-page').forEach(p => p.style.display = 'none');
             document.querySelector(`.form-page[data-page="${pageIndex}"]`).style.display = 'block';
-        }
-
-        async function syncNow() {
-            const pending = state.collectedData.filter(d => !d._synced);
-            if (pending.length === 0) {
-                notify('No pending data to sync', 'info');
-                return;
-            }
-            notify(`🔄 Syncing ${pending.length} records...`, 'info');
-            await syncDataToDhis2(pending);
-            renderDataTable();
         }
 
         window.captureGPS = function(btn) {
