@@ -51,6 +51,7 @@
         .sidebar-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #004080; text-transform: uppercase; }
         .field-type { background: #f8f9fa; border: 2px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
         .field-type:hover { border-color: #004080; background: #e8f4fc; }
+        .field-type.special { background: #e8f4fc; border-color: #17a2b8; }
         
         .canvas-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .canvas-header { background: white; padding: 12px 20px; border-bottom: 3px solid #004080; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -66,6 +67,7 @@
         .form-field { background: white; border: 2px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
         .form-field:hover { border-color: #004080; }
         .form-field.selected { border-color: #004080; border-width: 3px; box-shadow: 0 0 0 4px rgba(0,64,128,0.2); }
+        .form-field.dhis2-field { background: #e8f4fc; border-color: #17a2b8; }
         .form-field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .form-field-label { font-weight: 700; font-size: 12px; color: #333; }
         .form-field-actions { display: flex; gap: 4px; }
@@ -74,6 +76,7 @@
         .field-action-btn.delete { background: #dc3545; color: white; border-color: #dc3545; }
         .field-badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; margin-left: 8px; }
         .field-badge.required { background: #f8d7da; color: #721c24; }
+        .field-badge.dhis2 { background: #d1ecf1; color: #0c5460; }
         
         .section-divider { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 12px 16px; margin: 15px 0; border-radius: 8px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         
@@ -91,7 +94,7 @@
         
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; overflow-y: auto; }
         .modal-overlay.show { display: flex; }
-        .modal { background: white; border-radius: 12px; max-width: 600px; width: 100%; border: 4px double #004080; max-height: 90vh; overflow-y: auto; }
+        .modal { background: white; border-radius: 12px; max-width: 650px; width: 100%; border: 4px double #004080; max-height: 90vh; overflow-y: auto; }
         .modal-header { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
         .modal-body { padding: 20px; }
@@ -106,12 +109,13 @@
         .dhis2-input { width: 100%; padding: 10px 12px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; margin-bottom: 10px; }
         .dhis2-input:focus { outline: none; border-color: #17a2b8; }
         .dhis2-label { display: block; font-size: 10px; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; }
+        .dhis2-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .dhis2-status { padding: 12px 15px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
         .dhis2-status.connected { background: #d4edda; color: #155724; border: 2px solid #28a745; }
         .dhis2-status.disconnected { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
         .dhis2-status.syncing { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
         
-        .sync-log { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
+        .sync-log { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto; margin-top: 15px; }
         .log-entry { padding: 3px 0; border-bottom: 1px solid #333; }
         .log-entry.error { color: #ff6b6b; }
         .log-entry.success { color: #51cf66; }
@@ -134,15 +138,16 @@
         .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; position: sticky; top: 0; z-index: 100; }
         .viewer-back-btn { background: #dc3545; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; margin-right: 10px; }
         .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
+        .viewer-nav-btn.active { box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
         .connection-status { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-left: auto; }
         .connection-status.online { background: #28a745; color: white; }
         .connection-status.offline { background: #dc3545; color: white; }
         .viewer-tab { display: none; padding: 20px; }
         .viewer-tab.active { display: block; }
         .viewer-form { max-width: 650px; margin: 0 auto; }
-        .viewer-form-box { background: white; border: 4px double #004080; border-radius: 12px; overflow: hidden; }
+        .viewer-form-box { background: white; border: 4px double #004080; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
         .viewer-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 25px; text-align: center; }
-        .viewer-header img { width: 70px; border-radius: 10px; margin-bottom: 10px; }
+        .viewer-header img { width: 70px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .viewer-header h1 { font-size: 20px; margin-bottom: 5px; }
         .viewer-header p { font-size: 12px; opacity: 0.9; }
         .viewer-body { padding: 25px; }
@@ -152,7 +157,7 @@
         .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
         .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
         .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; }
-        .viewer-radio-option:hover { border-color: #004080; }
+        .viewer-radio-option:hover { border-color: #004080; background: #e8f4fc; }
         
         .page-header { background: #e8f4fc; margin: -25px -25px 20px -25px; padding: 15px 25px; border-bottom: 2px solid #004080; }
         .page-indicator { display: inline-block; background: #004080; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
@@ -165,8 +170,9 @@
         
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
         .data-table th, .data-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
-        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; }
+        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; position: sticky; top: 0; }
         .data-table tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tr:hover { background: #e8f4fc; }
         
         .sync-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; }
         .sync-badge.synced { background: #d4edda; color: #155724; }
@@ -176,12 +182,38 @@
         .dhis2-info-bar { background: #17a2b8; color: white; padding: 8px 15px; font-size: 11px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .dhis2-info-item { display: flex; align-items: center; gap: 5px; }
         
+        /* Dashboard Styles */
+        .dashboard-container { max-width: 1100px; margin: 0 auto; }
+        .dashboard-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .dashboard-header img { width: 60px; border-radius: 8px; margin-bottom: 10px; }
+        .dashboard-header h2 { font-size: 18px; margin-bottom: 5px; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-card.success { background: linear-gradient(135deg, #28a745 0%, #218838 100%); }
+        .stat-card.warning { background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000; }
+        .stat-card.info { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-card .stat-label { font-size: 10px; opacity: 0.9; margin-top: 5px; }
+        .chart-container { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 2px solid #e9ecef; }
+        .chart-container h4 { color: #004080; font-size: 14px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #004080; }
+        .chart-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .chart-box { flex: 1; min-width: 280px; max-width: 400px; }
+        
+        .filter-bar { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .filter-group select, .filter-group input { padding: 8px 12px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; }
+        .filter-btn { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Oswald', sans-serif; font-weight: 700; }
+        
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
             .sidebar, .properties-panel { width: 100%; max-height: 200px; }
             .header { flex-wrap: wrap; padding: 10px 15px; }
             .header h1 { font-size: 16px; }
             .form-title-input { width: 100%; }
+            .dhis2-row { grid-template-columns: 1fr; }
+            .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+            .chart-box { min-width: 100%; }
         }
     </style>
 </head>
@@ -253,6 +285,11 @@
     <div class="main-container" id="mainContainer">
         <div class="sidebar">
             <div class="sidebar-section">
+                <h3 class="sidebar-title">🔗 DHIS2 Fields</h3>
+                <div class="field-type special" data-type="period">📅 Period (YYYYMM)</div>
+                <div class="field-type special" data-type="orgunit">🏥 Org Unit / Facility</div>
+            </div>
+            <div class="sidebar-section">
                 <h3 class="sidebar-title">📝 Basic Fields</h3>
                 <div class="field-type" data-type="text">📄 Text Input</div>
                 <div class="field-type" data-type="number">🔢 Number</div>
@@ -294,13 +331,13 @@
                 <div class="form-preview">
                     <div class="form-preview-header">
                         <h2 id="previewTitle">My Data Collection Form</h2>
-                        <p>Data Collection System</p>
+                        <p>ICF-SL Data Collection System</p>
                     </div>
                     <div class="form-preview-body">
                         <div class="drop-zone" id="dropZone">
                             <p style="font-size:36px;margin-bottom:12px;">📥</p>
                             <p style="font-weight:600;">Click field types to add them</p>
-                            <p style="font-size:11px;color:#868e96;margin-top:10px;">Fields become DHIS2 Data Elements</p>
+                            <p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period & Org Unit fields for DHIS2 sync</p>
                         </div>
                     </div>
                 </div>
@@ -323,7 +360,7 @@
     <div class="viewer-container" id="homeContainer"></div>
     
     <!-- Footer -->
-    <footer class="footer">© 2025 ICF-SL | Form Builder Pro with Auto DHIS2 Sync</footer>
+    <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | Form Builder Pro</footer>
 
     <!-- DHIS2 Configuration Modal -->
     <div class="modal-overlay" id="dhis2Modal">
@@ -337,26 +374,62 @@
                     <span>🔴</span> <span>Not Connected</span>
                 </div>
                 
-                <div class="dhis2-config-section" autocomplete="off">
+                <div class="dhis2-config-section">
                     <div class="dhis2-config-title">🌐 Server Connection</div>
                     <label class="dhis2-label">DHIS2 Server URL</label>
                     <input type="url" class="dhis2-input" id="dhis2Url" placeholder="https://your-dhis2-instance.org" autocomplete="off">
                     
-                    <label class="dhis2-label">Username</label>
-                    <input type="text" class="dhis2-input" id="dhis2Username" placeholder="Enter username" autocomplete="off">
-                    
-                    <label class="dhis2-label">Password</label>
-                    <input type="password" class="dhis2-input" id="dhis2Password" placeholder="Enter password" autocomplete="new-password">
-                    
-                    <label class="dhis2-label">Org Unit Level for Data Entry</label>
-                    <select class="dhis2-input" id="dhis2OrgLevel">
-                        <option value="1">Level 1 (National)</option>
-                        <option value="2">Level 2 (Region)</option>
-                        <option value="3">Level 3 (District)</option>
-                        <option value="4">Level 4 (Chiefdom)</option>
-                        <option value="5" selected>Level 5 (Facility)</option>
-                        <option value="6">Level 6</option>
-                    </select>
+                    <div class="dhis2-row">
+                        <div>
+                            <label class="dhis2-label">Username</label>
+                            <input type="text" class="dhis2-input" id="dhis2Username" placeholder="Enter username" autocomplete="off">
+                        </div>
+                        <div>
+                            <label class="dhis2-label">Password</label>
+                            <input type="password" class="dhis2-input" id="dhis2Password" placeholder="Enter password" autocomplete="new-password">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dhis2-config-section">
+                    <div class="dhis2-config-title">📋 Field Mapping</div>
+                    <div class="dhis2-row">
+                        <div>
+                            <label class="dhis2-label">Org Unit Level</label>
+                            <select class="dhis2-input" id="dhis2OrgLevel">
+                                <option value="1">Level 1 (National)</option>
+                                <option value="2">Level 2 (Region)</option>
+                                <option value="3">Level 3 (District)</option>
+                                <option value="4">Level 4 (Chiefdom)</option>
+                                <option value="5" selected>Level 5 (Facility)</option>
+                                <option value="6">Level 6</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="dhis2-label">Org Unit Column in Form</label>
+                            <select class="dhis2-input" id="dhis2OrgUnitColumn">
+                                <option value="">-- Select Field --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="dhis2-row">
+                        <div>
+                            <label class="dhis2-label">Period Column in Form</label>
+                            <select class="dhis2-input" id="dhis2PeriodColumn">
+                                <option value="">-- Select Field --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="dhis2-label">Period Type</label>
+                            <select class="dhis2-input" id="dhis2PeriodType">
+                                <option value="Monthly" selected>Monthly</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Yearly">Yearly</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
@@ -370,8 +443,9 @@
                         This will automatically:<br>
                         ✓ Create Dataset using Form Name<br>
                         ✓ Create Data Elements from Form Fields<br>
-                        ✓ Assign ALL org units to the Dataset<br>
-                        ✓ Sync collected data to DHIS2
+                        ✓ Assign ALL org units at selected level<br>
+                        ✓ Match form org unit column to DHIS2 org units<br>
+                        ✓ Sync data using period from form
                     </p>
                     <button class="modal-btn success" onclick="autoSetupAndSync()" style="width:100%;">
                         🚀 Auto Setup & Sync to DHIS2
@@ -419,6 +493,18 @@
         ];
         let currentProxyIndex = 0;
 
+        // ==================== GENERATE PERIODS ====================
+        function generatePeriods() {
+            const periods = [];
+            for (let year = 2020; year <= 2026; year++) {
+                for (let month = 1; month <= 12; month++) {
+                    periods.push(`${year}${String(month).padStart(2, '0')}`);
+                }
+            }
+            return periods;
+        }
+        const PERIODS = generatePeriods();
+
         // ==================== GLOBAL STATE ====================
         const state = {
             user: null,
@@ -435,17 +521,24 @@
                 username: '',
                 password: '',
                 orgUnitLevel: 5,
+                orgUnitColumn: '',
+                periodColumn: '',
+                periodType: 'Monthly',
                 connected: false,
                 serverInfo: null,
                 datasetId: null,
                 datasetName: '',
                 dataElements: {},
-                orgUnits: []
+                orgUnits: [],
+                orgUnitMap: {}
             },
-            collectedData: []
+            collectedData: [],
+            chartInstances: {}
         };
 
         const fieldDefs = {
+            period: { label: 'Period', icon: '📅', defaultLabel: 'Period', valueType: 'TEXT', isDhis2: true },
+            orgunit: { label: 'Org Unit', icon: '🏥', defaultLabel: 'Health Facility', valueType: 'TEXT', isDhis2: true },
             text: { label: 'Text', icon: '📄', defaultLabel: 'Text Field', valueType: 'TEXT' },
             number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field', valueType: 'NUMBER' },
             date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field', valueType: 'DATE' },
@@ -542,22 +635,14 @@
                     return dhis2Request(endpoint, method, payload, retryCount + 1);
                 }
                 
-                return {
-                    success: response.ok,
-                    status: response.status,
-                    data: data
-                };
+                return { success: response.ok, status: response.status, data: data };
             } catch (error) {
                 if (retryCount < CORS_PROXIES.length - 1) {
                     currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
                     addLog('warning', `Proxy failed, trying next...`);
                     return dhis2Request(endpoint, method, payload, retryCount + 1);
                 }
-                return {
-                    success: false,
-                    status: 0,
-                    error: error.message
-                };
+                return { success: false, status: 0, error: error.message };
             }
         }
 
@@ -591,6 +676,9 @@
                     document.getElementById('dhis2ServerName').textContent = result.data.systemName;
                     document.getElementById('dhis2InfoBar').style.display = 'flex';
                     
+                    // Fetch org units for the selected level
+                    await fetchOrgUnitsForLevel();
+                    
                     saveConfig();
                     notify('✅ Connected to DHIS2!', 'success');
                 } else {
@@ -607,6 +695,33 @@
             }
         }
 
+        async function fetchOrgUnitsForLevel() {
+            const level = state.dhis2.orgUnitLevel;
+            addLog('info', `Fetching org units at level ${level}...`);
+            
+            const result = await dhis2Request(`organisationUnits.json?fields=id,name,displayName,code&filter=level:eq:${level}&paging=false`);
+            
+            if (result.success && result.data?.organisationUnits) {
+                state.dhis2.orgUnits = result.data.organisationUnits;
+                state.dhis2.orgUnitMap = {};
+                
+                result.data.organisationUnits.forEach(ou => {
+                    const names = [
+                        ou.displayName?.toLowerCase().trim(),
+                        ou.name?.toLowerCase().trim(),
+                        ou.code?.toLowerCase().trim()
+                    ].filter(Boolean);
+                    
+                    names.forEach(name => {
+                        state.dhis2.orgUnitMap[name] = ou.id;
+                    });
+                });
+                
+                document.getElementById('dhis2OrgUnitCount').textContent = state.dhis2.orgUnits.length;
+                addLog('success', `✓ Loaded ${state.dhis2.orgUnits.length} org units at level ${level}`);
+            }
+        }
+
         function updateStatus(type, message) {
             const el = document.getElementById('dhis2Status');
             el.className = `dhis2-status ${type}`;
@@ -616,13 +731,15 @@
 
         function addLog(type, message) {
             const log = document.getElementById('syncLog');
+            if (!log) return;
             const time = new Date().toLocaleTimeString();
             log.innerHTML += `<div class="log-entry ${type}">[${time}] ${message}</div>`;
             log.scrollTop = log.scrollHeight;
         }
 
         function clearLog() {
-            document.getElementById('syncLog').innerHTML = '';
+            const log = document.getElementById('syncLog');
+            if (log) log.innerHTML = '';
         }
 
         function saveConfig() {
@@ -630,12 +747,18 @@
             state.dhis2.username = document.getElementById('dhis2Username').value.trim();
             state.dhis2.password = document.getElementById('dhis2Password').value;
             state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
+            state.dhis2.orgUnitColumn = document.getElementById('dhis2OrgUnitColumn').value;
+            state.dhis2.periodColumn = document.getElementById('dhis2PeriodColumn').value;
+            state.dhis2.periodType = document.getElementById('dhis2PeriodType').value;
             
             localStorage.setItem('dhis2Config', JSON.stringify({
                 url: state.dhis2.url,
                 username: state.dhis2.username,
                 password: state.dhis2.password,
-                orgUnitLevel: state.dhis2.orgUnitLevel
+                orgUnitLevel: state.dhis2.orgUnitLevel,
+                orgUnitColumn: state.dhis2.orgUnitColumn,
+                periodColumn: state.dhis2.periodColumn,
+                periodType: state.dhis2.periodType
             }));
             
             notify('💾 Config saved!');
@@ -647,14 +770,37 @@
                 try {
                     const config = JSON.parse(saved);
                     state.dhis2 = { ...state.dhis2, ...config };
-                    
-                    if (document.getElementById('dhis2Url')) {
-                        document.getElementById('dhis2Url').value = state.dhis2.url || '';
-                        document.getElementById('dhis2Username').value = state.dhis2.username || '';
-                        document.getElementById('dhis2Password').value = state.dhis2.password || '';
-                        document.getElementById('dhis2OrgLevel').value = state.dhis2.orgUnitLevel || 5;
-                    }
                 } catch (e) {}
+            }
+        }
+
+        function updateFieldDropdowns() {
+            const orgUnitSelect = document.getElementById('dhis2OrgUnitColumn');
+            const periodSelect = document.getElementById('dhis2PeriodColumn');
+            
+            if (!orgUnitSelect || !periodSelect) return;
+            
+            const fields = state.fields.filter(f => f.type !== 'section');
+            
+            orgUnitSelect.innerHTML = '<option value="">-- Select Field --</option>';
+            periodSelect.innerHTML = '<option value="">-- Select Field --</option>';
+            
+            fields.forEach(f => {
+                orgUnitSelect.innerHTML += `<option value="${f.name}" ${state.dhis2.orgUnitColumn === f.name ? 'selected' : ''}>${f.label}</option>`;
+                periodSelect.innerHTML += `<option value="${f.name}" ${state.dhis2.periodColumn === f.name ? 'selected' : ''}>${f.label}</option>`;
+            });
+            
+            // Auto-select period and orgunit fields
+            const periodField = fields.find(f => f.type === 'period');
+            const orgunitField = fields.find(f => f.type === 'orgunit');
+            
+            if (periodField && !state.dhis2.periodColumn) {
+                state.dhis2.periodColumn = periodField.name;
+                periodSelect.value = periodField.name;
+            }
+            if (orgunitField && !state.dhis2.orgUnitColumn) {
+                state.dhis2.orgUnitColumn = orgunitField.name;
+                orgUnitSelect.value = orgunitField.name;
             }
         }
 
@@ -665,8 +811,9 @@
                 return;
             }
             
-            if (state.fields.filter(f => f.type !== 'section').length === 0) {
-                notify('Add fields to your form first', 'error');
+            const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit');
+            if (dataFields.length === 0) {
+                notify('Add data fields to your form first', 'error');
                 return;
             }
             
@@ -675,21 +822,11 @@
             updateStatus('syncing', 'Setting up...');
             
             try {
-                // Step 1: Get default category combo
-                addLog('info', '📋 Getting default category combo...');
-                const catResult = await dhis2Request('categoryOptionCombos.json?filter=name:eq:default&fields=id');
-                let categoryComboId = 'bjDvmb4bfuf';
-                if (catResult.success && catResult.data?.categoryOptionCombos?.length > 0) {
-                    categoryComboId = catResult.data.categoryOptionCombos[0].id;
-                }
-                addLog('success', `✓ Category combo: ${categoryComboId}`);
-                
-                // Step 2: Create Data Elements
-                addLog('info', '📝 Creating Data Elements from form fields...');
-                const formFields = state.fields.filter(f => f.type !== 'section');
+                // Step 1: Create Data Elements (only for data fields, not period/orgunit)
+                addLog('info', '📝 Creating Data Elements...');
                 const createdElements = [];
                 
-                for (const field of formFields) {
+                for (const field of dataFields) {
                     const def = fieldDefs[field.type];
                     const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
                     
@@ -700,16 +837,15 @@
                         const existing = checkResult.data.dataElements[0];
                         state.dhis2.dataElements[field.id] = existing.id;
                         createdElements.push({ id: existing.id });
-                        addLog('info', `  ↳ Exists: ${field.label} (${existing.id})`);
+                        addLog('info', `  ↳ Exists: ${field.label}`);
                     } else {
-                        // Create new
                         const payload = {
                             name: field.label,
                             shortName: field.label.substring(0, 50),
                             code: code,
                             domainType: 'AGGREGATE',
                             valueType: def?.valueType || 'TEXT',
-                            aggregationType: 'SUM'
+                            aggregationType: field.type === 'number' ? 'SUM' : 'NONE'
                         };
                         
                         const createResult = await dhis2Request('dataElements', 'POST', payload);
@@ -718,52 +854,36 @@
                             const newId = createResult.data.response.uid;
                             state.dhis2.dataElements[field.id] = newId;
                             createdElements.push({ id: newId });
-                            addLog('success', `  ✓ Created: ${field.label} (${newId})`);
+                            addLog('success', `  ✓ Created: ${field.label}`);
                         } else {
                             addLog('error', `  ✗ Failed: ${field.label}`);
                         }
                     }
-                    
                     await sleep(200);
                 }
                 
                 addLog('success', `✓ ${createdElements.length} data elements ready`);
                 
-                // Step 3: Get ALL org units
-                addLog('info', '🏥 Fetching ALL organization units...');
-                const orgResult = await dhis2Request('organisationUnits.json?fields=id&paging=false');
-                
-                if (!orgResult.success || !orgResult.data?.organisationUnits) {
-                    throw new Error('Failed to fetch org units');
+                // Step 2: Get org units at selected level
+                if (state.dhis2.orgUnits.length === 0) {
+                    await fetchOrgUnitsForLevel();
                 }
                 
-                state.dhis2.orgUnits = orgResult.data.organisationUnits;
-                addLog('success', `✓ Found ${state.dhis2.orgUnits.length} org units`);
-                document.getElementById('dhis2OrgUnitCount').textContent = state.dhis2.orgUnits.length;
-                
-                // Step 4: Create or Update Dataset
+                // Step 3: Create or Update Dataset
                 const datasetName = state.settings.title;
                 const datasetCode = datasetName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
                 
                 addLog('info', `📊 Setting up Dataset: ${datasetName}...`);
                 
-                // Check if dataset exists
                 const dsCheckResult = await dhis2Request(`dataSets.json?filter=code:eq:${datasetCode}&fields=id,name`);
                 
                 if (dsCheckResult.success && dsCheckResult.data?.dataSets?.length > 0) {
-                    // Update existing
                     const existingDs = dsCheckResult.data.dataSets[0];
                     state.dhis2.datasetId = existingDs.id;
                     state.dhis2.datasetName = existingDs.name;
                     addLog('info', `  ↳ Dataset exists: ${existingDs.id}`);
                     
-                    // Update with new elements and all org units
-                    const updatePayload = {
-                        dataSetElements: createdElements.map(de => ({ dataElement: { id: de.id } })),
-                        organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
-                    };
-                    
-                    // Use metadata import for update
+                    // Update dataset
                     const fullDs = await dhis2Request(`dataSets/${existingDs.id}.json?fields=:owner`);
                     if (fullDs.success && fullDs.data) {
                         const merged = {
@@ -775,20 +895,15 @@
                             organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
                         };
                         
-                        const updateResult = await dhis2Request(`dataSets/${existingDs.id}`, 'PUT', merged);
-                        if (updateResult.success) {
-                            addLog('success', `  ✓ Dataset updated with ${createdElements.length} elements`);
-                        } else {
-                            addLog('warning', `  ⚠ Could not update dataset`);
-                        }
+                        await dhis2Request(`dataSets/${existingDs.id}`, 'PUT', merged);
+                        addLog('success', `  ✓ Dataset updated`);
                     }
                 } else {
-                    // Create new dataset
                     const createPayload = {
                         name: datasetName,
                         shortName: datasetName.substring(0, 50),
                         code: datasetCode,
-                        periodType: 'Monthly',
+                        periodType: state.dhis2.periodType,
                         dataSetElements: createdElements.map(de => ({ dataElement: { id: de.id } })),
                         organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
                     };
@@ -800,13 +915,13 @@
                         state.dhis2.datasetName = datasetName;
                         addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
                     } else {
-                        addLog('error', `  ✗ Failed to create dataset: ${JSON.stringify(createResult.data)}`);
+                        addLog('error', `  ✗ Failed to create dataset`);
                     }
                 }
                 
                 document.getElementById('dhis2DatasetName').textContent = datasetName;
                 
-                // Step 5: Sync collected data
+                // Step 4: Sync collected data
                 const pendingData = state.collectedData.filter(d => !d._synced);
                 if (pendingData.length > 0) {
                     addLog('info', `📤 Syncing ${pendingData.length} records...`);
@@ -815,7 +930,6 @@
                     addLog('info', '📤 No pending data to sync');
                 }
                 
-                // Done
                 updateStatus('connected', 'Setup complete!');
                 addLog('success', '✅ AUTO SETUP COMPLETE!');
                 saveToStorage();
@@ -834,46 +948,50 @@
                 return;
             }
             
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            const periodColumn = state.dhis2.periodColumn;
+            
             let success = 0, failed = 0;
             
             for (const record of dataRecords) {
-                // Get org unit - try to find facility or use first selected
-                let orgUnitId = null;
-                
-                // Look for facility field
-                const facilityField = state.fields.find(f => 
-                    f.name.toLowerCase().includes('facility') || 
-                    f.label.toLowerCase().includes('facility') ||
-                    f.name.toLowerCase().includes('org_unit')
-                );
-                
-                if (facilityField && record[facilityField.name]) {
-                    const facilityName = record[facilityField.name].toLowerCase();
-                    const match = state.dhis2.orgUnits.find(ou => 
-                        ou.displayName?.toLowerCase() === facilityName ||
-                        ou.name?.toLowerCase() === facilityName
-                    );
-                    if (match) orgUnitId = match.id;
+                // Get period from form data
+                let period = record[periodColumn];
+                if (!period) {
+                    const ts = new Date(record._timestamp || Date.now());
+                    period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
                 }
                 
-                // If no match, use first org unit (for demo)
-                if (!orgUnitId && state.dhis2.orgUnits.length > 0) {
-                    orgUnitId = state.dhis2.orgUnits[0].id;
+                // Get org unit from form data and match to DHIS2
+                const orgUnitValue = record[orgUnitColumn];
+                let orgUnitId = null;
+                
+                if (orgUnitValue) {
+                    const searchKey = orgUnitValue.toLowerCase().trim();
+                    orgUnitId = state.dhis2.orgUnitMap[searchKey];
+                    
+                    // Try partial match
+                    if (!orgUnitId) {
+                        for (const [name, id] of Object.entries(state.dhis2.orgUnitMap)) {
+                            if (name.includes(searchKey) || searchKey.includes(name)) {
+                                orgUnitId = id;
+                                break;
+                            }
+                        }
+                    }
                 }
                 
                 if (!orgUnitId) {
-                    addLog('warning', `  ⚠ No org unit for record`);
+                    addLog('warning', `  ⚠ No matching org unit for: ${orgUnitValue || 'empty'}`);
+                    record._syncError = 'No matching org unit';
                     failed++;
                     continue;
                 }
                 
-                // Build period from timestamp
-                const ts = new Date(record._timestamp || Date.now());
-                const period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
-                
-                // Build data values
+                // Build data values (exclude period and orgunit fields)
                 const dataValues = [];
-                state.fields.filter(f => f.type !== 'section').forEach(field => {
+                const dataFields = state.fields.filter(f => f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit');
+                
+                dataFields.forEach(field => {
                     const deId = state.dhis2.dataElements[field.id];
                     const value = record[field.name];
                     
@@ -893,18 +1011,14 @@
                     continue;
                 }
                 
-                // Submit
-                const payload = {
-                    dataValues: dataValues
-                };
-                
+                const payload = { dataValues: dataValues };
                 const result = await dhis2Request('dataValueSets', 'POST', payload);
                 
                 if (result.success) {
                     record._synced = true;
                     record._syncedAt = new Date().toISOString();
                     success++;
-                    addLog('success', `  ✓ Synced ${dataValues.length} values`);
+                    addLog('success', `  ✓ Synced to ${orgUnitValue} for ${period}`);
                 } else {
                     record._syncError = result.error || 'Unknown error';
                     failed++;
@@ -925,6 +1039,15 @@
         // ==================== UI HELPERS ====================
         function openDhis2Config() {
             loadDhis2Config();
+            
+            // Populate form fields
+            document.getElementById('dhis2Url').value = state.dhis2.url || '';
+            document.getElementById('dhis2Username').value = state.dhis2.username || '';
+            document.getElementById('dhis2Password').value = state.dhis2.password || '';
+            document.getElementById('dhis2OrgLevel').value = state.dhis2.orgUnitLevel || 5;
+            document.getElementById('dhis2PeriodType').value = state.dhis2.periodType || 'Monthly';
+            
+            updateFieldDropdowns();
             document.getElementById('dhis2Modal').classList.add('show');
         }
 
@@ -999,6 +1122,17 @@
         function addField(type) {
             const def = fieldDefs[type];
             if (!def) return;
+            
+            // Check if period or orgunit already exists
+            if (type === 'period' && state.fields.find(f => f.type === 'period')) {
+                notify('Period field already exists', 'error');
+                return;
+            }
+            if (type === 'orgunit' && state.fields.find(f => f.type === 'orgunit')) {
+                notify('Org Unit field already exists', 'error');
+                return;
+            }
+            
             state.fieldCounter++;
             const field = {
                 id: 'field_' + state.fieldCounter,
@@ -1009,6 +1143,17 @@
                 options: def.options ? [...def.options] : [],
                 max: def.max || 5
             };
+            
+            // Set default names for DHIS2 fields
+            if (type === 'period') {
+                field.name = 'period';
+                field.label = 'Reporting Period';
+            }
+            if (type === 'orgunit') {
+                field.name = 'facility';
+                field.label = 'Health Facility';
+            }
+            
             state.fields.push(field);
             renderFields();
             selectField(field.id);
@@ -1048,12 +1193,12 @@
 
         function renderFields() {
             const dropZone = document.getElementById('dropZone');
-            const fieldCount = state.fields.filter(f => f.type !== 'section').length;
-            document.getElementById('fieldCount').textContent = `📊 ${fieldCount} data elements`;
+            const dataFieldCount = state.fields.filter(f => f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit').length;
+            document.getElementById('fieldCount').textContent = `📊 ${dataFieldCount} data elements`;
             
             if (state.fields.length === 0) {
                 dropZone.classList.remove('has-fields');
-                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Fields become DHIS2 Data Elements</p>';
+                dropZone.innerHTML = '<p style="font-size:36px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add them</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period & Org Unit fields for DHIS2 sync</p>';
                 return;
             }
             
@@ -1074,8 +1219,9 @@
                 }
                 
                 const def = fieldDefs[f.type];
+                const isDhis2Field = f.type === 'period' || f.type === 'orgunit';
                 
-                return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
+                return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''} ${isDhis2Field ? 'dhis2-field' : ''}" data-id="${f.id}">
                     <div class="form-field-header">
                         <span class="form-field-label">${def?.icon || '📄'} ${f.label}</span>
                         <div class="form-field-actions">
@@ -1087,6 +1233,7 @@
                     <div style="font-size:10px;color:#868e96;">
                         Code: <code>${f.name}</code>
                         ${f.required ? '<span class="field-badge required">Required</span>' : ''}
+                        ${isDhis2Field ? '<span class="field-badge dhis2">DHIS2</span>' : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -1101,7 +1248,7 @@
         function renderProperties() {
             const container = document.getElementById('propertiesContent');
             if (!state.selectedFieldId) {
-                container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;">👆</p><p>Select a field</p></div>';
+                container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;">👆</p><p>Select a field to edit</p></div>';
                 return;
             }
             
@@ -1112,11 +1259,11 @@
                 <div class="prop-section">
                     <div class="prop-section-title">📝 Field Settings</div>
                     <div class="property-group">
-                        <label class="property-label">Label (Data Element Name)</label>
+                        <label class="property-label">Label</label>
                         <input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}">
                     </div>
                     <div class="property-group">
-                        <label class="property-label">Code (Data Element Code)</label>
+                        <label class="property-label">Code / Name</label>
                         <input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}">
                     </div>
                     ${field.type !== 'section' ? `
@@ -1139,6 +1286,16 @@
                 `;
             }
             
+            if (field.type === 'orgunit') {
+                html += `
+                    <div class="prop-section" style="background:#e8f4fc;border-color:#17a2b8;">
+                        <div class="prop-section-title" style="color:#17a2b8;">🏥 Org Unit Options</div>
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Options will be loaded from DHIS2 based on selected level</p>
+                        <textarea class="property-textarea" id="propOptions" placeholder="Add custom options or leave empty for DHIS2 org units">${(field.options || []).join('\n')}</textarea>
+                    </div>
+                `;
+            }
+            
             container.innerHTML = html;
             
             document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
@@ -1157,7 +1314,9 @@
                 dhis2: {
                     datasetId: state.dhis2.datasetId,
                     datasetName: state.dhis2.datasetName,
-                    dataElements: state.dhis2.dataElements
+                    dataElements: state.dhis2.dataElements,
+                    orgUnitColumn: state.dhis2.orgUnitColumn,
+                    periodColumn: state.dhis2.periodColumn
                 }
             }));
         }
@@ -1175,6 +1334,8 @@
                         state.dhis2.datasetId = data.dhis2.datasetId;
                         state.dhis2.datasetName = data.dhis2.datasetName;
                         state.dhis2.dataElements = data.dhis2.dataElements || {};
+                        state.dhis2.orgUnitColumn = data.dhis2.orgUnitColumn || '';
+                        state.dhis2.periodColumn = data.dhis2.periodColumn || '';
                     }
                     
                     document.getElementById('formTitle').value = state.settings.title;
@@ -1222,10 +1383,13 @@
                 updatedAt: new Date().toISOString(),
                 fields: state.fields,
                 settings: state.settings,
+                collectedData: state.collectedData,
                 dhis2: {
                     datasetId: state.dhis2.datasetId,
                     datasetName: state.dhis2.datasetName,
-                    dataElements: state.dhis2.dataElements
+                    dataElements: state.dhis2.dataElements,
+                    orgUnitColumn: state.dhis2.orgUnitColumn,
+                    periodColumn: state.dhis2.periodColumn
                 }
             };
             if (existingIndex >= 0) forms[existingIndex] = formEntry;
@@ -1256,7 +1420,12 @@
             const formData = {
                 s: { t: state.settings.title, l: state.settings.logo },
                 f: state.fields.map(f => ({ i: f.id, y: f.type, l: f.label, n: f.name, r: f.required, o: f.options, mx: f.max })),
-                d: state.dhis2.datasetId ? { id: state.dhis2.datasetId, de: state.dhis2.dataElements } : null
+                d: state.dhis2.datasetId ? { 
+                    id: state.dhis2.datasetId, 
+                    de: state.dhis2.dataElements,
+                    oc: state.dhis2.orgUnitColumn,
+                    pc: state.dhis2.periodColumn
+                } : null
             };
             
             try {
@@ -1298,7 +1467,7 @@
                     </div>
                     <div style="padding:12px 15px;">
                         <div style="font-size:11px;color:#666;margin-bottom:10px;">
-                            📊 ${f.fieldCount} elements
+                            📊 ${f.fieldCount} fields | 📝 ${(f.collectedData || []).length} records
                             ${f.dhis2?.datasetId ? '<span style="color:#17a2b8;margin-left:8px;">🔗 DHIS2</span>' : ''}
                         </div>
                         <div style="display:flex;gap:6px;">
@@ -1340,11 +1509,14 @@
             state.fields = form.fields || [];
             state.settings = { ...state.settings, ...form.settings };
             state.fieldCounter = Math.max(...state.fields.map(f => parseInt(f.id.replace('field_', '')) || 0), 0) + 1;
+            state.collectedData = form.collectedData || [];
             
             if (form.dhis2) {
                 state.dhis2.datasetId = form.dhis2.datasetId;
                 state.dhis2.datasetName = form.dhis2.datasetName;
                 state.dhis2.dataElements = form.dhis2.dataElements || {};
+                state.dhis2.orgUnitColumn = form.dhis2.orgUnitColumn || '';
+                state.dhis2.periodColumn = form.dhis2.periodColumn || '';
             }
             
             document.getElementById('formTitle').value = state.settings.title;
@@ -1380,6 +1552,8 @@
             if (data.d) {
                 state.dhis2.datasetId = data.d.id;
                 state.dhis2.dataElements = data.d.de || {};
+                state.dhis2.orgUnitColumn = data.d.oc || '';
+                state.dhis2.periodColumn = data.d.pc || '';
             }
             
             document.getElementById('viewerContainer').classList.add('show');
@@ -1408,6 +1582,20 @@
                     let input = '';
                     
                     switch (field.type) {
+                        case 'period':
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
+                                <option value="">-- Select Period --</option>
+                                ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
+                            </select>`;
+                            break;
+                        case 'orgunit':
+                            const orgOptions = field.options?.length > 0 ? field.options : 
+                                state.dhis2.orgUnits.map(ou => ou.displayName || ou.name);
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
+                                <option value="">-- Select Facility --</option>
+                                ${orgOptions.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}
+                            </select>`;
+                            break;
                         case 'text': case 'email': case 'phone': case 'date': case 'time':
                             const type = field.type === 'phone' ? 'tel' : field.type;
                             input = `<input type="${type}" name="${field.name}" class="viewer-input" ${reqAttr}>`;
@@ -1463,7 +1651,8 @@
                     ${backBtn}
                     <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)">📝 Form</button>
                     <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)">📊 Data</button>
-                    ${state.dhis2.connected ? `<button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="syncNow()">🔄 Sync</button>` : ''}
+                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)">📈 Dashboard</button>
+                    ${state.dhis2.connected ? `<button class="viewer-nav-btn" style="background:#6f42c1;color:#fff;" onclick="syncNow()">🔄 Sync</button>` : ''}
                     <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
                         ${navigator.onLine ? '🟢 Online' : '🔴 Offline'}
                     </div>
@@ -1475,6 +1664,7 @@
                             <div class="viewer-header">
                                 <img src="${s.logo}" alt="Logo">
                                 <h1>${escapeHtml(s.title)}</h1>
+                                <p>ICF-SL Data Collection System</p>
                             </div>
                             <div class="viewer-body">
                                 <form id="viewerForm">${pagesHtml}</form>
@@ -1484,9 +1674,51 @@
                 </div>
                 
                 <div id="tabData" class="viewer-tab">
-                    <div style="max-width:900px;margin:0 auto;">
-                        <h3 style="color:#004080;margin-bottom:15px;">📊 Collected Data (${state.collectedData.length} records)</h3>
-                        <div id="dataTable"></div>
+                    <div style="max-width:1000px;margin:0 auto;">
+                        <div style="background:#004080;color:white;padding:15px 20px;border-radius:12px 12px 0 0;">
+                            <h3 style="margin:0;font-size:16px;">📊 Collected Data</h3>
+                        </div>
+                        <div style="background:white;padding:20px;border-radius:0 0 12px 12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                            <div id="dataTable"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabDashboard" class="viewer-tab">
+                    <div class="dashboard-container">
+                        <div class="dashboard-header">
+                            <img src="${s.logo}" alt="Logo">
+                            <h2>📈 ${escapeHtml(s.title)} - Dashboard</h2>
+                            <p>ICF-SL Data Analytics</p>
+                        </div>
+                        
+                        <div class="filter-bar">
+                            <div class="filter-group">
+                                <label>📅 Period From</label>
+                                <select id="filterPeriodFrom">
+                                    <option value="">All</option>
+                                    ${PERIODS.map(p => `<option value="${p}">${p}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>📅 Period To</label>
+                                <select id="filterPeriodTo">
+                                    <option value="">All</option>
+                                    ${PERIODS.map(p => `<option value="${p}">${p}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>🏥 Facility</label>
+                                <select id="filterFacility">
+                                    <option value="">All Facilities</option>
+                                </select>
+                            </div>
+                            <button class="filter-btn" onclick="applyFilters()">🔍 Apply</button>
+                            <button class="filter-btn" style="background:#dc3545;" onclick="clearFilters()">🗑️ Clear</button>
+                        </div>
+                        
+                        <div class="dashboard-stats" id="dashboardStats"></div>
+                        <div id="dashboardCharts"></div>
                     </div>
                 </div>
             `;
@@ -1494,6 +1726,7 @@
             window.totalPages = pages.length;
             setupFormSubmit();
             renderDataTable();
+            populateFacilityFilter();
         }
 
         function setupFormSubmit() {
@@ -1508,17 +1741,20 @@
                 
                 state.collectedData.push(data);
                 saveToStorage();
+                saveFormToList();
                 
                 form.reset();
                 goToPage(0);
                 
                 notify('✅ Data saved!');
                 renderDataTable();
+                renderDashboard();
                 
                 // Auto-sync if connected
                 if (state.dhis2.connected && state.dhis2.datasetId) {
                     notify('🔄 Syncing to DHIS2...', 'info');
                     await syncDataToDhis2([data]);
+                    renderDataTable();
                 }
             };
         }
@@ -1528,23 +1764,23 @@
             if (!container) return;
             
             if (state.collectedData.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">No data yet</p>';
+                container.innerHTML = '<p style="text-align:center;color:#868e96;padding:30px;">No data collected yet</p>';
                 return;
             }
             
             const fields = state.fields.filter(f => f.type !== 'section');
             
-            let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>#</th><th>Time</th>';
-            fields.slice(0, 5).forEach(f => html += `<th>${escapeHtml(f.label)}</th>`);
+            let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>#</th><th>Timestamp</th>';
+            fields.slice(0, 6).forEach(f => html += `<th>${escapeHtml(f.label)}</th>`);
             html += '<th>Status</th></tr></thead><tbody>';
             
-            state.collectedData.slice(-20).reverse().forEach((row, i) => {
+            state.collectedData.slice().reverse().forEach((row, i) => {
                 const syncStatus = row._synced ? 
-                    '<span class="sync-badge synced">Synced</span>' : 
-                    '<span class="sync-badge pending">Pending</span>';
+                    '<span class="sync-badge synced">✓ Synced</span>' : 
+                    (row._syncError ? '<span class="sync-badge failed">✗ Failed</span>' : '<span class="sync-badge pending">⏳ Pending</span>');
                     
-                html += `<tr><td>${state.collectedData.length - i}</td><td>${new Date(row._timestamp).toLocaleString()}</td>`;
-                fields.slice(0, 5).forEach(f => html += `<td>${escapeHtml(String(row[f.name] || '-').substring(0, 20))}</td>`);
+                html += `<tr><td>${state.collectedData.length - i}</td><td style="font-size:10px;">${new Date(row._timestamp).toLocaleString()}</td>`;
+                fields.slice(0, 6).forEach(f => html += `<td>${escapeHtml(String(row[f.name] || '-').substring(0, 25))}</td>`);
                 html += `<td>${syncStatus}</td></tr>`;
             });
             
@@ -1552,11 +1788,246 @@
             container.innerHTML = html;
         }
 
+        function populateFacilityFilter() {
+            const select = document.getElementById('filterFacility');
+            if (!select) return;
+            
+            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+            if (!orgUnitField) return;
+            
+            const facilities = [...new Set(state.collectedData.map(d => d[orgUnitField.name]).filter(Boolean))];
+            facilities.sort();
+            
+            select.innerHTML = '<option value="">All Facilities</option>';
+            facilities.forEach(f => {
+                select.innerHTML += `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`;
+            });
+        }
+
+        function applyFilters() {
+            renderDashboard();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterPeriodFrom').value = '';
+            document.getElementById('filterPeriodTo').value = '';
+            document.getElementById('filterFacility').value = '';
+            renderDashboard();
+        }
+
+        function getFilteredData() {
+            let data = [...state.collectedData];
+            
+            const periodFrom = document.getElementById('filterPeriodFrom')?.value;
+            const periodTo = document.getElementById('filterPeriodTo')?.value;
+            const facility = document.getElementById('filterFacility')?.value;
+            
+            const periodField = state.fields.find(f => f.type === 'period');
+            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+            
+            if (periodFrom && periodField) {
+                data = data.filter(d => d[periodField.name] >= periodFrom);
+            }
+            if (periodTo && periodField) {
+                data = data.filter(d => d[periodField.name] <= periodTo);
+            }
+            if (facility && orgUnitField) {
+                data = data.filter(d => d[orgUnitField.name] === facility);
+            }
+            
+            return data;
+        }
+
+        function renderDashboard() {
+            const statsContainer = document.getElementById('dashboardStats');
+            const chartsContainer = document.getElementById('dashboardCharts');
+            if (!statsContainer || !chartsContainer) return;
+            
+            const filteredData = getFilteredData();
+            const totalData = state.collectedData;
+            
+            // Stats
+            const synced = filteredData.filter(d => d._synced).length;
+            const pending = filteredData.filter(d => !d._synced && !d._syncError).length;
+            const failed = filteredData.filter(d => d._syncError).length;
+            
+            const periodField = state.fields.find(f => f.type === 'period');
+            const uniquePeriods = periodField ? [...new Set(filteredData.map(d => d[periodField.name]).filter(Boolean))].length : 0;
+            
+            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+            const uniqueFacilities = orgUnitField ? [...new Set(filteredData.map(d => d[orgUnitField.name]).filter(Boolean))].length : 0;
+            
+            statsContainer.innerHTML = `
+                <div class="stat-card"><div class="stat-value">${filteredData.length}</div><div class="stat-label">Total Records</div></div>
+                <div class="stat-card success"><div class="stat-value">${synced}</div><div class="stat-label">Synced to DHIS2</div></div>
+                <div class="stat-card warning"><div class="stat-value">${pending}</div><div class="stat-label">Pending Sync</div></div>
+                <div class="stat-card info"><div class="stat-value">${uniquePeriods}</div><div class="stat-label">Periods</div></div>
+                <div class="stat-card"><div class="stat-value">${uniqueFacilities}</div><div class="stat-label">Facilities</div></div>
+            `;
+            
+            // Destroy old charts
+            Object.values(state.chartInstances).forEach(chart => { if (chart) chart.destroy(); });
+            state.chartInstances = {};
+            
+            if (filteredData.length === 0) {
+                chartsContainer.innerHTML = '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">No data to display</p></div>';
+                return;
+            }
+            
+            // Generate charts for categorical fields
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
+            const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
+            const numericFields = state.fields.filter(f => f.type === 'number');
+            
+            let chartsHtml = '';
+            
+            // Chart for each categorical field
+            categoricalFields.forEach((field, idx) => {
+                const valueCounts = {};
+                filteredData.forEach(row => {
+                    const value = row[field.name];
+                    if (value) {
+                        valueCounts[value] = (valueCounts[value] || 0) + 1;
+                    }
+                });
+                
+                if (Object.keys(valueCounts).length > 0) {
+                    chartsHtml += `
+                        <div class="chart-container">
+                            <h4>📊 ${escapeHtml(field.label)}</h4>
+                            <div class="chart-wrapper">
+                                <div class="chart-box"><canvas id="barChart_${idx}"></canvas></div>
+                                <div class="chart-box"><canvas id="pieChart_${idx}"></canvas></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Numeric summary
+            if (numericFields.length > 0) {
+                chartsHtml += `
+                    <div class="chart-container">
+                        <h4>🔢 Numeric Summary</h4>
+                        <div style="overflow-x:auto;">
+                            <table class="data-table">
+                                <thead><tr><th>Field</th><th>Sum</th><th>Average</th><th>Min</th><th>Max</th><th>Count</th></tr></thead>
+                                <tbody>
+                                    ${numericFields.map(field => {
+                                        const values = filteredData.map(d => parseFloat(d[field.name]) || 0);
+                                        const sum = values.reduce((a, b) => a + b, 0);
+                                        const avg = values.length > 0 ? (sum / values.length).toFixed(2) : 0;
+                                        const min = values.length > 0 ? Math.min(...values) : 0;
+                                        const max = values.length > 0 ? Math.max(...values) : 0;
+                                        return `<tr><td><strong>${escapeHtml(field.label)}</strong></td><td>${sum}</td><td>${avg}</td><td>${min}</td><td>${max}</td><td>${values.length}</td></tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Trend by period
+            if (periodField && filteredData.length > 1) {
+                chartsHtml += `
+                    <div class="chart-container">
+                        <h4>📈 Records by Period</h4>
+                        <div class="chart-box" style="max-width:100%;"><canvas id="trendChart"></canvas></div>
+                    </div>
+                `;
+            }
+            
+            chartsContainer.innerHTML = chartsHtml || '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">No categorical data for charts</p></div>';
+            
+            // Render charts
+            setTimeout(() => {
+                const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'];
+                
+                categoricalFields.forEach((field, idx) => {
+                    const valueCounts = {};
+                    filteredData.forEach(row => {
+                        const value = row[field.name];
+                        if (value) valueCounts[value] = (valueCounts[value] || 0) + 1;
+                    });
+                    
+                    if (Object.keys(valueCounts).length === 0) return;
+                    
+                    const labels = Object.keys(valueCounts);
+                    const values = Object.values(valueCounts);
+                    const total = values.reduce((a, b) => a + b, 0);
+                    
+                    const barCtx = document.getElementById(`barChart_${idx}`);
+                    if (barCtx) {
+                        state.chartInstances[`bar_${idx}`] = new Chart(barCtx, {
+                            type: 'bar',
+                            data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: colors.slice(0, labels.length) }] },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false }, title: { display: true, text: 'Bar Chart', font: { family: 'Oswald' } } },
+                                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                            }
+                        });
+                    }
+                    
+                    const pieCtx = document.getElementById(`pieChart_${idx}`);
+                    if (pieCtx) {
+                        state.chartInstances[`pie_${idx}`] = new Chart(pieCtx, {
+                            type: 'pie',
+                            data: { 
+                                labels: labels.map((l, i) => `${l} (${((values[i] / total) * 100).toFixed(1)}%)`), 
+                                datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }] 
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { position: 'bottom', labels: { font: { family: 'Oswald', size: 10 } } }, title: { display: true, text: 'Pie Chart', font: { family: 'Oswald' } } }
+                            }
+                        });
+                    }
+                });
+                
+                // Trend chart
+                if (periodField && document.getElementById('trendChart')) {
+                    const periodCounts = {};
+                    filteredData.forEach(row => {
+                        const period = row[periodField.name];
+                        if (period) periodCounts[period] = (periodCounts[period] || 0) + 1;
+                    });
+                    
+                    const sortedPeriods = Object.keys(periodCounts).sort();
+                    
+                    state.chartInstances['trend'] = new Chart(document.getElementById('trendChart'), {
+                        type: 'line',
+                        data: {
+                            labels: sortedPeriods.map(p => `${p.substring(0,4)}-${p.substring(4)}`),
+                            datasets: [{
+                                label: 'Records',
+                                data: sortedPeriods.map(p => periodCounts[p]),
+                                borderColor: '#004080',
+                                backgroundColor: 'rgba(0,64,128,0.1)',
+                                fill: true,
+                                tension: 0.3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
         function showTab(tab, btn) {
             document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
             if (btn) btn.classList.add('active');
+            
+            if (tab === 'dashboard') {
+                renderDashboard();
+            }
         }
 
         function goToPage(pageIndex) {
@@ -1601,7 +2072,7 @@
             container.querySelector('input').value = val;
         };
 
-        // Init
+        // Initialize
         init();
     </script>
 </body>
