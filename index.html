@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICF Collect | DHIS2 & Google Sheets Integration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Oswald', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        
+        /* Auth Styles */
+        .auth-container { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #004080 0%, #001a33 100%); padding: 20px; }
+        .auth-box { background: white; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .auth-header { background: #004080; color: white; padding: 25px; text-align: center; }
+        .auth-header img { width: 80px; border-radius: 10px; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto; }
+        .auth-header h1 { font-size: 24px; margin-bottom: 5px; }
+        .auth-header p { font-size: 12px; opacity: 0.9; }
+        .auth-body { padding: 25px; }
+        .auth-tabs { display: flex; margin-bottom: 20px; }
+        .auth-tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: 700; font-size: 13px; border-bottom: 3px solid #ddd; transition: all 0.2s; }
+        .auth-tab.active { border-bottom-color: #004080; color: #004080; }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .auth-group { margin-bottom: 15px; }
+        .auth-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; color: #333; }
+        .auth-input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 14px; }
+        .auth-input:focus { outline: none; border-color: #004080; }
+        .auth-btn { width: 100%; padding: 14px; background: #004080; color: white; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .auth-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: none; }
+        .auth-success { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: none; }
+        
+        /* Header */
+        .header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .header-logo { width: 45px; height: 45px; border-radius: 8px; }
+        .header h1 { font-size: 20px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .header-user { font-size: 12px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 20px; }
+        .header-btn { background: white; color: #004080; border: none; padding: 10px 16px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .header-btn.primary { background: #ffc107; color: #000; }
+        .header-btn.success { background: #28a745; color: white; }
+        .header-btn.danger { background: #dc3545; color: white; }
+        .header-btn.dhis2 { background: #17a2b8; color: white; }
+        .header-btn.sheets { background: #0f9d58; color: white; }
+        
+        /* Main Layout */
+        .main-container { display: none; margin-top: 70px; height: calc(100vh - 100px); }
+        .main-container.show { display: flex; }
+        .footer { background: #004080; color: white; padding: 8px 20px; text-align: center; font-size: 11px; position: fixed; bottom: 0; left: 0; right: 0; }
+        
+        /* Sidebar */
+        .sidebar { width: 220px; background: white; border-right: 3px solid #004080; overflow-y: auto; padding: 15px; }
+        .sidebar-section { margin-bottom: 15px; }
+        .sidebar-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #004080; text-transform: uppercase; }
+        .field-type { background: #f8f9fa; border: 2px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+        .field-type:hover { border-color: #004080; background: #e8f4fc; }
+        .field-type.special { background: #e8f4fc; border-color: #17a2b8; }
+        
+        /* Canvas */
+        .canvas-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .canvas-header { background: white; padding: 12px 20px; border-bottom: 3px solid #004080; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .form-title-input { font-size: 16px; font-weight: 700; border: 2px solid #ddd; padding: 8px 12px; border-radius: 6px; font-family: 'Oswald', sans-serif; width: 300px; }
+        .canvas { flex: 1; overflow-y: auto; padding: 20px; background: #e9ecef; }
+        .form-preview { max-width: 650px; margin: 0 auto; background: white; border: 4px double #004080; border-radius: 12px; min-height: 350px; }
+        .form-preview-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 18px; text-align: center; border-radius: 8px 8px 0 0; }
+        .form-preview-body { padding: 18px; min-height: 250px; }
+        
+        .drop-zone { border: 3px dashed #adb5bd; border-radius: 10px; padding: 40px; text-align: center; color: #6c757d; }
+        .drop-zone.has-fields { border: none; padding: 0; }
+        
+        /* Form Fields */
+        .form-field { background: white; border: 2px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
+        .form-field:hover { border-color: #004080; }
+        .form-field.selected { border-color: #004080; border-width: 3px; box-shadow: 0 0 0 4px rgba(0,64,128,0.2); }
+        .form-field.dhis2-field { background: #e8f4fc; border-color: #17a2b8; }
+        .form-field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .form-field-label { font-weight: 700; font-size: 12px; color: #333; }
+        .form-field-actions { display: flex; gap: 4px; }
+        .field-action-btn { background: #e9ecef; border: 2px solid #adb5bd; cursor: pointer; font-size: 14px; padding: 6px 10px; border-radius: 6px; }
+        .field-action-btn:hover { background: #004080; color: white; }
+        .field-action-btn.delete { background: #dc3545; color: white; border-color: #dc3545; }
+        .field-badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; margin-left: 8px; }
+        .field-badge.required { background: #f8d7da; color: #721c24; }
+        .field-badge.dhis2 { background: #d1ecf1; color: #0c5460; }
+        .field-badge.aggregate { background: #d4edda; color: #155724; }
+        
+        .section-divider { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 12px 16px; margin: 15px 0; border-radius: 8px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        
+        /* Properties Panel */
+        .properties-panel { width: 340px; background: white; border-left: 3px solid #004080; overflow-y: auto; padding: 15px; }
+        .properties-title { font-size: 12px; font-weight: 700; color: #004080; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #004080; }
+        .property-group { margin-bottom: 12px; }
+        .property-label { display: block; font-size: 10px; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; }
+        .property-input, .property-select { width: 100%; padding: 8px 10px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; }
+        .property-textarea { width: 100%; padding: 8px 10px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; min-height: 60px; }
+        .property-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; padding: 6px 0; }
+        .property-checkbox input { width: 18px; height: 18px; }
+        .no-selection { text-align: center; color: #868e96; padding: 40px 15px; }
+        .prop-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; margin-bottom: 15px; }
+        .prop-section-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; overflow-y: auto; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 12px; max-width: 750px; width: 100%; border: 4px double #004080; max-height: 90vh; overflow-y: auto; }
+        .modal-header { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        .modal-header.sheets { background: linear-gradient(135deg, #0f9d58 0%, #0b8043 100%); }
+        .modal-header.primary { background: linear-gradient(135deg, #004080 0%, #002855 100%); }
+        .modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .modal-body { padding: 20px; }
+        .modal-btn { padding: 12px 24px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; border: none; }
+        .modal-btn.primary { background: #004080; color: white; }
+        .modal-btn.success { background: #28a745; color: white; }
+        .modal-btn.danger { background: #dc3545; color: white; }
+        .modal-btn.dhis2 { background: #17a2b8; color: white; }
+        .modal-btn.sheets { background: #0f9d58; color: white; }
+        .modal-btn.purple { background: #6f42c1; color: white; }
+        .modal-btn.orange { background: #fd7e14; color: white; }
+        
+        /* Config Sections */
+        .config-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .config-section.dhis2 { background: #e8f4fc; border-color: #17a2b8; }
+        .config-section.sheets { background: #e6f4ea; border-color: #0f9d58; }
+        .config-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .config-title.dhis2 { color: #17a2b8; }
+        .config-title.sheets { color: #0f9d58; }
+        .config-input { width: 100%; padding: 10px 12px; border: 2px solid #dee2e6; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; margin-bottom: 10px; }
+        .config-input:focus { outline: none; border-color: #004080; }
+        .config-label { display: block; font-size: 10px; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; }
+        .config-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .help-text { font-size: 10px; color: #666; margin-top: 3px; font-style: italic; }
+        
+        /* Status */
+        .status-badge { padding: 12px 15px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .status-badge.connected { background: #d4edda; color: #155724; border: 2px solid #28a745; }
+        .status-badge.disconnected { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
+        .status-badge.syncing { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+        
+        /* Sync Log */
+        .sync-log { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto; margin-top: 15px; }
+        .log-entry { padding: 3px 0; border-bottom: 1px solid #333; }
+        .log-entry.error { color: #ff6b6b; }
+        .log-entry.success { color: #51cf66; }
+        .log-entry.warning { color: #ffd43b; }
+        .log-entry.info { color: #74c0fc; }
+        
+        /* Share Modal */
+        .qr-container { text-align: center; padding: 20px; }
+        .qr-box { display: inline-block; padding: 25px; background: white; border: 4px solid #004080; border-radius: 12px; }
+        #qrCode { min-width: 200px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        .qr-url { background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 10px; word-break: break-all; margin-top: 15px; max-height: 80px; overflow-y: auto; font-family: monospace; }
+        .qr-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        
+        /* Notification */
+        .notification { position: fixed; top: 70px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 12px; z-index: 3000; display: none; max-width: 350px; }
+        .notification.show { display: block; }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #17a2b8; }
+        
+        /* Viewer */
+        .viewer-container { display: none; min-height: 100vh; background: #e9ecef; }
+        .viewer-container.show { display: block; }
+        .viewer-nav { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .viewer-back-btn { background: #dc3545; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; margin-right: 10px; }
+        .viewer-nav-btn { padding: 10px 18px; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
+        .viewer-nav-btn.active { box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
+        .connection-status { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-left: auto; }
+        .connection-status.online { background: #28a745; color: white; }
+        .connection-status.offline { background: #dc3545; color: white; }
+        .viewer-tab { display: none; padding: 20px; }
+        .viewer-tab.active { display: block; }
+        
+        /* Form Viewer */
+        .viewer-form { max-width: 650px; margin: 0 auto; }
+        .viewer-form-box { background: white; border: 4px double #004080; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .viewer-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 25px; text-align: center; }
+        .viewer-header img { width: 70px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .viewer-header h1 { font-size: 20px; margin-bottom: 5px; }
+        .viewer-header p { font-size: 12px; opacity: 0.9; }
+        .viewer-body { padding: 25px; }
+        .viewer-field { margin-bottom: 18px; }
+        .viewer-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; color: #333; }
+        .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
+        .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
+        .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .viewer-radio-option:hover { border-color: #004080; background: #e8f4fc; }
+        
+        /* Page Navigation */
+        .page-header { background: #e8f4fc; margin: -25px -25px 20px -25px; padding: 15px 25px; border-bottom: 2px solid #004080; }
+        .page-indicator { display: inline-block; background: #004080; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+        .page-title { font-size: 16px; color: #004080; font-weight: 700; margin: 0; }
+        .page-navigation { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e9ecef; gap: 10px; flex-wrap: wrap; }
+        .nav-btn { padding: 14px 28px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .back-btn { background: #6c757d; color: white; }
+        .next-btn { background: #004080; color: white; }
+        .submit-btn { background: #28a745; color: white; }
+        
+        /* Data Table */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
+        .data-table th, .data-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
+        .data-table th { background: #004080; color: white; font-weight: 700; font-size: 10px; position: sticky; top: 0; }
+        .data-table tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tr:hover { background: #e8f4fc; }
+        
+        .sync-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+        .sync-badge.synced { background: #d4edda; color: #155724; }
+        .sync-badge.pending { background: #fff3cd; color: #856404; }
+        .sync-badge.failed { background: #f8d7da; color: #721c24; }
+        
+        /* Filter Panel */
+        .filter-panel { background: linear-gradient(135deg, #004080 0%, #002855 100%); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .filter-title { color: white; font-size: 14px; font-weight: 700; }
+        .filter-toggle { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: 11px; }
+        .filter-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+        .filter-label { color: rgba(255,255,255,0.9); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+        .filter-select, .filter-input { padding: 8px 10px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; }
+        .filter-btn { padding: 8px 16px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; }
+        .filter-btn.apply { background: #28a745; color: white; }
+        .filter-btn.clear { background: #dc3545; color: white; }
+        .filter-count { background: #ffc107; color: #000; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-left: 8px; }
+        
+        /* Data View Tabs */
+        .data-view-tabs { display: flex; gap: 0; margin-bottom: 20px; }
+        .data-view-tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: 700; font-size: 13px; border: 2px solid #dee2e6; background: #f8f9fa; }
+        .data-view-tab:first-child { border-radius: 8px 0 0 8px; }
+        .data-view-tab:last-child { border-radius: 0 8px 8px 0; }
+        .data-view-tab.active { background: #004080; color: white; border-color: #004080; }
+        .data-view-tab.active.aggregate { background: #28a745; border-color: #28a745; }
+        
+        /* Dashboard */
+        .dashboard-container { max-width: 1100px; margin: 0 auto; }
+        .dashboard-header { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .dashboard-header img { width: 60px; border-radius: 8px; margin-bottom: 10px; }
+        .dashboard-header h2 { font-size: 18px; margin-bottom: 5px; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #004080 0%, #002855 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-card.success { background: linear-gradient(135deg, #28a745 0%, #218838 100%); }
+        .stat-card.warning { background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000; }
+        .stat-card.info { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); }
+        .stat-card.purple { background: linear-gradient(135deg, #6f42c1 0%, #59359a 100%); }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-card .stat-label { font-size: 10px; opacity: 0.9; margin-top: 5px; }
+        .chart-container { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 2px solid #e9ecef; }
+        .chart-container h4 { color: #004080; font-size: 14px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #004080; }
+        .chart-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .chart-box { flex: 1; min-width: 280px; max-width: 400px; }
+        
+        /* Aggregate Table */
+        .aggregate-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .aggregate-table th { background: #28a745; color: white; padding: 12px; text-align: left; font-size: 11px; }
+        .aggregate-table td { border: 1px solid #dee2e6; padding: 10px; }
+        .aggregate-table tr:nth-child(even) { background: #f8f9fa; }
+        .aggregate-table tr:hover { background: #e8f4fc; }
+        .aggregate-value { font-weight: 700; color: #004080; }
+        
+        /* Sync Mode Selector */
+        .sync-mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .sync-mode-option { flex: 1; padding: 15px; border: 3px solid #dee2e6; border-radius: 8px; cursor: pointer; text-align: center; }
+        .sync-mode-option:hover { border-color: #004080; }
+        .sync-mode-option.selected { border-color: #004080; background: #e8f4fc; }
+        .sync-mode-option.selected.tracker { border-color: #6f42c1; background: #f3e8ff; }
+        .sync-mode-option h4 { font-size: 13px; margin-bottom: 5px; }
+        .sync-mode-option p { font-size: 10px; color: #666; }
+        
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar, .properties-panel { width: 100%; max-height: 200px; }
+            .header { flex-wrap: wrap; padding: 10px 15px; }
+            .header h1 { font-size: 16px; }
+            .form-title-input { width: 100%; }
+            .config-row { grid-template-columns: 1fr; }
+            .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+            .chart-box { min-width: 100%; }
+            .filter-controls { flex-direction: column; }
+            .filter-group { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Container -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-box">
+            <div class="auth-header">
+                <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL">
+                <h1>ICF Collect</h1>
+                <p>DHIS2 & Google Sheets Integration</p>
+            </div>
+            <div class="auth-body">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login">Login</div>
+                    <div class="auth-tab" data-tab="signup">Sign Up</div>
+                </div>
+                <div class="auth-error" id="authError"></div>
+                <div class="auth-success" id="authSuccess"></div>
+                <form class="auth-form active" id="loginForm">
+                    <div class="auth-group">
+                        <label class="auth-label">Email</label>
+                        <input type="email" class="auth-input" id="loginEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="auth-group">
+                        <label class="auth-label">Password</label>
+                        <input type="password" class="auth-input" id="loginPassword" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="auth-btn">🔓 Login</button>
+                </form>
+                <form class="auth-form" id="signupForm">
+                    <div class="auth-group">
+                        <label class="auth-label">Full Name</label>
+                        <input type="text" class="auth-input" id="signupName" required placeholder="John Doe">
+                    </div>
+                    <div class="auth-group">
+                        <label class="auth-label">Email</label>
+                        <input type="email" class="auth-input" id="signupEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="auth-group">
+                        <label class="auth-label">Password</label>
+                        <input type="password" class="auth-input" id="signupPassword" required minlength="6" placeholder="Min 6 characters">
+                    </div>
+                    <button type="submit" class="auth-btn">📝 Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-brand">
+            <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" class="header-logo">
+            <h1>📋 ICF Collect</h1>
+        </div>
+        <div class="header-actions">
+            <span class="header-user" id="headerUser">👤 User</span>
+            <button class="header-btn" onclick="showHome()">🏠 Home</button>
+            <button class="header-btn success" onclick="newForm()">📄 New</button>
+            <button class="header-btn" onclick="saveCurrentForm()">💾 Save</button>
+            <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
+            <button class="header-btn sheets" onclick="openSheetsConfig()">📊 Sheets</button>
+            <button class="header-btn dhis2" onclick="openDhis2Config()">🔗 DHIS2</button>
+            <button class="header-btn primary" onclick="shareForm()">📤 Share</button>
+            <button class="header-btn danger" onclick="logout()">🚪 Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container" id="mainContainer">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🔗 DHIS2 Fields</h3>
+                <div class="field-type special" data-type="period">📅 Period (YYYYMM)</div>
+                <div class="field-type special" data-type="orgunit">🏥 Org Unit</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📝 Basic Fields</h3>
+                <div class="field-type" data-type="text">📄 Text Input</div>
+                <div class="field-type" data-type="number">🔢 Number</div>
+                <div class="field-type" data-type="date">📅 Date</div>
+                <div class="field-type" data-type="time">🕐 Time</div>
+                <div class="field-type" data-type="email">📧 Email</div>
+                <div class="field-type" data-type="phone">📱 Phone</div>
+                <div class="field-type" data-type="textarea">📝 Long Text</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">☑️ Selection Fields</h3>
+                <div class="field-type" data-type="select">📋 Dropdown</div>
+                <div class="field-type" data-type="radio">🔘 Radio Buttons</div>
+                <div class="field-type" data-type="checkbox">☑️ Checkboxes</div>
+                <div class="field-type" data-type="yesno">✅ Yes / No</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🎯 Special Fields</h3>
+                <div class="field-type" data-type="gps">📍 GPS Location</div>
+                <div class="field-type" data-type="rating">⭐ Rating</div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📑 Structure</h3>
+                <div class="field-type" data-type="section">📁 Section / Page</div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <div class="canvas-header">
+                <input type="text" class="form-title-input" id="formTitle" value="My Data Collection Form" placeholder="Form Title...">
+                <span style="color:#666;font-size:12px;font-weight:600;" id="fieldCount">📊 0 fields</span>
+            </div>
+            <div class="canvas">
+                <div class="form-preview">
+                    <div class="form-preview-header">
+                        <h2 id="previewTitle">My Data Collection Form</h2>
+                        <p>ICF-SL Data Collection System</p>
+                    </div>
+                    <div class="form-preview-body">
+                        <div class="drop-zone" id="dropZone">
+                            <p style="font-size:48px;margin-bottom:12px;">📥</p>
+                            <p style="font-weight:600;">Click field types to add them</p>
+                            <p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period + Org Unit fields for DHIS2 sync</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="properties-panel" id="propertiesPanel">
+            <h3 class="properties-title">⚙️ Field Properties</h3>
+            <div id="propertiesContent">
+                <div class="no-selection">
+                    <p style="font-size:32px;margin-bottom:12px;">👆</p>
+                    <p>Select a field to edit</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Viewer Container -->
+    <div class="viewer-container" id="viewerContainer"></div>
+    <div class="viewer-container" id="homeContainer"></div>
+    
+    <!-- Footer -->
+    <footer class="footer">© 2025 Informatics Consultancy Firm - Sierra Leone (ICF-SL) | ICF Collect v3</footer>
+
+    <!-- Google Sheets Configuration Modal -->
+    <div class="modal-overlay" id="sheetsModal">
+        <div class="modal">
+            <div class="modal-header sheets">
+                <h3>📊 Google Sheets Configuration</h3>
+                <button class="modal-close" onclick="closeModal('sheetsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="sheetsStatus" class="status-badge disconnected">
+                    ❌ <span>Not Connected</span>
+                </div>
+                
+                <div class="config-section sheets">
+                    <div class="config-title sheets">📊 Google Apps Script Setup</div>
+                    <label class="config-label">Script URL (Web App URL)</label>
+                    <input type="url" class="config-input" id="sheetsScriptUrl" placeholder="https://script.google.com/macros/s/...">
+                    <p class="help-text">Deploy your Google Apps Script as a web app and paste the URL here</p>
+                    
+                    <label class="config-label" style="margin-top:15px;">Sheet ID (Optional)</label>
+                    <input type="text" class="config-input" id="sheetsSheetId" placeholder="Leave empty to auto-create">
+                    <p class="help-text">The ID from your Google Sheet URL, or leave empty to create new</p>
+                </div>
+                
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+                    <button class="modal-btn sheets" onclick="testSheetsConnection()">🔍 Test Connection</button>
+                    <button class="modal-btn primary" onclick="saveSheetsConfig()">💾 Save Config</button>
+                </div>
+                
+                <div class="config-section">
+                    <div class="config-title">📋 Google Apps Script Code</div>
+                    <p style="font-size:11px;color:#666;margin-bottom:10px;">Copy this code to your Google Apps Script project:</p>
+                    <button class="modal-btn" onclick="copyGASCode()" style="background:#6c757d;color:white;">📋 Copy Script Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DHIS2 Configuration Modal -->
+    <div class="modal-overlay" id="dhis2Modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔗 DHIS2 Configuration</h3>
+                <button class="modal-close" onclick="closeModal('dhis2Modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="dhis2Status" class="status-badge disconnected">
+                    ❌ <span>Not Connected</span>
+                </div>
+                
+                <div class="config-section dhis2">
+                    <div class="config-title dhis2">🌐 Server Connection</div>
+                    <label class="config-label">DHIS2 Server URL</label>
+                    <input type="url" class="config-input" id="dhis2Url" placeholder="https://your-dhis2-instance.org">
+                    
+                    <div class="config-row">
+                        <div>
+                            <label class="config-label">Username</label>
+                            <input type="text" class="config-input" id="dhis2Username" placeholder="Username">
+                        </div>
+                        <div>
+                            <label class="config-label">Password</label>
+                            <input type="password" class="config-input" id="dhis2Password" placeholder="Password">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <div class="config-title">📊 Sync Mode</div>
+                    <div class="sync-mode-selector">
+                        <div class="sync-mode-option selected" data-mode="aggregate" onclick="selectSyncMode('aggregate')">
+                            <h4>📊 Aggregate</h4>
+                            <p>Creates Dataset + Data Elements</p>
+                            <p style="font-size:9px;color:#004080;margin-top:4px;">Syncs summarized data by Facility/Period</p>
+                        </div>
+                        <div class="sync-mode-option" data-mode="tracker" onclick="selectSyncMode('tracker')">
+                            <h4>📋 Event Program</h4>
+                            <p>Creates Program + Data Elements</p>
+                            <p style="font-size:9px;color:#6f42c1;margin-top:4px;">Syncs each record as individual event</p>
+                        </div>
+                    </div>
+                    
+                    <div id="aggregateConfig">
+                        <div class="config-row">
+                            <div>
+                                <label class="config-label">Org Unit Level</label>
+                                <select class="config-input" id="dhis2OrgLevel">
+                                    <option value="1">Level 1 (National)</option>
+                                    <option value="2">Level 2 (Region)</option>
+                                    <option value="3">Level 3 (District)</option>
+                                    <option value="4">Level 4 (Chiefdom)</option>
+                                    <option value="5" selected>Level 5 (Facility)</option>
+                                    <option value="6">Level 6</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="config-label">Period Type</label>
+                                <select class="config-input" id="dhis2PeriodType">
+                                    <option value="Monthly" selected>Monthly</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="Daily">Daily</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Yearly">Yearly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="trackerConfig" style="display:none;">
+                        <label class="config-label">Program ID</label>
+                        <input type="text" class="config-input" id="dhis2ProgramId" placeholder="Leave empty to auto-create, or enter existing Program ID">
+                        <p class="help-text">Leave empty: Setup will create a new Event Program. Or enter an existing Program UID to use it.</p>
+                    </div>
+                </div>
+                
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+                    <button class="modal-btn dhis2" onclick="testDhis2Connection()">🔍 Test Connection</button>
+                    <button class="modal-btn primary" onclick="saveDhis2Config()">💾 Save Config</button>
+                </div>
+                
+                <div class="config-section">
+                    <div class="config-title">🚀 Setup & Sync Actions</div>
+                    <p style="font-size:11px;color:#666;margin-bottom:15px;">
+                        <strong>Setup DHIS2:</strong> Creates Dataset/Program and Data Elements<br>
+                        <strong>Sync Data:</strong> Pushes data to DHIS2 based on selected mode
+                    </p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button class="modal-btn success" onclick="setupDhis2()" style="flex:1;">⚙️ Setup DHIS2</button>
+                        <button class="modal-btn purple" onclick="syncToDhis2()" style="flex:1;">🔄 Sync to DHIS2</button>
+                    </div>
+                </div>
+                
+                <div class="sync-log" id="syncLog">
+                    <div class="log-entry info">Ready...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal">
+            <div class="modal-header primary">
+                <h3>📤 Share Form</h3>
+                <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="qr-container">
+                    <div class="qr-box"><div id="qrCode"></div></div>
+                    <div style="margin-top:15px;font-weight:700;color:#004080;">📱 Scan to open form</div>
+                    <div class="qr-url" id="shareUrl"></div>
+                    <div class="qr-actions">
+                        <button class="modal-btn primary" onclick="copyShareUrl()">📋 Copy URL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const CONFIG = {
+            PROXY_URL: 'https://script.google.com/macros/s/AKfycbyRXc68PYSmDSCYPakAS8Gc9R00kRjmsMYoDujPYMItyquXfwMAJUtRqXLiDlNWbSfDQQ/exec',
+            LOGO_URL: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg'
+        };
+
+        // ==================== GLOBAL STATE ====================
+        const state = {
+            user: null,
+            fields: [],
+            selectedFieldId: null,
+            fieldCounter: 0,
+            isSharedMode: false,
+            settings: {
+                title: 'My Data Collection Form',
+                logo: CONFIG.LOGO_URL
+            },
+            sheets: {
+                scriptUrl: '',
+                sheetId: '',
+                connected: false
+            },
+            dhis2: {
+                url: '',
+                username: '',
+                password: '',
+                syncMode: 'aggregate', // 'aggregate' or 'tracker'
+                orgUnitLevel: 5,
+                periodType: 'Monthly',
+                programId: '',
+                connected: false,
+                datasetId: null,
+                dataElements: {},
+                orgUnits: [],
+                orgUnitMap: {}
+            },
+            collectedData: [],
+            filters: {},
+            dateFilter: { start: '', end: '' },
+            currentDataView: 'case', // 'case' or 'aggregate'
+            chartInstances: {}
+        };
+
+        const fieldDefs = {
+            period: { label: 'Period', icon: '📅', defaultLabel: 'Reporting Period', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
+            orgunit: { label: 'Org Unit', icon: '🏥', defaultLabel: 'Health Facility', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
+            text: { label: 'Text', icon: '📄', defaultLabel: 'Text Field', valueType: 'TEXT', category: 'text' },
+            number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field', valueType: 'NUMBER', category: 'numeric' },
+            date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field', valueType: 'DATE', category: 'date' },
+            time: { label: 'Time', icon: '🕐', defaultLabel: 'Time Field', valueType: 'TIME', category: 'time' },
+            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address', valueType: 'TEXT', category: 'text' },
+            phone: { label: 'Phone', icon: '📱', defaultLabel: 'Phone Number', valueType: 'PHONE_NUMBER', category: 'text' },
+            textarea: { label: 'Long Text', icon: '📝', defaultLabel: 'Long Text', valueType: 'LONG_TEXT', category: 'text' },
+            select: { label: 'Dropdown', icon: '📋', defaultLabel: 'Dropdown', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
+            radio: { label: 'Radio', icon: '🔘', defaultLabel: 'Radio Choice', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
+            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', valueType: 'TRUE_ONLY', category: 'categorical', options: ['Option 1', 'Option 2'] },
+            yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question', valueType: 'BOOLEAN', category: 'categorical' },
+            gps: { label: 'GPS', icon: '📍', defaultLabel: 'GPS Location', valueType: 'COORDINATE', category: 'special' },
+            rating: { label: 'Rating', icon: '⭐', defaultLabel: 'Rating', valueType: 'INTEGER', category: 'categorical', max: 5 },
+            section: { label: 'Section', icon: '📁', defaultLabel: 'New Section', valueType: null, category: 'structure' }
+        };
+
+        // ==================== PERIODS ====================
+        function generatePeriods() {
+            const periods = [];
+            for (let year = 2020; year <= 2026; year++) {
+                for (let month = 1; month <= 12; month++) {
+                    periods.push(`${year}${String(month).padStart(2, '0')}`);
+                }
+            }
+            return periods;
+        }
+        const PERIODS = generatePeriods();
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const compressedData = urlParams.get('d');
+            
+            if (compressedData) {
+                try {
+                    const decoded = atob(decodeURIComponent(compressedData));
+                    const charData = decoded.split('').map(c => c.charCodeAt(0));
+                    const binData = new Uint8Array(charData);
+                    const decompressed = pako.inflate(binData, { to: 'string' });
+                    const data = JSON.parse(decompressed);
+                    state.isSharedMode = true;
+                    renderSharedForm(data);
+                    return;
+                } catch (err) { console.error('Decode error:', err); }
+            }
+            
+            loadFromStorage();
+            loadConfigs();
+            setupEventListeners();
+            checkAuth();
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab)));
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('signupForm').addEventListener('submit', handleSignup);
+            document.querySelectorAll('.field-type').forEach(el => el.addEventListener('click', () => addField(el.dataset.type)));
+            document.getElementById('formTitle').addEventListener('input', (e) => {
+                state.settings.title = e.target.value;
+                document.getElementById('previewTitle').textContent = e.target.value;
+                saveToStorage();
+            });
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+            });
+        }
+
+        // ==================== GOOGLE SHEETS ====================
+        async function testSheetsConnection() {
+            const scriptUrl = document.getElementById('sheetsScriptUrl').value.trim();
+            if (!scriptUrl) {
+                notify('Enter Script URL first', 'error');
+                return;
+            }
+            
+            updateSheetsStatus('syncing', 'Testing...');
+            
+            try {
+                const response = await fetch(`${scriptUrl}?action=ping`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    state.sheets.connected = true;
+                    updateSheetsStatus('connected', 'Connected to Google Sheets');
+                    notify('Connected to Google Sheets!');
+                } else {
+                    updateSheetsStatus('disconnected', 'Connection failed');
+                    notify('Connection failed', 'error');
+                }
+            } catch (err) {
+                updateSheetsStatus('disconnected', 'Connection error');
+                notify('Error: ' + err.message, 'error');
+            }
+        }
+
+        function saveSheetsConfig() {
+            state.sheets.scriptUrl = document.getElementById('sheetsScriptUrl').value.trim();
+            state.sheets.sheetId = document.getElementById('sheetsSheetId').value.trim();
+            localStorage.setItem('icfSheetsConfig', JSON.stringify(state.sheets));
+            notify('Google Sheets config saved!');
+        }
+
+        function updateSheetsStatus(type, message) {
+            const el = document.getElementById('sheetsStatus');
+            el.className = `status-badge ${type}`;
+            const icon = type === 'connected' ? '✅' : type === 'syncing' ? '⏳' : '❌';
+            el.innerHTML = `${icon} <span>${message}</span>`;
+        }
+
+        async function submitToGoogleSheets(data) {
+            const scriptUrl = state.sheets.scriptUrl;
+            if (!scriptUrl) {
+                saveOffline(data);
+                return { success: true, offline: true };
+            }
+            
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'submit',
+                        formTitle: state.settings.title,
+                        sheetId: state.sheets.sheetId,
+                        data: data
+                    })
+                });
+                const result = await response.json();
+                if (result.success) return { success: true };
+                saveOffline(data);
+                return { success: false, offline: true };
+            } catch (err) {
+                saveOffline(data);
+                return { success: false, offline: true };
+            }
+        }
+
+        async function loadFromGoogleSheets() {
+            const scriptUrl = state.sheets.scriptUrl;
+            if (!scriptUrl) return [];
+            
+            try {
+                const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=1000&sheetId=${encodeURIComponent(state.sheets.sheetId || '')}`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    return result.data;
+                }
+            } catch (err) {
+                console.error('Load error:', err);
+            }
+            return [];
+        }
+
+        function saveOffline(data) {
+            data._offline = true;
+            const offlineData = JSON.parse(localStorage.getItem('icfOfflineData') || '[]');
+            offlineData.push({ formTitle: state.settings.title, data: data });
+            localStorage.setItem('icfOfflineData', JSON.stringify(offlineData));
+        }
+
+        function copyGASCode() {
+            const code = `// ICF Collect - Google Apps Script
+// Deploy as Web App: Execute as "Me", Access "Anyone"
+
+const SPREADSHEET_ID = ''; // Leave empty to auto-create
+
+function doGet(e) {
+  const action = e.parameter.action;
+  
+  if (action === 'ping') {
+    return jsonResponse({ success: true, message: 'Connected' });
+  }
+  
+  if (action === 'getData') {
+    return getData(e);
+  }
+  
+  return jsonResponse({ success: false, error: 'Unknown action' });
+}
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    
+    if (data.action === 'submit') {
+      return submitData(data);
+    }
+    
+    return jsonResponse({ success: false, error: 'Unknown action' });
+  } catch (err) {
+    return jsonResponse({ success: false, error: err.message });
+  }
+}
+
+function submitData(payload) {
+  const formTitle = payload.formTitle || 'Form Data';
+  const sheetId = payload.sheetId || SPREADSHEET_ID;
+  const rowData = payload.data;
+  
+  let ss;
+  if (sheetId) {
+    ss = SpreadsheetApp.openById(sheetId);
+  } else {
+    ss = SpreadsheetApp.create('ICF Collect - ' + formTitle);
+  }
+  
+  let sheet = ss.getSheetByName(formTitle);
+  if (!sheet) {
+    sheet = ss.insertSheet(formTitle);
+    // Add headers
+    const headers = Object.keys(rowData);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  }
+  
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const row = headers.map(h => rowData[h] || '');
+  sheet.appendRow(row);
+  
+  return jsonResponse({ success: true, sheetId: ss.getId() });
+}
+
+function getData(e) {
+  const formTitle = e.parameter.formTitle || 'Form Data';
+  const sheetId = e.parameter.sheetId || SPREADSHEET_ID;
+  const limit = parseInt(e.parameter.limit) || 500;
+  
+  if (!sheetId) {
+    return jsonResponse({ success: false, error: 'No sheet ID' });
+  }
+  
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const sheet = ss.getSheetByName(formTitle);
+    
+    if (!sheet) {
+      return jsonResponse({ success: true, data: [] });
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return jsonResponse({ success: true, data: [] });
+    }
+    
+    const headers = data[0];
+    const rows = data.slice(1, limit + 1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = row[i]);
+      return obj;
+    });
+    
+    return jsonResponse({ success: true, data: rows });
+  } catch (err) {
+    return jsonResponse({ success: false, error: err.message });
+  }
+}
+
+function jsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                notify('Script code copied!');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                notify('Script code copied!');
+            });
+        }
+
+        // ==================== DHIS2 ====================
+        async function dhis2Request(endpoint, method = 'GET', payload = null) {
+            const { url, username, password } = state.dhis2;
+            if (!url || !username || !password) {
+                throw new Error('DHIS2 not configured');
+            }
+
+            const serverUrl = url.replace(/\/$/, '');
+            const apiUrl = `${serverUrl}/api/${endpoint}`;
+            const auth = btoa(`${username}:${password}`);
+            
+            const proxiedUrl = `${CONFIG.PROXY_URL}?url=${encodeURIComponent(apiUrl)}&auth=${encodeURIComponent(auth)}${method !== 'GET' ? '&method=' + method : ''}`;
+            
+            const options = {
+                method: method === 'GET' ? 'GET' : 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            };
+            
+            if (payload && method !== 'GET') {
+                options.body = JSON.stringify(payload);
+            }
+            
+            try {
+                const response = await fetch(proxiedUrl, options);
+                const data = await response.json();
+                
+                if (data.httpStatusCode === 401) {
+                    return { success: false, status: 401, error: 'Unauthorized' };
+                }
+                
+                return { success: true, status: 200, data: data };
+            } catch (error) {
+                return { success: false, status: 0, error: error.message };
+            }
+        }
+
+        async function testDhis2Connection() {
+            const url = document.getElementById('dhis2Url').value.trim();
+            const username = document.getElementById('dhis2Username').value.trim();
+            const password = document.getElementById('dhis2Password').value;
+            
+            if (!url || !username || !password) {
+                notify('Fill all DHIS2 fields', 'error');
+                return;
+            }
+            
+            state.dhis2.url = url;
+            state.dhis2.username = username;
+            state.dhis2.password = password;
+            
+            updateDhis2Status('syncing', 'Testing...');
+            addLog('info', 'Connecting to DHIS2...');
+            
+            try {
+                const result = await dhis2Request('system/info.json');
+                
+                if (result.success && result.data?.systemName) {
+                    state.dhis2.connected = true;
+                    updateDhis2Status('connected', `Connected to ${result.data.systemName}`);
+                    addLog('success', `✓ Connected: ${result.data.systemName}`);
+                    
+                    if (state.dhis2.syncMode === 'aggregate') {
+                        await fetchOrgUnits();
+                    }
+                    
+                    notify('Connected to DHIS2!');
+                } else {
+                    state.dhis2.connected = false;
+                    updateDhis2Status('disconnected', 'Connection failed');
+                    addLog('error', '✗ Connection failed');
+                    notify('Connection failed', 'error');
+                }
+            } catch (error) {
+                state.dhis2.connected = false;
+                updateDhis2Status('disconnected', 'Error');
+                addLog('error', '✗ Error: ' + error.message);
+                notify('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function fetchOrgUnits() {
+            const level = state.dhis2.orgUnitLevel;
+            addLog('info', `Fetching org units at level ${level}...`);
+            
+            const result = await dhis2Request(`organisationUnits.json?fields=id,name,displayName,code&filter=level:eq:${level}&paging=false`);
+            
+            if (result.success && result.data?.organisationUnits) {
+                state.dhis2.orgUnits = result.data.organisationUnits;
+                state.dhis2.orgUnitMap = {};
+                
+                result.data.organisationUnits.forEach(ou => {
+                    const names = [
+                        ou.displayName?.toLowerCase().trim(),
+                        ou.name?.toLowerCase().trim(),
+                        ou.code?.toLowerCase().trim()
+                    ].filter(Boolean);
+                    
+                    names.forEach(name => {
+                        state.dhis2.orgUnitMap[name] = ou.id;
+                    });
+                });
+                
+                addLog('success', `✓ Loaded ${state.dhis2.orgUnits.length} org units`);
+            }
+        }
+
+        function selectSyncMode(mode) {
+            state.dhis2.syncMode = mode;
+            document.querySelectorAll('.sync-mode-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.dataset.mode === mode) el.classList.add('selected');
+            });
+            
+            document.getElementById('aggregateConfig').style.display = mode === 'aggregate' ? 'block' : 'none';
+            document.getElementById('trackerConfig').style.display = mode === 'tracker' ? 'block' : 'none';
+        }
+
+        function saveDhis2Config() {
+            state.dhis2.url = document.getElementById('dhis2Url').value.trim();
+            state.dhis2.username = document.getElementById('dhis2Username').value.trim();
+            state.dhis2.password = document.getElementById('dhis2Password').value;
+            state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
+            state.dhis2.periodType = document.getElementById('dhis2PeriodType').value;
+            state.dhis2.programId = document.getElementById('dhis2ProgramId').value.trim();
+            
+            localStorage.setItem('icfDhis2Config', JSON.stringify({
+                url: state.dhis2.url,
+                username: state.dhis2.username,
+                password: state.dhis2.password,
+                syncMode: state.dhis2.syncMode,
+                orgUnitLevel: state.dhis2.orgUnitLevel,
+                periodType: state.dhis2.periodType,
+                programId: state.dhis2.programId
+            }));
+            
+            notify('DHIS2 config saved!');
+        }
+
+        function updateDhis2Status(type, message) {
+            const el = document.getElementById('dhis2Status');
+            el.className = `status-badge ${type}`;
+            const icon = type === 'connected' ? '✅' : type === 'syncing' ? '⏳' : '❌';
+            el.innerHTML = `${icon} <span>${message}</span>`;
+        }
+
+        function addLog(type, message) {
+            const log = document.getElementById('syncLog');
+            if (!log) return;
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `<div class="log-entry ${type}">[${time}] ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            const log = document.getElementById('syncLog');
+            if (log) log.innerHTML = '';
+        }
+
+        async function setupDhis2() {
+            if (!state.dhis2.connected) {
+                notify('Connect to DHIS2 first', 'error');
+                return;
+            }
+            
+            clearLog();
+            addLog('info', `Setting up DHIS2 (${state.dhis2.syncMode} mode)...`);
+            updateDhis2Status('syncing', 'Setting up...');
+            
+            const dataFields = state.fields.filter(f => 
+                f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+            );
+            
+            if (dataFields.length === 0) {
+                notify('Add data fields first', 'error');
+                return;
+            }
+            
+            try {
+                // Create Data Elements
+                addLog('info', 'Creating Data Elements...');
+                const createdElements = [];
+                
+                for (const field of dataFields) {
+                    const def = fieldDefs[field.type];
+                    const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                    
+                    const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
+                    
+                    if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
+                        const existing = checkResult.data.dataElements[0];
+                        state.dhis2.dataElements[field.id] = existing.id;
+                        createdElements.push({ id: existing.id, field: field });
+                        addLog('info', `  ↳ Exists: ${field.label}`);
+                    } else {
+                        const payload = {
+                            name: field.label,
+                            shortName: field.label.substring(0, 50),
+                            code: code,
+                            domainType: state.dhis2.syncMode === 'tracker' ? 'TRACKER' : 'AGGREGATE',
+                            valueType: def?.valueType || 'TEXT',
+                            aggregationType: field.type === 'number' ? 'SUM' : 'NONE'
+                        };
+                        
+                        const createResult = await dhis2Request('dataElements', 'POST', payload);
+                        
+                        if (createResult.success && createResult.data?.response?.uid) {
+                            const newId = createResult.data.response.uid;
+                            state.dhis2.dataElements[field.id] = newId;
+                            createdElements.push({ id: newId, field: field });
+                            addLog('success', `  ✓ Created: ${field.label}`);
+                        } else {
+                            addLog('error', `  ✗ Failed: ${field.label}`);
+                        }
+                    }
+                    await sleep(200);
+                }
+                
+                if (state.dhis2.syncMode === 'aggregate') {
+                    await setupAggregateDataset(createdElements);
+                } else {
+                    await setupTrackerProgram(createdElements);
+                }
+                
+                updateDhis2Status('connected', 'Setup complete!');
+                addLog('success', 'DHIS2 SETUP COMPLETE!');
+                saveToStorage();
+                notify('DHIS2 setup complete!');
+                
+            } catch (error) {
+                updateDhis2Status('disconnected', 'Setup failed');
+                addLog('error', '✗ Error: ' + error.message);
+                notify('Setup failed', 'error');
+            }
+        }
+
+        async function setupTrackerProgram(createdElements) {
+            // Ensure org units are loaded
+            if (state.dhis2.orgUnits.length === 0) {
+                await fetchOrgUnits();
+            }
+            
+            const programName = state.settings.title;
+            const programCode = programName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
+            
+            // Check if user provided an existing Program ID
+            const userProvidedProgramId = document.getElementById('dhis2ProgramId').value.trim();
+            
+            let programId = null;
+            let programStageId = null;
+            
+            if (userProvidedProgramId) {
+                // User provided a Program ID - verify it exists
+                addLog('info', `Checking existing Program: ${userProvidedProgramId}...`);
+                const existingProgResult = await dhis2Request(`programs/${userProvidedProgramId}.json?fields=id,name,programStages[id]`);
+                
+                if (existingProgResult.success && existingProgResult.data?.id) {
+                    programId = existingProgResult.data.id;
+                    programStageId = existingProgResult.data.programStages?.[0]?.id;
+                    state.dhis2.programId = programId;
+                    addLog('success', `  ✓ Using existing Program: ${existingProgResult.data.name}`);
+                } else {
+                    addLog('error', `  ✗ Program not found: ${userProvidedProgramId}`);
+                    addLog('info', 'Creating new Program instead...');
+                }
+            }
+            
+            if (!programId) {
+                addLog('info', `Setting up Event Program: ${programName}...`);
+                
+                // Check if program exists by code
+                const progCheckResult = await dhis2Request(`programs.json?filter=code:eq:${programCode}&fields=id,name,programStages[id]`);
+                
+                if (progCheckResult.success && progCheckResult.data?.programs?.length > 0) {
+                    const existingProg = progCheckResult.data.programs[0];
+                    programId = existingProg.id;
+                    programStageId = existingProg.programStages?.[0]?.id;
+                    state.dhis2.programId = programId;
+                    addLog('info', `  ↳ Program exists: ${programId}`);
+                } else {
+                    // Create new Event Program (WITHOUT_REGISTRATION = Event Program)
+                    const programPayload = {
+                        name: programName,
+                        shortName: programName.substring(0, 50),
+                        code: programCode,
+                        programType: 'WITHOUT_REGISTRATION', // Event Program for case-based data
+                        organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
+                    };
+                    
+                    const createProgResult = await dhis2Request('programs', 'POST', programPayload);
+                    
+                    if (createProgResult.success && createProgResult.data?.response?.uid) {
+                        programId = createProgResult.data.response.uid;
+                        state.dhis2.programId = programId;
+                        addLog('success', `  ✓ Program created: ${programId}`);
+                        
+                        // Create Program Stage
+                        await sleep(300);
+                        const stagePayload = {
+                            name: programName + ' - Data Entry',
+                            program: { id: programId },
+                            sortOrder: 1
+                        };
+                        
+                        const createStageResult = await dhis2Request('programStages', 'POST', stagePayload);
+                        
+                        if (createStageResult.success && createStageResult.data?.response?.uid) {
+                            programStageId = createStageResult.data.response.uid;
+                            addLog('success', `  ✓ Program Stage created: ${programStageId}`);
+                        } else {
+                            addLog('error', '  ✗ Failed to create Program Stage');
+                        }
+                    } else {
+                        addLog('error', '  ✗ Failed to create Program');
+                        return;
+                    }
+                }
+            }
+            
+            // Assign Data Elements to Program Stage
+            if (programStageId && createdElements.length > 0) {
+                addLog('info', 'Assigning Data Elements to Program Stage...');
+                
+                // Get current program stage to update it
+                const stageResult = await dhis2Request(`programStages/${programStageId}.json?fields=:owner`);
+                
+                if (stageResult.success && stageResult.data) {
+                    const stageData = stageResult.data;
+                    
+                    // Build programStageDataElements array
+                    const programStageDataElements = createdElements.map((el, idx) => ({
+                        dataElement: { id: el.id },
+                        compulsory: el.field?.required || false,
+                        sortOrder: idx + 1
+                    }));
+                    
+                    stageData.programStageDataElements = programStageDataElements;
+                    
+                    const updateResult = await dhis2Request(`programStages/${programStageId}`, 'PUT', stageData);
+                    
+                    if (updateResult.success) {
+                        addLog('success', `  ✓ Assigned ${createdElements.length} data elements to stage`);
+                    } else {
+                        addLog('warning', '  ⚠ Could not assign all data elements');
+                    }
+                }
+            }
+            
+            // Update Program ID in the UI
+            document.getElementById('dhis2ProgramId').value = programId;
+            addLog('success', `Event Program ready: ${programId}`);
+        }
+
+        async function setupAggregateDataset(createdElements) {
+            if (state.dhis2.orgUnits.length === 0) {
+                await fetchOrgUnits();
+            }
+            
+            const datasetName = state.settings.title;
+            const datasetCode = datasetName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
+            
+            addLog('info', `Setting up Dataset: ${datasetName}...`);
+            
+            const dsCheckResult = await dhis2Request(`dataSets.json?filter=code:eq:${datasetCode}&fields=id,name`);
+            
+            if (dsCheckResult.success && dsCheckResult.data?.dataSets?.length > 0) {
+                state.dhis2.datasetId = dsCheckResult.data.dataSets[0].id;
+                addLog('info', `  ↳ Dataset exists: ${state.dhis2.datasetId}`);
+            } else {
+                const createPayload = {
+                    name: datasetName,
+                    shortName: datasetName.substring(0, 50),
+                    code: datasetCode,
+                    periodType: state.dhis2.periodType,
+                    dataSetElements: createdElements.map(de => ({ dataElement: { id: de.id } })),
+                    organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
+                };
+                
+                const createResult = await dhis2Request('dataSets', 'POST', createPayload);
+                
+                if (createResult.success && createResult.data?.response?.uid) {
+                    state.dhis2.datasetId = createResult.data.response.uid;
+                    addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
+                } else {
+                    addLog('error', '  ✗ Failed to create dataset');
+                }
+            }
+        }
+
+        async function syncToDhis2() {
+            if (!state.dhis2.connected) {
+                notify('Connect to DHIS2 first', 'error');
+                return;
+            }
+            
+            clearLog();
+            
+            if (state.dhis2.syncMode === 'aggregate') {
+                await syncAggregateData();
+            } else {
+                await syncTrackerData();
+            }
+        }
+
+        async function syncAggregateData() {
+            addLog('info', 'Syncing AGGREGATE data to DHIS2...');
+            updateDhis2Status('syncing', 'Syncing...');
+            
+            // Get aggregate data
+            const aggregateData = calculateAggregateData();
+            
+            if (aggregateData.length === 0) {
+                notify('No data to sync', 'info');
+                addLog('info', 'No aggregate data to sync');
+                return;
+            }
+            
+            let success = 0, failed = 0;
+            
+            for (const record of aggregateData) {
+                const period = record._period;
+                const orgUnitName = record._orgUnit;
+                const orgUnitId = state.dhis2.orgUnitMap[orgUnitName?.toLowerCase().trim()];
+                
+                if (!orgUnitId) {
+                    addLog('error', `  ✗ No org unit match: ${orgUnitName}`);
+                    failed++;
+                    continue;
+                }
+                
+                const dataValues = [];
+                const dataFields = state.fields.filter(f => 
+                    f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+                );
+                
+                dataFields.forEach(field => {
+                    const deId = state.dhis2.dataElements[field.id];
+                    const value = record[field.name];
+                    
+                    if (deId && value !== undefined && value !== null && value !== '') {
+                        dataValues.push({
+                            dataElement: deId,
+                            value: String(value),
+                            period: period,
+                            orgUnit: orgUnitId
+                        });
+                    }
+                });
+                
+                if (dataValues.length === 0) continue;
+                
+                const result = await dhis2Request('dataValueSets', 'POST', { dataValues });
+                
+                if (result.success) {
+                    success++;
+                    addLog('success', `  ✓ Synced: ${orgUnitName} / ${period}`);
+                } else {
+                    failed++;
+                    addLog('error', `  ✗ Failed: ${orgUnitName} / ${period}`);
+                }
+                
+                await sleep(300);
+            }
+            
+            updateDhis2Status('connected', 'Sync complete');
+            addLog('info', `Sync complete: ${success} success, ${failed} failed`);
+            notify(`Synced ${success} records to DHIS2!`);
+        }
+
+        async function syncTrackerData() {
+            addLog('info', 'Syncing TRACKER/EVENT data to DHIS2...');
+            updateDhis2Status('syncing', 'Syncing...');
+            
+            const programId = state.dhis2.programId;
+            if (!programId) {
+                notify('Run Setup DHIS2 first to create the Program', 'error');
+                addLog('error', 'No Program ID - run Setup first');
+                return;
+            }
+            
+            // Ensure org units are loaded
+            if (state.dhis2.orgUnits.length === 0) {
+                await fetchOrgUnits();
+            }
+            
+            const pendingData = state.collectedData.filter(d => !d._synced);
+            
+            if (pendingData.length === 0) {
+                notify('No pending data to sync', 'info');
+                addLog('info', 'No pending data to sync');
+                return;
+            }
+            
+            addLog('info', `Syncing ${pendingData.length} events...`);
+            
+            let success = 0, failed = 0;
+            
+            for (const record of pendingData) {
+                // Get org unit
+                const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+                const orgUnitName = orgUnitField ? record[orgUnitField.name] : '';
+                let orgUnitId = state.dhis2.orgUnitMap[orgUnitName?.toLowerCase().trim()];
+                
+                // Try partial match if exact match fails
+                if (!orgUnitId && orgUnitName) {
+                    const searchKey = orgUnitName.toLowerCase().trim();
+                    for (const [name, id] of Object.entries(state.dhis2.orgUnitMap)) {
+                        if (name.includes(searchKey) || searchKey.includes(name)) {
+                            orgUnitId = id;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!orgUnitId) {
+                    // Use first org unit as fallback
+                    orgUnitId = state.dhis2.orgUnits[0]?.id;
+                    if (!orgUnitId) {
+                        addLog('error', `  ✗ No org unit: ${orgUnitName}`);
+                        failed++;
+                        continue;
+                    }
+                    addLog('warning', `  ⚠ Using default org unit for: ${orgUnitName}`);
+                }
+                
+                // Get event date from period or timestamp
+                let eventDate = record._timestamp?.split('T')[0] || new Date().toISOString().split('T')[0];
+                const periodField = state.fields.find(f => f.type === 'period');
+                if (periodField && record[periodField.name]) {
+                    // Convert YYYYMM to YYYY-MM-01
+                    const period = record[periodField.name];
+                    if (period.length === 6) {
+                        eventDate = `${period.substring(0, 4)}-${period.substring(4, 6)}-01`;
+                    }
+                }
+                
+                // Build data values
+                const dataValues = [];
+                const dataFields = state.fields.filter(f => 
+                    f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+                );
+                
+                dataFields.forEach(field => {
+                    const deId = state.dhis2.dataElements[field.id];
+                    const value = record[field.name];
+                    
+                    if (deId && value !== undefined && value !== null && value !== '') {
+                        dataValues.push({
+                            dataElement: deId,
+                            value: String(value)
+                        });
+                    }
+                });
+                
+                if (dataValues.length === 0) {
+                    addLog('warning', '  ⚠ No data values in record');
+                    failed++;
+                    continue;
+                }
+                
+                // Create event payload
+                const event = {
+                    program: programId,
+                    orgUnit: orgUnitId,
+                    eventDate: eventDate,
+                    status: 'COMPLETED',
+                    dataValues: dataValues
+                };
+                
+                const result = await dhis2Request('events', 'POST', event);
+                
+                if (result.success && (result.data?.response?.imported > 0 || result.data?.response?.importSummaries)) {
+                    record._synced = true;
+                    record._syncedAt = new Date().toISOString();
+                    delete record._syncError;
+                    success++;
+                    addLog('success', `  ✓ Event synced: ${orgUnitName || 'record'}`);
+                } else {
+                    record._syncError = result.error || JSON.stringify(result.data?.message || result.data?.response?.importSummaries?.[0]?.description) || 'Unknown error';
+                    failed++;
+                    addLog('error', `  ✗ Event failed: ${record._syncError}`);
+                }
+                
+                await sleep(300);
+            }
+            
+            updateDhis2Status('connected', 'Sync complete');
+            addLog('info', `Sync complete: ${success} success, ${failed} failed`);
+            saveToStorage();
+            saveFormToList();
+            
+            if (success > 0) notify(`Synced ${success} events to DHIS2!`);
+            if (failed > 0) notify(`${failed} events failed`, 'error');
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ==================== DATA AGGREGATION ====================
+        function calculateAggregateData() {
+            const periodField = state.fields.find(f => f.type === 'period');
+            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+            
+            if (!periodField || !orgUnitField) {
+                notify('Add Period and Org Unit fields for aggregation', 'error');
+                return [];
+            }
+            
+            const grouped = {};
+            const data = getFilteredData();
+            
+            data.forEach(record => {
+                const period = record[periodField.name] || 'Unknown';
+                const orgUnit = record[orgUnitField.name] || 'Unknown';
+                const key = `${orgUnit}|||${period}`;
+                
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        _orgUnit: orgUnit,
+                        _period: period,
+                        _count: 0
+                    };
+                }
+                
+                grouped[key]._count++;
+                
+                // Aggregate other fields
+                state.fields.forEach(field => {
+                    if (field.type === 'section' || field.type === 'period' || field.type === 'orgunit') return;
+                    
+                    const value = record[field.name];
+                    const def = fieldDefs[field.type];
+                    
+                    if (def?.category === 'numeric' || field.type === 'number') {
+                        // Sum numbers
+                        const numVal = parseFloat(value) || 0;
+                        grouped[key][field.name] = (grouped[key][field.name] || 0) + numVal;
+                    } else if (def?.category === 'categorical' || field.type === 'yesno') {
+                        // Count "Yes" or first option
+                        if (!grouped[key][field.name + '_counts']) {
+                            grouped[key][field.name + '_counts'] = {};
+                        }
+                        if (value) {
+                            grouped[key][field.name + '_counts'][value] = (grouped[key][field.name + '_counts'][value] || 0) + 1;
+                        }
+                        
+                        // For Yes/No, count Yes
+                        if (field.type === 'yesno') {
+                            if (value === 'Yes') {
+                                grouped[key][field.name] = (grouped[key][field.name] || 0) + 1;
+                            }
+                        } else {
+                            // For other categorical, take most common
+                            const counts = grouped[key][field.name + '_counts'];
+                            let maxCount = 0;
+                            let maxValue = '';
+                            Object.entries(counts).forEach(([k, v]) => {
+                                if (v > maxCount) {
+                                    maxCount = v;
+                                    maxValue = k;
+                                }
+                            });
+                            grouped[key][field.name] = `${maxValue} (${maxCount})`;
+                        }
+                    }
+                });
+            });
+            
+            return Object.values(grouped);
+        }
+
+        // ==================== FILTERING ====================
+        function getFilterableFields() {
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating', 'orgunit'];
+            return state.fields.filter(f => categoricalTypes.includes(f.type));
+        }
+
+        function getFilteredData() {
+            let data = [...state.collectedData];
+            
+            // Date filter
+            if (state.dateFilter.start || state.dateFilter.end) {
+                data = data.filter(row => {
+                    const ts = row._timestamp;
+                    if (!ts) return true;
+                    const rowDate = new Date(ts);
+                    
+                    if (state.dateFilter.start && rowDate < new Date(state.dateFilter.start)) return false;
+                    if (state.dateFilter.end) {
+                        const endDate = new Date(state.dateFilter.end);
+                        endDate.setHours(23, 59, 59, 999);
+                        if (rowDate > endDate) return false;
+                    }
+                    return true;
+                });
+            }
+            
+            // Field filters
+            Object.keys(state.filters).forEach(fieldName => {
+                const filterValue = state.filters[fieldName];
+                if (filterValue) {
+                    data = data.filter(row => {
+                        const rowValue = row[fieldName];
+                        return rowValue && rowValue.toString().trim() === filterValue;
+                    });
+                }
+            });
+            
+            return data;
+        }
+
+        window.updateFilter = function(fieldName, value) {
+            if (value) {
+                state.filters[fieldName] = value;
+            } else {
+                delete state.filters[fieldName];
+            }
+            applyFilters();
+        };
+
+        window.updateDateFilter = function(type, value) {
+            state.dateFilter[type] = value;
+            applyFilters();
+        };
+
+        window.clearAllFilters = function() {
+            state.filters = {};
+            state.dateFilter = { start: '', end: '' };
+            document.querySelectorAll('.filter-select, .filter-input').forEach(el => el.value = '');
+            applyFilters();
+            notify('Filters cleared');
+        };
+
+        function applyFilters() {
+            renderDataContent();
+            renderDashboard();
+        }
+
+        // ==================== UI HELPERS ====================
+        function openSheetsConfig() {
+            document.getElementById('sheetsScriptUrl').value = state.sheets.scriptUrl || '';
+            document.getElementById('sheetsSheetId').value = state.sheets.sheetId || '';
+            document.getElementById('sheetsModal').classList.add('show');
+        }
+
+        function openDhis2Config() {
+            document.getElementById('dhis2Url').value = state.dhis2.url || '';
+            document.getElementById('dhis2Username').value = state.dhis2.username || '';
+            document.getElementById('dhis2Password').value = state.dhis2.password || '';
+            document.getElementById('dhis2OrgLevel').value = state.dhis2.orgUnitLevel || 5;
+            document.getElementById('dhis2PeriodType').value = state.dhis2.periodType || 'Monthly';
+            document.getElementById('dhis2ProgramId').value = state.dhis2.programId || '';
+            selectSyncMode(state.dhis2.syncMode || 'aggregate');
+            document.getElementById('dhis2Modal').classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function notify(message, type = 'success') {
+            const el = document.getElementById('notification');
+            el.textContent = message;
+            el.className = 'notification show' + (type === 'error' ? ' error' : type === 'info' ? ' info' : '');
+            setTimeout(() => el.classList.remove('show'), 4000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ==================== AUTH ====================
+        function checkAuth() {
+            const saved = localStorage.getItem('icfCollectUser');
+            if (saved) { state.user = JSON.parse(saved); showBuilder(); }
+        }
+
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.querySelector(`.auth-tab[data-tab="${tab}"]`)?.classList.add('active');
+            document.getElementById(tab + 'Form')?.classList.add('active');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const users = JSON.parse(localStorage.getItem('icfCollectUsers') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) { state.user = user; localStorage.setItem('icfCollectUser', JSON.stringify(user)); showBuilder(); }
+            else { document.getElementById('authError').style.display = 'block'; document.getElementById('authError').textContent = 'Invalid credentials'; }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const users = JSON.parse(localStorage.getItem('icfCollectUsers') || '[]');
+            if (users.find(u => u.email === email)) { document.getElementById('authError').style.display = 'block'; document.getElementById('authError').textContent = 'Email exists'; return; }
+            users.push({ id: Date.now().toString(), name, email, password });
+            localStorage.setItem('icfCollectUsers', JSON.stringify(users));
+            document.getElementById('authSuccess').style.display = 'block';
+            document.getElementById('authSuccess').textContent = 'Account created! Please login.';
+            setTimeout(() => switchAuthTab('login'), 1500);
+        }
+
+        function showBuilder() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainContainer').classList.add('show');
+            document.getElementById('headerUser').textContent = '👤 ' + (state.user?.name || 'User');
+            renderFields();
+        }
+
+        function logout() {
+            state.user = null;
+            localStorage.removeItem('icfCollectUser');
+            document.getElementById('mainContainer').classList.remove('show');
+            document.getElementById('authContainer').style.display = 'flex';
+        }
+
+        // ==================== FORM BUILDER ====================
+        function addField(type) {
+            const def = fieldDefs[type];
+            if (!def) return;
+            
+            // Check for duplicates
+            if ((type === 'period' || type === 'orgunit') && state.fields.find(f => f.type === type)) {
+                notify(`${def.label} field already exists`, 'error');
+                return;
+            }
+            
+            state.fieldCounter++;
+            const field = {
+                id: 'field_' + state.fieldCounter,
+                type: type,
+                label: def.defaultLabel,
+                name: type + '_' + state.fieldCounter,
+                required: true,
+                options: def.options ? [...def.options] : [],
+                max: def.max || 5
+            };
+            
+            if (type === 'period') {
+                field.name = 'period';
+                field.label = 'Reporting Period';
+            }
+            if (type === 'orgunit') {
+                field.name = 'orgunit';
+                field.label = 'Health Facility';
+            }
+            
+            state.fields.push(field);
+            renderFields();
+            selectField(field.id);
+            saveToStorage();
+        }
+
+        function removeField(id) {
+            event?.stopPropagation();
+            if (!confirm('Delete field?')) return;
+            state.fields = state.fields.filter(f => f.id !== id);
+            if (state.selectedFieldId === id) { state.selectedFieldId = null; renderProperties(); }
+            renderFields();
+            saveToStorage();
+        }
+
+        function moveField(id, direction) {
+            event?.stopPropagation();
+            const index = state.fields.findIndex(f => f.id === id);
+            if (index < 0) return;
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= state.fields.length) return;
+            [state.fields[index], state.fields[newIndex]] = [state.fields[newIndex], state.fields[index]];
+            renderFields();
+            saveToStorage();
+        }
+
+        function selectField(id) {
+            state.selectedFieldId = id;
+            renderFields();
+            renderProperties();
+        }
+
+        function updateField(prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (field) { field[prop] = value; renderFields(); saveToStorage(); }
+        }
+
+        function renderFields() {
+            const dropZone = document.getElementById('dropZone');
+            const dataFieldCount = state.fields.filter(f => f.type !== 'section').length;
+            document.getElementById('fieldCount').textContent = `📊 ${dataFieldCount} fields`;
+            
+            if (state.fields.length === 0) {
+                dropZone.classList.remove('has-fields');
+                dropZone.innerHTML = '<p style="font-size:48px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add them</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period + Org Unit fields for DHIS2 sync</p>';
+                return;
+            }
+            
+            dropZone.classList.add('has-fields');
+            
+            dropZone.innerHTML = state.fields.map(f => {
+                if (f.type === 'section') {
+                    return `<div class="section-divider ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
+                        <span>📁 ${f.label.toUpperCase()}</span>
+                        <div style="display:flex;gap:5px;">
+                            <button class="field-action-btn" onclick="moveField('${f.id}','up')">▲</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','down')">▼</button>
+                            <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
+                        </div>
+                    </div>`;
+                }
+                
+                const def = fieldDefs[f.type];
+                const isDhis2Field = f.type === 'period' || f.type === 'orgunit';
+                const isNumeric = f.type === 'number';
+                
+                return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''} ${isDhis2Field ? 'dhis2-field' : ''}" data-id="${f.id}">
+                    <div class="form-field-header">
+                        <span class="form-field-label">${def?.icon || '📄'} ${f.label}</span>
+                        <div class="form-field-actions">
+                            <button class="field-action-btn" onclick="moveField('${f.id}','up')">▲</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','down')">▼</button>
+                            <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
+                        </div>
+                    </div>
+                    <div style="font-size:10px;color:#868e96;">
+                        Code: <code>${f.name}</code>
+                        ${f.required ? '<span class="field-badge required">Required</span>' : ''}
+                        ${isDhis2Field ? '<span class="field-badge dhis2">DHIS2</span>' : ''}
+                        ${isNumeric ? '<span class="field-badge aggregate">SUM</span>' : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            dropZone.querySelectorAll('.form-field, .section-divider').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (!e.target.closest('.field-action-btn')) selectField(el.dataset.id);
+                });
+            });
+        }
+
+        function renderProperties() {
+            const container = document.getElementById('propertiesContent');
+            if (!state.selectedFieldId) {
+                container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;">👆</p><p>Select a field to edit</p></div>';
+                return;
+            }
+            
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field) return;
+            
+            let html = `
+                <div class="prop-section">
+                    <div class="prop-section-title">📝 Field Settings</div>
+                    <div class="property-group">
+                        <label class="property-label">Label</label>
+                        <input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}">
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">Code / Name</label>
+                        <input type="text" class="property-input" id="propName" value="${escapeHtml(field.name)}">
+                    </div>
+                    ${field.type !== 'section' ? `
+                        <div class="property-group">
+                            <label class="property-checkbox">
+                                <input type="checkbox" id="propRequired" ${field.required ? 'checked' : ''}>
+                                <span>Required Field</span>
+                            </label>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            if (['select', 'radio', 'checkbox'].includes(field.type)) {
+                html += `
+                    <div class="prop-section">
+                        <div class="prop-section-title">📋 Options (one per line)</div>
+                        <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
+                    </div>
+                `;
+            }
+            
+            if (field.type === 'orgunit') {
+                html += `
+                    <div class="prop-section">
+                        <div class="prop-section-title">🏥 Facility Options</div>
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Add facility names (will match with DHIS2 org units)</p>
+                        <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
+            document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
+            document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
+            document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
+        }
+
+        // ==================== STORAGE ====================
+        function saveToStorage() {
+            localStorage.setItem('icfCollectForm', JSON.stringify({
+                fields: state.fields,
+                settings: state.settings,
+                fieldCounter: state.fieldCounter,
+                collectedData: state.collectedData,
+                dhis2: {
+                    datasetId: state.dhis2.datasetId,
+                    dataElements: state.dhis2.dataElements
+                }
+            }));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('icfCollectForm');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state.fields = data.fields || [];
+                    state.settings = { ...state.settings, ...data.settings };
+                    state.fieldCounter = data.fieldCounter || 0;
+                    state.collectedData = data.collectedData || [];
+                    if (data.dhis2) {
+                        state.dhis2.datasetId = data.dhis2.datasetId;
+                        state.dhis2.dataElements = data.dhis2.dataElements || {};
+                    }
+                    
+                    document.getElementById('formTitle').value = state.settings.title;
+                    document.getElementById('previewTitle').textContent = state.settings.title;
+                } catch (e) {}
+            }
+        }
+
+        function loadConfigs() {
+            // Load Sheets config
+            const sheetsConfig = localStorage.getItem('icfSheetsConfig');
+            if (sheetsConfig) {
+                try {
+                    const config = JSON.parse(sheetsConfig);
+                    state.sheets = { ...state.sheets, ...config };
+                } catch (e) {}
+            }
+            
+            // Load DHIS2 config
+            const dhis2Config = localStorage.getItem('icfDhis2Config');
+            if (dhis2Config) {
+                try {
+                    const config = JSON.parse(dhis2Config);
+                    state.dhis2 = { ...state.dhis2, ...config };
+                } catch (e) {}
+            }
+        }
+
+        // ==================== FORM OPERATIONS ====================
+        function newForm() {
+            if (state.fields.length > 0 && !confirm('Create new form?')) return;
+            state.fields = [];
+            state.selectedFieldId = null;
+            state.fieldCounter = 0;
+            state.dhis2.dataElements = {};
+            state.dhis2.datasetId = null;
+            state.collectedData = [];
+            
+            const title = prompt('Form Name:', 'New Form');
+            if (title) {
+                state.settings.title = title;
+                document.getElementById('formTitle').value = title;
+                document.getElementById('previewTitle').textContent = title;
+            }
+            saveToStorage();
+            renderFields();
+            renderProperties();
+            notify('New form created!');
+        }
+
+        function saveCurrentForm() {
+            if (state.fields.length === 0) { notify('Add fields first!', 'error'); return; }
+            saveToStorage();
+            saveFormToList();
+            notify('Form saved!');
+        }
+
+        function saveFormToList() {
+            const forms = JSON.parse(localStorage.getItem('icfCollectForms') || '[]');
+            const existingIndex = forms.findIndex(f => f.title === state.settings.title);
+            const formEntry = {
+                id: existingIndex >= 0 ? forms[existingIndex].id : 'form_' + Date.now(),
+                title: state.settings.title,
+                fieldCount: state.fields.filter(f => f.type !== 'section').length,
+                updatedAt: new Date().toISOString(),
+                fields: state.fields,
+                settings: state.settings,
+                collectedData: state.collectedData,
+                dhis2: {
+                    datasetId: state.dhis2.datasetId,
+                    dataElements: state.dhis2.dataElements
+                }
+            };
+            if (existingIndex >= 0) forms[existingIndex] = formEntry;
+            else forms.push(formEntry);
+            localStorage.setItem('icfCollectForms', JSON.stringify(forms));
+        }
+
+        function previewForm() {
+            if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
+            state.isSharedMode = false;
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.footer').style.display = 'none';
+            document.getElementById('viewerContainer').classList.add('show');
+            renderFormViewer();
+        }
+
+        function closeViewer() {
+            document.getElementById('viewerContainer').classList.remove('show');
+            document.querySelector('.header').style.display = '';
+            document.getElementById('mainContainer').classList.add('show');
+            document.querySelector('.footer').style.display = '';
+        }
+
+        function shareForm() {
+            if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
+            
+            const formData = {
+                s: { t: state.settings.title, l: state.settings.logo, su: state.sheets.scriptUrl, si: state.sheets.sheetId },
+                f: state.fields.map(f => ({ i: f.id, y: f.type, l: f.label, n: f.name, r: f.required, o: f.options, mx: f.max })),
+                d: state.dhis2.datasetId ? { id: state.dhis2.datasetId, de: state.dhis2.dataElements } : null
+            };
+            
+            try {
+                const jsonStr = JSON.stringify(formData);
+                const compressed = pako.deflate(jsonStr);
+                const encoded = btoa(String.fromCharCode.apply(null, compressed));
+                const shareUrl = window.location.origin + window.location.pathname + '?d=' + encodeURIComponent(encoded);
+                
+                document.getElementById('shareUrl').textContent = shareUrl;
+                
+                const qrContainer = document.getElementById('qrCode');
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, { text: shareUrl, width: 200, height: 200, colorDark: '#004080' });
+                
+                saveFormToList();
+                document.getElementById('shareModal').classList.add('show');
+            } catch (err) { notify('Error: ' + err.message, 'error'); }
+        }
+
+        function copyShareUrl() {
+            navigator.clipboard.writeText(document.getElementById('shareUrl').textContent)
+                .then(() => notify('Copied to clipboard!'))
+                .catch(() => notify('Copy failed', 'error'));
+        }
+
+        // ==================== HOME ====================
+        function showHome() {
+            const forms = JSON.parse(localStorage.getItem('icfCollectForms') || '[]');
+            let formsHtml = forms.length === 0 ? `
+                <div style="text-align:center;padding:60px;color:#868e96;">
+                    <p style="font-size:64px;margin-bottom:12px;">📭</p>
+                    <h3 style="color:#004080;">No Forms Yet</h3>
+                    <button onclick="closeHome()" style="padding:15px 30px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:20px;font-weight:bold;">➕ Create Form</button>
+                </div>
+            ` : forms.map((f, i) => `
+                <div style="background:#fff;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#004080,#002855);color:#fff;padding:12px 15px;">
+                        <h3 style="margin:0;font-size:14px;">📋 ${escapeHtml(f.title)}</h3>
+                    </div>
+                    <div style="padding:12px 15px;">
+                        <div style="font-size:11px;color:#666;margin-bottom:10px;">
+                            📊 ${f.fieldCount} fields | 📝 ${(f.collectedData || []).length} records
+                            ${f.dhis2?.datasetId ? '<span style="color:#17a2b8;margin-left:8px;">🔗 DHIS2</span>' : ''}
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                            <button onclick="editForm(${i})" style="flex:1;padding:8px;background:#004080;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;">✏️ Edit</button>
+                            <button onclick="deleteForm(${i})" style="padding:8px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('homeContainer').innerHTML = `
+                <div style="max-width:600px;margin:0 auto;padding:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h2 style="color:#004080;">🏠 My Forms</h2>
+                        <button onclick="closeHome()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">➕ New</button>
+                    </div>
+                    ${formsHtml}
+                </div>
+            `;
+            
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.footer').style.display = 'none';
+            document.getElementById('homeContainer').classList.add('show');
+        }
+
+        function closeHome() {
+            document.getElementById('homeContainer').classList.remove('show');
+            document.querySelector('.header').style.display = 'flex';
+            document.getElementById('mainContainer').classList.add('show');
+            document.querySelector('.footer').style.display = 'block';
+        }
+
+        function editForm(index) {
+            const forms = JSON.parse(localStorage.getItem('icfCollectForms') || '[]');
+            const form = forms[index];
+            if (!form) return;
+            
+            state.fields = form.fields || [];
+            state.settings = { ...state.settings, ...form.settings };
+            state.fieldCounter = Math.max(...state.fields.map(f => parseInt(f.id.replace('field_', '')) || 0), 0) + 1;
+            state.collectedData = form.collectedData || [];
+            
+            if (form.dhis2) {
+                state.dhis2.datasetId = form.dhis2.datasetId;
+                state.dhis2.dataElements = form.dhis2.dataElements || {};
+            }
+            
+            document.getElementById('formTitle').value = state.settings.title;
+            document.getElementById('previewTitle').textContent = state.settings.title;
+            saveToStorage();
+            closeHome();
+            renderFields();
+            renderProperties();
+            notify('Form loaded!');
+        }
+
+        function deleteForm(index) {
+            const forms = JSON.parse(localStorage.getItem('icfCollectForms') || '[]');
+            if (!confirm(`Delete "${forms[index]?.title}"?`)) return;
+            forms.splice(index, 1);
+            localStorage.setItem('icfCollectForms', JSON.stringify(forms));
+            showHome();
+            notify('Deleted');
+        }
+
+        // ==================== FORM VIEWER ====================
+        function renderSharedForm(data) {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainContainer').classList.remove('show');
+            document.querySelector('.header').style.display = 'none';
+            document.querySelector('.footer').style.display = 'none';
+            
+            state.settings = { title: data.s?.t || 'Form', logo: data.s?.l || state.settings.logo };
+            state.sheets.scriptUrl = data.s?.su || '';
+            state.sheets.sheetId = data.s?.si || '';
+            state.fields = (data.f || []).map(f => ({
+                id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false, options: f.o || [], max: f.mx || 5
+            }));
+            
+            if (data.d) {
+                state.dhis2.datasetId = data.d.id;
+                state.dhis2.dataElements = data.d.de || {};
+            }
+            
+            document.getElementById('viewerContainer').classList.add('show');
+            renderFormViewer();
+        }
+
+        function renderFormViewer() {
+            const s = state.settings;
+            let pages = [], currentPage = { title: 'Page 1', fields: [] };
+            
+            state.fields.forEach(field => {
+                if (field.type === 'section') {
+                    if (currentPage.fields.length > 0) pages.push(currentPage);
+                    currentPage = { title: field.label, fields: [] };
+                } else {
+                    currentPage.fields.push(field);
+                }
+            });
+            if (currentPage.fields.length > 0) pages.push(currentPage);
+            if (pages.length === 0) pages = [{ title: s.title, fields: state.fields.filter(f => f.type !== 'section') }];
+            
+            let pagesHtml = pages.map((page, pageIndex) => {
+                let fieldsHtml = page.fields.map(field => {
+                    const req = field.required ? '<span style="color:#dc3545;">*</span>' : '';
+                    const reqAttr = field.required ? 'required' : '';
+                    let input = '';
+                    
+                    switch (field.type) {
+                        case 'period':
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
+                                <option value="">-- Select Period --</option>
+                                ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
+                            </select>`;
+                            break;
+                        case 'orgunit':
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
+                                <option value="">-- Select Facility --</option>
+                                ${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}
+                            </select>`;
+                            break;
+                        case 'text': case 'email': case 'phone': case 'date': case 'time':
+                            const type = field.type === 'phone' ? 'tel' : field.type;
+                            input = `<input type="${type}" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                            break;
+                        case 'number':
+                            input = `<input type="number" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                            break;
+                        case 'textarea':
+                            input = `<textarea name="${field.name}" class="viewer-input" rows="3" ${reqAttr}></textarea>`;
+                            break;
+                        case 'select':
+                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}><option value="">-- Select --</option>${(field.options||[]).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`;
+                            break;
+                        case 'radio': case 'yesno':
+                            const opts = field.type === 'yesno' ? ['Yes','No'] : (field.options||[]);
+                            input = `<div class="viewer-radio-group">${opts.map(o => `<label class="viewer-radio-option"><input type="radio" name="${field.name}" value="${escapeHtml(o)}" ${reqAttr}><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
+                            break;
+                        case 'checkbox':
+                            input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
+                            break;
+                        case 'gps':
+                            input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;">📍 Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`;
+                            break;
+                        case 'rating':
+                            input = `<div>${Array(field.max || 5).fill().map((_, i) => `<span onclick="setRating(this,${i+1})" class="rating-star" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
+                            break;
+                        default:
+                            input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                    }
+                    
+                    return `<div class="viewer-field"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
+                }).join('');
+                
+                const isFirst = pageIndex === 0, isLast = pageIndex === pages.length - 1;
+                
+                return `
+                    <div class="form-page" data-page="${pageIndex}" style="${pageIndex === 0 ? '' : 'display:none;'}">
+                        ${pages.length > 1 ? `<div class="page-header"><span class="page-indicator">Page ${pageIndex + 1}/${pages.length}</span><h3 class="page-title">${escapeHtml(page.title)}</h3></div>` : ''}
+                        ${fieldsHtml}
+                        <div class="page-navigation">
+                            ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
+                            ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}
+                            ${isLast ? `<button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const backBtn = state.isSharedMode ? '' : '<button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back</button>';
+            
+            document.getElementById('viewerContainer').innerHTML = `
+                <div class="viewer-nav">
+                    ${backBtn}
+                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)">📝 Form</button>
+                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)">📊 Data</button>
+                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)">📈 Dashboard</button>
+                    <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
+                        ${navigator.onLine ? '🟢 Online' : '🔴 Offline'}
+                    </div>
+                </div>
+                
+                <div id="tabForm" class="viewer-tab active">
+                    <div class="viewer-form">
+                        <div class="viewer-form-box">
+                            <div class="viewer-header">
+                                <img src="${s.logo}" alt="Logo">
+                                <h1>${escapeHtml(s.title)}</h1>
+                                <p>ICF-SL Data Collection System</p>
+                            </div>
+                            <div class="viewer-body">
+                                <form id="viewerForm">${pagesHtml}</form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabData" class="viewer-tab">
+                    <div style="max-width:1100px;margin:0 auto;" id="dataContent">
+                        <p style="text-align:center;padding:40px;">⏳ Loading...</p>
+                    </div>
+                </div>
+                
+                <div id="tabDashboard" class="viewer-tab">
+                    <div class="dashboard-container" id="dashboardContent">
+                        <p style="text-align:center;padding:40px;">⏳ Loading...</p>
+                    </div>
+                </div>
+            `;
+            
+            window.totalPages = pages.length;
+            setupFormSubmit();
+            loadViewerData();
+        }
+
+        function setupFormSubmit() {
+            const form = document.getElementById('viewerForm');
+            if (!form) return;
+            
+            form.onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const data = { _id: Date.now(), _timestamp: new Date().toISOString(), _synced: false };
+                new FormData(form).forEach((v, k) => data[k] = v);
+                
+                state.collectedData.push(data);
+                saveToStorage();
+                saveFormToList();
+                
+                // Also submit to Google Sheets
+                const result = await submitToGoogleSheets(data);
+                
+                form.reset();
+                goToPage(0);
+                
+                notify(result.offline ? '💾 Saved offline' : '✅ Submitted!');
+                loadViewerData();
+            };
+        }
+
+        async function loadViewerData() {
+            // Try to load from Google Sheets first
+            if (state.sheets.scriptUrl) {
+                const sheetsData = await loadFromGoogleSheets();
+                if (sheetsData.length > 0) {
+                    // Merge with local data
+                    const localIds = new Set(state.collectedData.map(d => d._id));
+                    sheetsData.forEach(d => {
+                        if (!localIds.has(d._id)) {
+                            state.collectedData.push(d);
+                        }
+                    });
+                }
+            }
+            
+            renderDataContent();
+            renderDashboard();
+        }
+
+        function renderDataContent() {
+            const container = document.getElementById('dataContent');
+            if (!container) return;
+            
+            const filterableFields = getFilterableFields();
+            const filteredData = getFilteredData();
+            const aggregateData = calculateAggregateData();
+            const activeFilterCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
+                                     (state.dateFilter.start || state.dateFilter.end ? 1 : 0);
+            
+            // Build filter panel
+            let filtersHtml = `
+                <div class="filter-group">
+                    <label class="filter-label">📅 From</label>
+                    <input type="date" class="filter-input" value="${state.dateFilter.start}" onchange="updateDateFilter('start', this.value)">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">📅 To</label>
+                    <input type="date" class="filter-input" value="${state.dateFilter.end}" onchange="updateDateFilter('end', this.value)">
+                </div>
+            `;
+            
+            filterableFields.forEach(field => {
+                const uniqueValues = [...new Set(state.collectedData.map(d => d[field.name]).filter(Boolean))];
+                filtersHtml += `
+                    <div class="filter-group">
+                        <label class="filter-label">${escapeHtml(field.label)}</label>
+                        <select class="filter-select" onchange="updateFilter('${field.name}', this.value)">
+                            <option value="">All</option>
+                            ${uniqueValues.map(v => `<option value="${escapeHtml(v)}" ${state.filters[field.name] === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = `
+                <div class="filter-panel">
+                    <div class="filter-header">
+                        <div class="filter-title">🔍 Filters ${activeFilterCount > 0 ? `<span class="filter-count">${activeFilterCount} active</span>` : ''}</div>
+                        <button class="filter-btn clear" onclick="clearAllFilters()">🗑️ Clear</button>
+                    </div>
+                    <div class="filter-controls">${filtersHtml}</div>
+                </div>
+                
+                <div class="data-view-tabs">
+                    <div class="data-view-tab ${state.currentDataView === 'case' ? 'active' : ''}" onclick="switchDataView('case')">📋 Case-Based (${filteredData.length})</div>
+                    <div class="data-view-tab ${state.currentDataView === 'aggregate' ? 'active aggregate' : ''}" onclick="switchDataView('aggregate')">📊 Aggregate (${aggregateData.length})</div>
+                </div>
+                
+                <div id="dataTableContainer">${state.currentDataView === 'case' ? renderCaseTable(filteredData) : renderAggregateTable(aggregateData)}</div>
+                
+                <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="modal-btn primary" onclick="refreshData()">🔄 Refresh</button>
+                    <button class="modal-btn success" onclick="downloadCSV()">📥 Download CSV</button>
+                </div>
+            `;
+        }
+
+        window.switchDataView = function(view) {
+            state.currentDataView = view;
+            renderDataContent();
+        };
+
+        function renderCaseTable(data) {
+            if (data.length === 0) {
+                return '<p style="text-align:center;padding:40px;color:#868e96;">📭 No records found</p>';
+            }
+            
+            const fields = state.fields.filter(f => f.type !== 'section');
+            
+            let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>#</th><th>📅 Timestamp</th>';
+            fields.slice(0, 8).forEach(f => html += `<th>${escapeHtml(f.label)}</th>`);
+            html += '<th>Status</th></tr></thead><tbody>';
+            
+            data.slice().reverse().forEach((row, i) => {
+                const syncStatus = row._synced ? 
+                    '<span class="sync-badge synced">✓ Synced</span>' : 
+                    (row._syncError ? '<span class="sync-badge failed">✗ Failed</span>' : '<span class="sync-badge pending">⏳ Pending</span>');
+                    
+                html += `<tr><td>${data.length - i}</td><td style="font-size:10px;">${new Date(row._timestamp).toLocaleString()}</td>`;
+                fields.slice(0, 8).forEach(f => html += `<td>${escapeHtml(String(row[f.name] || '-').substring(0, 25))}</td>`);
+                html += `<td>${syncStatus}</td></tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function renderAggregateTable(data) {
+            if (data.length === 0) {
+                return '<p style="text-align:center;padding:40px;color:#868e96;">📭 No aggregate data (need Period + Org Unit fields)</p>';
+            }
+            
+            const dataFields = state.fields.filter(f => 
+                f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+            );
+            
+            let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr><th>🏥 Facility</th><th>📅 Period</th><th>📊 Records</th>';
+            dataFields.slice(0, 6).forEach(f => {
+                const def = fieldDefs[f.type];
+                const suffix = f.type === 'number' ? ' (SUM)' : f.type === 'yesno' ? ' (Yes)' : '';
+                html += `<th>${escapeHtml(f.label)}${suffix}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            data.forEach(row => {
+                html += `<tr><td><strong>${escapeHtml(row._orgUnit)}</strong></td><td>${escapeHtml(row._period)}</td><td class="aggregate-value">${row._count}</td>`;
+                dataFields.slice(0, 6).forEach(f => {
+                    const value = row[f.name];
+                    html += `<td class="aggregate-value">${value !== undefined ? escapeHtml(String(value)) : '-'}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        window.refreshData = async function() {
+            notify('🔄 Refreshing...');
+            await loadViewerData();
+            notify('✅ Refreshed!');
+        };
+
+        window.downloadCSV = function() {
+            const data = state.currentDataView === 'case' ? getFilteredData() : calculateAggregateData();
+            if (data.length === 0) { notify('No data', 'error'); return; }
+            
+            const headers = Object.keys(data[0]).filter(k => !k.startsWith('_') || k === '_timestamp');
+            let csv = headers.join(',') + '\n';
+            
+            data.forEach(row => {
+                csv += headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${state.settings.title}_${state.currentDataView}_data.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            notify('✅ Downloaded!');
+        };
+
+        function renderDashboard() {
+            const container = document.getElementById('dashboardContent');
+            if (!container) return;
+            
+            const filteredData = getFilteredData();
+            const aggregateData = calculateAggregateData();
+            
+            // Destroy old charts
+            Object.values(state.chartInstances).forEach(chart => { if (chart) chart.destroy(); });
+            state.chartInstances = {};
+            
+            // Stats
+            const synced = state.collectedData.filter(d => d._synced).length;
+            const pending = state.collectedData.filter(d => !d._synced && !d._syncError).length;
+            const periodField = state.fields.find(f => f.type === 'period');
+            const uniquePeriods = periodField ? [...new Set(filteredData.map(d => d[periodField.name]).filter(Boolean))].length : 0;
+            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+            const uniqueOrgUnits = orgUnitField ? [...new Set(filteredData.map(d => d[orgUnitField.name]).filter(Boolean))].length : 0;
+            
+            // Build charts
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
+            const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
+            const numericFields = state.fields.filter(f => f.type === 'number');
+            
+            let chartsHtml = '';
+            
+            categoricalFields.forEach((field, idx) => {
+                const valueCounts = {};
+                filteredData.forEach(row => {
+                    const value = row[field.name];
+                    if (value) valueCounts[value] = (valueCounts[value] || 0) + 1;
+                });
+                
+                if (Object.keys(valueCounts).length > 0) {
+                    chartsHtml += `
+                        <div class="chart-container">
+                            <h4>📊 ${escapeHtml(field.label)}</h4>
+                            <div class="chart-wrapper">
+                                <div class="chart-box"><canvas id="barChart_${idx}"></canvas></div>
+                                <div class="chart-box"><canvas id="pieChart_${idx}"></canvas></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (numericFields.length > 0 && aggregateData.length > 0) {
+                chartsHtml += `
+                    <div class="chart-container">
+                        <h4>🔢 Numeric Summary (Aggregate)</h4>
+                        <div style="overflow-x:auto;">
+                            <table class="data-table">
+                                <thead><tr><th>Field</th><th>Total Sum</th><th>Average per Location</th><th>Min</th><th>Max</th></tr></thead>
+                                <tbody>
+                                    ${numericFields.map(field => {
+                                        const values = aggregateData.map(d => d[field.name] || 0);
+                                        const sum = values.reduce((a, b) => a + b, 0);
+                                        const avg = values.length > 0 ? (sum / values.length).toFixed(2) : 0;
+                                        const min = values.length > 0 ? Math.min(...values) : 0;
+                                        const max = values.length > 0 ? Math.max(...values) : 0;
+                                        return `<tr><td><strong>${escapeHtml(field.label)}</strong></td><td>${sum}</td><td>${avg}</td><td>${min}</td><td>${max}</td></tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div class="dashboard-header">
+                    <img src="${state.settings.logo}" alt="Logo">
+                    <h2>📈 ${escapeHtml(state.settings.title)} - Dashboard</h2>
+                    <p>ICF-SL Data Analytics</p>
+                </div>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="stat-value">${filteredData.length}</div><div class="stat-label">Total Records</div></div>
+                    <div class="stat-card success"><div class="stat-value">${synced}</div><div class="stat-label">Synced</div></div>
+                    <div class="stat-card warning"><div class="stat-value">${pending}</div><div class="stat-label">Pending</div></div>
+                    <div class="stat-card info"><div class="stat-value">${uniquePeriods}</div><div class="stat-label">Periods</div></div>
+                    <div class="stat-card purple"><div class="stat-value">${uniqueOrgUnits}</div><div class="stat-label">Facilities</div></div>
+                    <div class="stat-card"><div class="stat-value">${aggregateData.length}</div><div class="stat-label">Aggregate Rows</div></div>
+                </div>
+                
+                ${chartsHtml || '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">📊 Add categorical fields for charts</p></div>'}
+            `;
+            
+            // Render charts
+            setTimeout(() => {
+                const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'];
+                
+                categoricalFields.forEach((field, idx) => {
+                    const valueCounts = {};
+                    filteredData.forEach(row => {
+                        const value = row[field.name];
+                        if (value) valueCounts[value] = (valueCounts[value] || 0) + 1;
+                    });
+                    
+                    if (Object.keys(valueCounts).length === 0) return;
+                    
+                    const labels = Object.keys(valueCounts);
+                    const values = Object.values(valueCounts);
+                    const total = values.reduce((a, b) => a + b, 0);
+                    
+                    const barCtx = document.getElementById(`barChart_${idx}`);
+                    if (barCtx) {
+                        state.chartInstances[`bar_${idx}`] = new Chart(barCtx, {
+                            type: 'bar',
+                            data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: colors.slice(0, labels.length) }] },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false }, title: { display: true, text: 'Bar Chart', font: { family: 'Oswald' } } },
+                                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                            }
+                        });
+                    }
+                    
+                    const pieCtx = document.getElementById(`pieChart_${idx}`);
+                    if (pieCtx) {
+                        state.chartInstances[`pie_${idx}`] = new Chart(pieCtx, {
+                            type: 'pie',
+                            data: { 
+                                labels: labels.map((l, i) => `${l} (${((values[i] / total) * 100).toFixed(1)}%)`), 
+                                datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }] 
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { position: 'bottom', labels: { font: { family: 'Oswald', size: 10 } } }, title: { display: true, text: 'Pie Chart', font: { family: 'Oswald' } } }
+                            }
+                        });
+                    }
+                });
+            }, 100);
+        }
+
+        function showTab(tab, btn) {
+            document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
+            if (btn) btn.classList.add('active');
+            
+            if (tab === 'data') renderDataContent();
+            if (tab === 'dashboard') renderDashboard();
+        }
+
+        function goToPage(pageIndex) {
+            document.querySelectorAll('.form-page').forEach(p => p.style.display = 'none');
+            document.querySelector(`.form-page[data-page="${pageIndex}"]`).style.display = 'block';
+        }
+
+        window.captureGPS = function(btn) {
+            const container = btn.parentElement;
+            const status = container.querySelector('.gps-status');
+            const input = container.querySelector('input[type="hidden"]');
+            status.innerHTML = '⏳ Getting location...';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        const coords = `[${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}]`;
+                        input.value = coords;
+                        status.innerHTML = '✅ ' + coords;
+                    },
+                    err => { status.innerHTML = '❌ ' + err.message; }
+                );
+            } else {
+                status.innerHTML = '❌ Not supported';
+            }
+        };
+
+        window.setRating = function(star, val) {
+            const container = star.parentElement;
+            container.querySelectorAll('span').forEach((s, i) => s.style.opacity = i < val ? '1' : '0.3');
+            container.querySelector('input').value = val;
+        };
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
