@@ -373,11 +373,6 @@
     <div class="main-container" id="mainContainer">
         <div class="sidebar">
             <div class="sidebar-section">
-                <h3 class="sidebar-title"><span data-icon="link" data-size="14"></span> DHIS2 Fields</h3>
-                <div class="field-type special" data-type="period"><span data-icon="calendar-days" data-size="14"></span> Period (YYYYMM)</div>
-                <div class="field-type special" data-type="orgunit"><span data-icon="building-2" data-size="14"></span> Org Unit</div>
-            </div>
-            <div class="sidebar-section">
                 <h3 class="sidebar-title"><span data-icon="edit-3" data-size="14"></span> Basic Fields</h3>
                 <div class="field-type" data-type="text"><span data-icon="type" data-size="14"></span> Text Input</div>
                 <div class="field-type" data-type="number"><span data-icon="hash" data-size="14"></span> Number</div>
@@ -490,6 +485,22 @@
                     </div>
                     
                     <div id="aggregateConfig">
+                        <div class="config-row">
+                            <div>
+                                <label class="config-label">Period Column</label>
+                                <select class="config-input" id="dhis2PeriodColumn">
+                                    <option value="">-- Select field --</option>
+                                </select>
+                                <p class="help-text" style="font-size:10px;color:#666;margin-top:4px;">Field with period (YYYYMM format)</p>
+                            </div>
+                            <div>
+                                <label class="config-label">Org Unit Column</label>
+                                <select class="config-input" id="dhis2OrgUnitColumn">
+                                    <option value="">-- Select field --</option>
+                                </select>
+                                <p class="help-text" style="font-size:10px;color:#666;margin-top:4px;">Field with facility/org unit name</p>
+                            </div>
+                        </div>
                         <div class="config-row">
                             <div>
                                 <label class="config-label">Org Unit Level</label>
@@ -691,6 +702,8 @@
                 syncMode: 'aggregate', // 'aggregate' or 'tracker'
                 orgUnitLevel: 5,
                 periodType: 'Monthly',
+                periodColumn: '',
+                orgUnitColumn: '',
                 programId: '',
                 connected: false,
                 datasetId: null,
@@ -706,8 +719,6 @@
         };
 
         const fieldDefs = {
-            period: { label: 'Period', icon: 'calendar-days', defaultLabel: 'Reporting Period', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
-            orgunit: { label: 'Org Unit', icon: 'building-2', defaultLabel: 'Health Facility', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
             text: { label: 'Text', icon: 'type', defaultLabel: 'Text Field', valueType: 'TEXT', category: 'text' },
             number: { label: 'Number', icon: 'hash', defaultLabel: 'Number Field', valueType: 'NUMBER', category: 'numeric' },
             date: { label: 'Date', icon: 'calendar', defaultLabel: 'Date Field', valueType: 'DATE', category: 'date' },
@@ -1389,6 +1400,8 @@ function testScript() {
             state.dhis2.orgUnitLevel = parseInt(document.getElementById('dhis2OrgLevel').value);
             state.dhis2.periodType = document.getElementById('dhis2PeriodType').value;
             state.dhis2.programId = document.getElementById('dhis2ProgramId').value.trim();
+            state.dhis2.periodColumn = document.getElementById('dhis2PeriodColumn').value;
+            state.dhis2.orgUnitColumn = document.getElementById('dhis2OrgUnitColumn').value;
             
             localStorage.setItem('icfDhis2Config', JSON.stringify({
                 url: state.dhis2.url,
@@ -1397,6 +1410,8 @@ function testScript() {
                 syncMode: state.dhis2.syncMode,
                 orgUnitLevel: state.dhis2.orgUnitLevel,
                 periodType: state.dhis2.periodType,
+                periodColumn: state.dhis2.periodColumn,
+                orgUnitColumn: state.dhis2.orgUnitColumn,
                 programId: state.dhis2.programId
             }));
             
@@ -1429,12 +1444,15 @@ function testScript() {
                 return;
             }
             
+            const periodColumn = state.dhis2.periodColumn;
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            
             clearLog();
             addLog('info', `Setting up DHIS2 (${state.dhis2.syncMode} mode)...`);
             updateDhis2Status('syncing', 'Setting up...');
             
             const dataFields = state.fields.filter(f => 
-                f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+                f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
             );
             
             if (dataFields.length === 0) {
@@ -1681,6 +1699,9 @@ function testScript() {
                 return;
             }
             
+            const periodColumn = state.dhis2.periodColumn;
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            
             let success = 0, failed = 0;
             
             for (const record of aggregateData) {
@@ -1696,7 +1717,7 @@ function testScript() {
                 
                 const dataValues = [];
                 const dataFields = state.fields.filter(f => 
-                    f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+                    f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
                 );
                 
                 dataFields.forEach(field => {
@@ -1757,14 +1778,16 @@ function testScript() {
                 return;
             }
             
+            const periodColumn = state.dhis2.periodColumn;
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            
             addLog('info', `Syncing ${pendingData.length} events...`);
             
             let success = 0, failed = 0;
             
             for (const record of pendingData) {
                 // Get org unit
-                const orgUnitField = state.fields.find(f => f.type === 'orgunit');
-                const orgUnitName = orgUnitField ? record[orgUnitField.name] : '';
+                const orgUnitName = orgUnitColumn ? record[orgUnitColumn] : '';
                 let orgUnitId = state.dhis2.orgUnitMap[orgUnitName?.toLowerCase().trim()];
                 
                 // Try partial match if exact match fails
@@ -1791,19 +1814,18 @@ function testScript() {
                 
                 // Get event date from period or timestamp
                 let eventDate = record._timestamp?.split('T')[0] || new Date().toISOString().split('T')[0];
-                const periodField = state.fields.find(f => f.type === 'period');
-                if (periodField && record[periodField.name]) {
+                if (periodColumn && record[periodColumn]) {
                     // Convert YYYYMM to YYYY-MM-01
-                    const period = record[periodField.name];
+                    const period = record[periodColumn];
                     if (period.length === 6) {
                         eventDate = `${period.substring(0, 4)}-${period.substring(4, 6)}-01`;
                     }
                 }
                 
-                // Build data values
+                // Build data values (excluding period and orgunit columns)
                 const dataValues = [];
                 const dataFields = state.fields.filter(f => 
-                    f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+                    f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
                 );
                 
                 dataFields.forEach(field => {
@@ -1865,11 +1887,11 @@ function testScript() {
 
         // ==================== DATA AGGREGATION ====================
         function calculateAggregateData() {
-            const periodField = state.fields.find(f => f.type === 'period');
-            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
+            const periodColumn = state.dhis2.periodColumn;
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
             
-            if (!periodField || !orgUnitField) {
-                notify('Add Period and Org Unit fields for aggregation', 'error');
+            if (!periodColumn || !orgUnitColumn) {
+                notify('Select Period Column and Org Unit Column in DHIS2 settings', 'error');
                 return [];
             }
             
@@ -1877,8 +1899,8 @@ function testScript() {
             const data = getFilteredData();
             
             data.forEach(record => {
-                const period = record[periodField.name] || 'Unknown';
-                const orgUnit = record[orgUnitField.name] || 'Unknown';
+                const period = record[periodColumn] || 'Unknown';
+                const orgUnit = record[orgUnitColumn] || 'Unknown';
                 const key = `${orgUnit}|||${period}`;
                 
                 if (!grouped[key]) {
@@ -1891,9 +1913,10 @@ function testScript() {
                 
                 grouped[key]._count++;
                 
-                // Aggregate other fields
+                // Aggregate other fields (excluding the period and orgunit columns)
                 state.fields.forEach(field => {
-                    if (field.type === 'section' || field.type === 'period' || field.type === 'orgunit') return;
+                    if (field.type === 'section') return;
+                    if (field.name === periodColumn || field.name === orgUnitColumn) return;
                     
                     const value = record[field.name];
                     const def = fieldDefs[field.type];
@@ -1938,7 +1961,7 @@ function testScript() {
 
         // ==================== FILTERING ====================
         function getFilterableFields() {
-            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating', 'orgunit'];
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox', 'rating'];
             return state.fields.filter(f => categoricalTypes.includes(f.type));
         }
 
@@ -2012,6 +2035,32 @@ function testScript() {
             document.getElementById('dhis2PeriodType').value = state.dhis2.periodType || 'Monthly';
             document.getElementById('dhis2ProgramId').value = state.dhis2.programId || '';
             selectSyncMode(state.dhis2.syncMode || 'aggregate');
+            
+            // Populate Period Column and Org Unit Column dropdowns
+            const periodSelect = document.getElementById('dhis2PeriodColumn');
+            const orgUnitSelect = document.getElementById('dhis2OrgUnitColumn');
+            
+            // Clear existing options except first
+            periodSelect.innerHTML = '<option value="">-- Select field --</option>';
+            orgUnitSelect.innerHTML = '<option value="">-- Select field --</option>';
+            
+            // Add form fields as options
+            state.fields.filter(f => f.type !== 'section').forEach(f => {
+                const periodOpt = document.createElement('option');
+                periodOpt.value = f.name;
+                periodOpt.textContent = f.label;
+                periodSelect.appendChild(periodOpt);
+                
+                const orgOpt = document.createElement('option');
+                orgOpt.value = f.name;
+                orgOpt.textContent = f.label;
+                orgUnitSelect.appendChild(orgOpt);
+            });
+            
+            // Set selected values
+            if (state.dhis2.periodColumn) periodSelect.value = state.dhis2.periodColumn;
+            if (state.dhis2.orgUnitColumn) orgUnitSelect.value = state.dhis2.orgUnitColumn;
+            
             document.getElementById('dhis2Modal').classList.add('show');
         }
 
@@ -2186,12 +2235,6 @@ function testScript() {
             const def = fieldDefs[type];
             if (!def) return;
             
-            // Check for duplicates
-            if ((type === 'period' || type === 'orgunit') && state.fields.find(f => f.type === type)) {
-                notify(`${def.label} field already exists`, 'error');
-                return;
-            }
-            
             state.fieldCounter++;
             const field = {
                 id: 'field_' + state.fieldCounter,
@@ -2202,15 +2245,6 @@ function testScript() {
                 options: def.options ? [...def.options] : [],
                 max: def.max || 5
             };
-            
-            if (type === 'period') {
-                field.name = 'period';
-                field.label = 'Reporting Period';
-            }
-            if (type === 'orgunit') {
-                field.name = 'orgunit';
-                field.label = 'Health Facility';
-            }
             
             state.fields.push(field);
             renderFields();
@@ -2276,10 +2310,9 @@ function testScript() {
                 }
                 
                 const def = fieldDefs[f.type];
-                const isDhis2Field = f.type === 'period' || f.type === 'orgunit';
                 const isNumeric = f.type === 'number';
                 
-                return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''} ${isDhis2Field ? 'dhis2-field' : ''}" data-id="${f.id}">
+                return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
                     <div class="form-field-header">
                         <span class="form-field-label"><span class="inline-icon">${getIcon(def?.icon || 'file-text', 14)}</span> ${f.label}</span>
                         <div class="form-field-actions">
@@ -2291,7 +2324,6 @@ function testScript() {
                     <div style="font-size:10px;color:#868e96;">
                         Code: <code>${f.name}</code>
                         ${f.required ? '<span class="field-badge required">Required</span>' : ''}
-                        ${isDhis2Field ? '<span class="field-badge dhis2">DHIS2</span>' : ''}
                         ${isNumeric ? '<span class="field-badge aggregate">SUM</span>' : ''}
                     </div>
                 </div>`;
@@ -2340,16 +2372,6 @@ function testScript() {
                 html += `
                     <div class="prop-section">
                         <div class="prop-section-title"><span data-icon="list" data-size="12"></span> Options (one per line)</div>
-                        <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
-                    </div>
-                `;
-            }
-            
-            if (field.type === 'orgunit') {
-                html += `
-                    <div class="prop-section">
-                        <div class="prop-section-title"><span class="inline-icon">${getIcon('building-2', 14)}</span> Facility Options</div>
-                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Add facility names (will match with DHIS2 org units)</p>
                         <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
                     </div>
                 `;
@@ -2644,18 +2666,6 @@ function testScript() {
                     let input = '';
                     
                     switch (field.type) {
-                        case 'period':
-                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
-                                <option value="">-- Select Period --</option>
-                                ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
-                            </select>`;
-                            break;
-                        case 'orgunit':
-                            input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
-                                <option value="">-- Select Facility --</option>
-                                ${(field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}
-                            </select>`;
-                            break;
                         case 'text': case 'email': case 'phone': case 'date': case 'time':
                             const type = field.type === 'phone' ? 'tel' : field.type;
                             input = `<input type="${type}" name="${field.name}" class="viewer-input" ${reqAttr}>`;
@@ -2888,11 +2898,14 @@ function testScript() {
 
         function renderAggregateTable(data) {
             if (data.length === 0) {
-                return '<p style="text-align:center;padding:40px;color:#868e96;"><span data-icon="inbox" data-size="20"></span> No aggregate data (need Period + Org Unit fields)</p>';
+                return '<p style="text-align:center;padding:40px;color:#868e96;"><span data-icon="inbox" data-size="20"></span> No aggregate data (select Period Column and Org Unit Column in DHIS2 settings)</p>';
             }
             
+            const periodColumn = state.dhis2.periodColumn;
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            
             const dataFields = state.fields.filter(f => 
-                f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
+                f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
             );
             
             let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr><th><span class="inline-icon">' + getIcon('building-2', 14) + '</span> Facility</th><th><span class="inline-icon">' + getIcon('calendar', 14) + '</span> Period</th><th><span class="inline-icon">' + getIcon('bar-chart-3', 14) + '</span> Records</th>';
@@ -2957,10 +2970,10 @@ function testScript() {
             // Stats
             const synced = state.collectedData.filter(d => d._synced).length;
             const pending = state.collectedData.filter(d => !d._synced && !d._syncError).length;
-            const periodField = state.fields.find(f => f.type === 'period');
-            const uniquePeriods = periodField ? [...new Set(filteredData.map(d => d[periodField.name]).filter(Boolean))].length : 0;
-            const orgUnitField = state.fields.find(f => f.type === 'orgunit');
-            const uniqueOrgUnits = orgUnitField ? [...new Set(filteredData.map(d => d[orgUnitField.name]).filter(Boolean))].length : 0;
+            const periodColumn = state.dhis2.periodColumn;
+            const uniquePeriods = periodColumn ? [...new Set(filteredData.map(d => d[periodColumn]).filter(Boolean))].length : 0;
+            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            const uniqueOrgUnits = orgUnitColumn ? [...new Set(filteredData.map(d => d[orgUnitColumn]).filter(Boolean))].length : 0;
             
             // Build charts
             const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
