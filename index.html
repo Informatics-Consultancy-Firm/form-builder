@@ -833,27 +833,45 @@
             const scriptUrl = CONFIG.AUTH_SCRIPT_URL;
             if (!scriptUrl) {
                 saveOffline(data);
-                return { success: true, offline: true };
+                return { success: false, offline: true };
+            }
+            
+            // Check if online
+            if (!navigator.onLine) {
+                saveOffline(data);
+                return { success: false, offline: true };
             }
             
             try {
+                const payload = {
+                    action: 'submit',
+                    formTitle: state.settings.title,
+                    sheetId: state.sheets.sheetId || '',
+                    data: data
+                };
+                
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({
-                        action: 'submit',
-                        formTitle: state.settings.title,
-                        sheetId: state.sheets.sheetId,
-                        data: data
-                    })
+                    body: JSON.stringify(payload)
                 });
+                
                 const result = await response.json();
-                if (result.success) return { success: true };
-                saveOffline(data);
-                return { success: false, offline: true };
+                
+                if (result.success) {
+                    // Mark as synced
+                    data._synced = true;
+                    data._syncedAt = new Date().toISOString();
+                    return { success: true, offline: false };
+                } else {
+                    console.error('Sheets submission failed:', result.error);
+                    saveOffline(data);
+                    return { success: false, offline: true, error: result.error };
+                }
             } catch (err) {
+                console.error('Sheets submission error:', err);
                 saveOffline(data);
-                return { success: false, offline: true };
+                return { success: false, offline: true, error: err.message };
             }
         }
 
@@ -879,6 +897,116 @@
             offlineData.push({ formTitle: state.settings.title, data: data });
             localStorage.setItem('icfOfflineData', JSON.stringify(offlineData));
         }
+
+        async function syncOfflineData() {
+            if (!navigator.onLine) {
+                notify('No internet connection', 'error');
+                return;
+            }
+            
+            const offlineData = JSON.parse(localStorage.getItem('icfOfflineData') || '[]');
+            if (offlineData.length === 0) {
+                notify('No offline data to sync', 'info');
+                return;
+            }
+            
+            notify(`Syncing ${offlineData.length} offline records...`, 'info');
+            
+            let synced = 0;
+            let failed = 0;
+            const remaining = [];
+            
+            for (const item of offlineData) {
+                try {
+                    const response = await fetch(CONFIG.AUTH_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({
+                            action: 'submit',
+                            formTitle: item.formTitle,
+                            sheetId: state.sheets.sheetId || '',
+                            data: item.data
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        synced++;
+                        // Update local data
+                        const localRecord = state.collectedData.find(d => d._id === item.data._id);
+                        if (localRecord) {
+                            localRecord._synced = true;
+                            localRecord._syncedAt = new Date().toISOString();
+                            delete localRecord._offline;
+                        }
+                    } else {
+                        failed++;
+                        remaining.push(item);
+                    }
+                } catch (err) {
+                    failed++;
+                    remaining.push(item);
+                }
+            }
+            
+            // Save remaining offline data
+            localStorage.setItem('icfOfflineData', JSON.stringify(remaining));
+            saveToStorage();
+            
+            if (synced > 0) {
+                notify(`Synced ${synced} records to Google Sheets!`, 'success');
+            }
+            if (failed > 0) {
+                notify(`${failed} records failed to sync`, 'error');
+            }
+            
+            loadViewerData();
+        }
+
+        // Auto-sync when coming online
+        window.addEventListener('online', () => {
+            const offlineData = JSON.parse(localStorage.getItem('icfOfflineData') || '[]');
+            if (offlineData.length > 0) {
+                notify('Back online! Syncing offline data...', 'info');
+                setTimeout(syncOfflineData, 1000);
+            }
+        });
+
+        function getOfflineCount() {
+            const offlineData = JSON.parse(localStorage.getItem('icfOfflineData') || '[]');
+            return offlineData.length;
+        }
+
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connectionStatus');
+            if (!statusEl) return;
+            
+            const offlineCount = getOfflineCount();
+            const isOnline = navigator.onLine;
+            
+            statusEl.className = 'connection-status ' + (isOnline ? 'online' : 'offline');
+            
+            if (isOnline) {
+                if (offlineCount > 0) {
+                    statusEl.innerHTML = `<span class="inline-icon" style="color:#ffc107;">${getIcon('wifi', 14)}</span> Online (${offlineCount} pending)`;
+                    statusEl.style.background = '#ffc107';
+                    statusEl.style.color = '#000';
+                } else {
+                    statusEl.innerHTML = `<span class="inline-icon">${getIcon('wifi', 14)}</span> Online`;
+                    statusEl.style.background = '#28a745';
+                    statusEl.style.color = '#fff';
+                }
+            } else {
+                statusEl.innerHTML = `<span class="inline-icon">${getIcon('wifi-off', 14)}</span> Offline`;
+                statusEl.style.background = '#dc3545';
+                statusEl.style.color = '#fff';
+            }
+        }
+
+        // Update connection status on network changes
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
 
         // ==================== DHIS2 ====================
         async function dhis2Request(endpoint, method = 'GET', payload = null) {
@@ -933,33 +1061,38 @@
                     
                     // Check for DHIS2 error responses
                     if (data && (data.httpStatus === 'Unauthorized' || data.httpStatusCode === 401)) {
-                        return { success: false, status: 401, error: 'Unauthorized - check credentials' };
+                        return { success: false, status: 401, error: 'Unauthorized - check credentials', data: data };
                     }
                     if (data && (data.httpStatus === 'Not Found' || data.httpStatusCode === 404)) {
-                        return { success: false, status: 404, error: 'Not found' };
+                        return { success: false, status: 404, error: 'Not found', data: data };
                     }
                     if (data && data.httpStatusCode && data.httpStatusCode >= 400) {
-                        return { success: false, status: data.httpStatusCode, error: data.message || 'Request failed' };
+                        return { success: false, status: data.httpStatusCode, error: data.message || 'Request failed', data: data };
                     }
                     
-                    // Success check
+                    // Success check - include 201 Created and other success patterns
                     const isSuccess = data && (
-                        typeof data === 'object' && !data.error ||
+                        data.httpStatus === 'Created' ||
+                        data.httpStatus === 'OK' ||
+                        data.httpStatusCode === 200 ||
+                        data.httpStatusCode === 201 ||
                         data.response?.uid ||
                         data.status === 'OK' ||
                         data.status === 'SUCCESS' ||
+                        (typeof data === 'object' && !data.error && !data.httpStatus) ||
                         Array.isArray(data) ||
                         (data.organisationUnits !== undefined) ||
                         (data.dataSets !== undefined) ||
                         (data.dataElements !== undefined) ||
+                        (data.programs !== undefined) ||
                         (data.systemName !== undefined)
                     );
                     
                     if (isSuccess) {
-                        return { success: true, status: 200, data: data };
+                        return { success: true, status: data.httpStatusCode || 200, data: data };
                     }
                     
-                    // If we got data but it's not clearly success, still return it
+                    // If we got data but it's not clearly success, still return it (let caller decide)
                     if (data && typeof data === 'object') {
                         return { success: true, status: 200, data: data };
                     }
@@ -1129,6 +1262,11 @@
                 return;
             }
             
+            // Ensure org units are loaded
+            if (state.dhis2.orgUnits.length === 0) {
+                await fetchOrgUnits();
+            }
+            
             try {
                 // Create Data Elements
                 addLog('info', 'Creating Data Elements...');
@@ -1166,13 +1304,21 @@
                                 
                                 const createResult = await dhis2Request('dataElements', 'POST', payload);
                                 
-                                if (createResult.success && createResult.data?.response?.uid) {
-                                    const newId = createResult.data.response.uid;
+                                // Check various success response formats
+                                const newId = createResult.data?.response?.uid || 
+                                             createResult.data?.uid ||
+                                             (createResult.data?.status === 'OK' && createResult.data?.response?.uid);
+                                
+                                if (createResult.success && newId) {
                                     state.dhis2.dataElements[colName] = newId;
                                     createdElements.push({ id: newId, name: label });
                                     addLog('success', `  ✓ Created: ${label}`);
                                 } else {
-                                    addLog('error', `  ✗ Failed: ${label}`);
+                                    const errorMsg = createResult.data?.message || 
+                                                    createResult.data?.response?.errorReports?.[0]?.message ||
+                                                    createResult.error || 
+                                                    JSON.stringify(createResult.data);
+                                    addLog('error', `  ✗ Failed: ${label} - ${errorMsg}`);
                                 }
                             }
                             await sleep(200);
@@ -1200,18 +1346,28 @@
                             
                             const createResult = await dhis2Request('dataElements', 'POST', payload);
                             
-                            if (createResult.success && createResult.data?.response?.uid) {
-                                const newId = createResult.data.response.uid;
+                            // Check various success response formats
+                            const newId = createResult.data?.response?.uid || 
+                                         createResult.data?.uid ||
+                                         (createResult.data?.status === 'OK' && createResult.data?.response?.uid);
+                            
+                            if (createResult.success && newId) {
                                 state.dhis2.dataElements[field.id] = newId;
                                 createdElements.push({ id: newId, name: field.label });
                                 addLog('success', `  ✓ Created: ${field.label}`);
                             } else {
-                                addLog('error', `  ✗ Failed: ${field.label}`);
+                                const errorMsg = createResult.data?.message || 
+                                                createResult.data?.response?.errorReports?.[0]?.message ||
+                                                createResult.error || 
+                                                JSON.stringify(createResult.data);
+                                addLog('error', `  ✗ Failed: ${field.label} - ${errorMsg}`);
                             }
                         }
                         await sleep(200);
                     }
                 }
+                
+                addLog('success', `✓ ${createdElements.length} data elements ready`);
                 
                 if (state.dhis2.syncMode === 'aggregate') {
                     await setupAggregateDataset(createdElements);
@@ -1353,6 +1509,11 @@
                 await fetchOrgUnits();
             }
             
+            if (createdElements.length === 0) {
+                addLog('warning', '⚠ No data elements to add to dataset');
+                return;
+            }
+            
             const datasetName = state.settings.title;
             const datasetCode = datasetName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
             
@@ -1363,6 +1524,28 @@
             if (dsCheckResult.success && dsCheckResult.data?.dataSets?.length > 0) {
                 state.dhis2.datasetId = dsCheckResult.data.dataSets[0].id;
                 addLog('info', `  ↳ Dataset exists: ${state.dhis2.datasetId}`);
+                
+                // Update existing dataset with elements and org units
+                addLog('info', '  Updating dataset with data elements...');
+                const fullDs = await dhis2Request(`dataSets/${state.dhis2.datasetId}.json?fields=:owner`);
+                if (fullDs.success && fullDs.data) {
+                    const merged = {
+                        ...fullDs.data,
+                        dataSetElements: createdElements.map(de => ({ 
+                            dataSet: { id: state.dhis2.datasetId },
+                            dataElement: { id: de.id } 
+                        })),
+                        organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
+                    };
+                    
+                    const updateResult = await dhis2Request(`dataSets/${state.dhis2.datasetId}`, 'PUT', merged);
+                    if (updateResult.success) {
+                        addLog('success', `  ✓ Dataset updated with ${createdElements.length} elements and ${state.dhis2.orgUnits.length} org units`);
+                    } else {
+                        const errorMsg = updateResult.data?.message || updateResult.error || JSON.stringify(updateResult.data);
+                        addLog('warning', `  ⚠ Could not update dataset: ${errorMsg}`);
+                    }
+                }
             } else {
                 const createPayload = {
                     name: datasetName,
@@ -1373,13 +1556,22 @@
                     organisationUnits: state.dhis2.orgUnits.map(ou => ({ id: ou.id }))
                 };
                 
+                addLog('info', `  Creating dataset with ${createdElements.length} elements and ${state.dhis2.orgUnits.length} org units...`);
+                
                 const createResult = await dhis2Request('dataSets', 'POST', createPayload);
                 
-                if (createResult.success && createResult.data?.response?.uid) {
-                    state.dhis2.datasetId = createResult.data.response.uid;
+                // Check various success response formats
+                const newId = createResult.data?.response?.uid || createResult.data?.uid;
+                
+                if (createResult.success && newId) {
+                    state.dhis2.datasetId = newId;
                     addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
                 } else {
-                    addLog('error', '  ✗ Failed to create dataset');
+                    const errorMsg = createResult.data?.message || 
+                                    createResult.data?.response?.errorReports?.[0]?.message ||
+                                    createResult.error || 
+                                    JSON.stringify(createResult.data);
+                    addLog('error', `  ✗ Failed to create dataset: ${errorMsg}`);
                 }
             }
         }
@@ -2469,7 +2661,7 @@
                     <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)"><span data-icon="edit-3" data-size="14"></span> Form</button>
                     <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)"><span data-icon="table" data-size="14"></span> Data</button>
                     <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)"><span data-icon="bar-chart-2" data-size="14"></span> Dashboard</button>
-                    <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
+                    <div id="connectionStatus" class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
                         ${navigator.onLine ? '<span class="inline-icon" style="color:#28a745;">' + getIcon('wifi', 14) + '</span> Online' : '<span class="inline-icon" style="color:#dc3545;">' + getIcon('wifi-off', 14) + '</span> Offline'}
                     </div>
                 </div>
@@ -2518,17 +2710,46 @@
                 const data = { _id: Date.now(), _timestamp: new Date().toISOString(), _synced: false };
                 new FormData(form).forEach((v, k) => data[k] = v);
                 
+                // Show submitting state
+                const submitBtn = form.querySelector('.submit-btn');
+                const originalText = submitBtn ? submitBtn.innerHTML : '';
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<span class="spin" style="display:inline-block;">' + getIcon('loader', 14) + '</span> Submitting...';
+                    submitBtn.disabled = true;
+                }
+                
+                // Submit to Google Sheets first (if online)
+                const result = await submitToGoogleSheets(data);
+                
+                // Update sync status based on result
+                if (result.success && !result.offline) {
+                    data._synced = true;
+                }
+                
+                // Save locally
                 state.collectedData.push(data);
                 saveToStorage();
                 saveFormToList();
                 
-                // Also submit to Google Sheets
-                const result = await submitToGoogleSheets(data);
-                
+                // Reset form
                 form.reset();
                 goToPage(0);
                 
-                notify(result.offline ? 'Saved offline' : 'Submitted!');
+                // Restore button
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+                
+                // Show appropriate notification
+                if (result.success && !result.offline) {
+                    notify('Submitted to Google Sheets!', 'success');
+                } else if (result.offline) {
+                    notify('Saved offline (will sync when online)', 'info');
+                } else {
+                    notify('Saved locally', 'info');
+                }
+                
                 loadViewerData();
             };
         }
@@ -2552,6 +2773,7 @@
             
             renderDataContent();
             renderDashboard();
+            updateConnectionStatus();
         }
 
         function renderDataContent() {
@@ -2608,6 +2830,7 @@
                 <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
                     <button class="modal-btn primary" onclick="refreshData()"><span class="inline-icon">${getIcon('refresh-cw', 14)}</span> Refresh</button>
                     <button class="modal-btn success" onclick="downloadCSV()"><span class="inline-icon">${getIcon('download', 14)}</span> Download CSV</button>
+                    ${getOfflineCount() > 0 ? `<button class="modal-btn" style="background:#ffc107;color:#000;" onclick="syncOfflineData()"><span class="inline-icon">${getIcon('upload', 14)}</span> Sync Offline (${getOfflineCount()})</button>` : ''}
                 </div>
             `;
             initIcons();
