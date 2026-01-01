@@ -696,13 +696,13 @@
     <script>
         // ==================== CONFIGURATION ====================
         const CONFIG = {
-            PROXY_URL: 'https://script.google.com/macros/s/AKfycbwTIKo14pD4dvWk6RvRXETHu3F8xhWKEx15XlYNJViWYwsdl3gdkSF5c8BI6kvH5wKGQg/exec',
-            AUTH_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwTIKo14pD4dvWk6RvRXETHu3F8xhWKEx15XlYNJViWYwsdl3gdkSF5c8BI6kvH5wKGQg/exec',
+            PROXY_URL: 'https://script.google.com/macros/s/AKfycbwC9lJdYj4askujDNO2GfK-Rqq02VBcr90NXhifgvpawboEK1YCyUfbi2GA2hFL2UghkA/exec',
+            AUTH_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwC9lJdYj4askujDNO2GfK-Rqq02VBcr90NXhifgvpawboEK1YCyUfbi2GA2hFL2UghkA/exec',
             LOGO_URL: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg'
         };
 
         // ==================== PROXY CONFIGURATION ====================
-        // For DHIS2 POST/PUT requests, only GAS proxy works (CORS proxies block POST)
+        // Multiple proxies for DHIS2 connection fallback
         const PROXIES = [
             { 
                 name: 'Direct',
@@ -711,8 +711,23 @@
             },
             { 
                 name: 'GAS Proxy',
-                url: 'https://script.google.com/macros/s/AKfycbwTIKo14pD4dvWk6RvRXETHu3F8xhWKEx15XlYNJViWYwsdl3gdkSF5c8BI6kvH5wKGQg/exec',
+                url: 'https://script.google.com/macros/s/AKfycbwC9lJdYj4askujDNO2GfK-Rqq02VBcr90NXhifgvpawboEK1YCyUfbi2GA2hFL2UghkA/exec',
                 type: 'gas'
+            },
+            {
+                name: 'CORS Proxy 1',
+                url: 'https://corsproxy.io/?',
+                type: 'cors'
+            },
+            {
+                name: 'CORS Proxy 2', 
+                url: 'https://api.allorigins.win/raw?url=',
+                type: 'cors'
+            },
+            {
+                name: 'CORS Proxy 3',
+                url: 'https://cors-anywhere.herokuapp.com/',
+                type: 'cors'
             }
         ];
 
