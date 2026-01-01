@@ -256,6 +256,10 @@
         .aggregate-table td { border: 1px solid #dee2e6; padding: 10px; }
         .aggregate-table tr:nth-child(even) { background: #f8f9fa; }
         .aggregate-table tr:hover { background: #e8f4fc; }
+        
+        /* Inline Icons */
+        .inline-icon { display: inline-flex; align-items: center; vertical-align: middle; margin-right: 4px; }
+        .inline-icon svg { display: block; }
         .aggregate-value { font-weight: 700; color: #004080; }
         
         /* Sync Mode Selector */
@@ -306,7 +310,7 @@
                         <label class="auth-label">Password</label>
                         <input type="password" class="auth-input" id="loginPassword" required placeholder="Enter password">
                     </div>
-                    <button type="submit" class="auth-btn">🔓 Login</button>
+                    <button type="submit" class="auth-btn"><span data-icon="unlock" data-size="14"></span> Login</button>
                 </form>
                 <form class="auth-form" id="signupForm">
                     <div class="auth-group">
@@ -321,7 +325,7 @@
                         <label class="auth-label">Password</label>
                         <input type="password" class="auth-input" id="signupPassword" required minlength="6" placeholder="Min 6 characters">
                     </div>
-                    <button type="submit" class="auth-btn">📝 Create Account</button>
+                    <button type="submit" class="auth-btn"><span data-icon="user-plus" data-size="14"></span> Create Account</button>
                 </form>
             </div>
         </div>
@@ -331,18 +335,18 @@
     <header class="header">
         <div class="header-brand">
             <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL" class="header-logo">
-            <h1>📋 ICF Collect</h1>
+            <h1><span data-icon="clipboard-list" data-size="24"></span> ICF Collect</h1>
         </div>
         <div class="header-actions">
-            <span class="header-user" id="headerUser">👤 User</span>
-            <button class="header-btn" onclick="showHome()">🏠 Home</button>
-            <button class="header-btn success" onclick="newForm()">📄 New</button>
-            <button class="header-btn" onclick="saveCurrentForm()">💾 Save</button>
-            <button class="header-btn" onclick="previewForm()">👁️ Preview</button>
-            <button class="header-btn sheets" onclick="openSheetsConfig()">📊 Sheets</button>
-            <button class="header-btn dhis2" onclick="openDhis2Config()">🔗 DHIS2</button>
-            <button class="header-btn primary" onclick="shareForm()">📤 Share</button>
-            <button class="header-btn danger" onclick="logout()">🚪 Logout</button>
+            <span class="header-user" id="headerUser"><span data-icon="user" data-size="14"></span> User</span>
+            <button class="header-btn" onclick="showHome()"><span data-icon="home" data-size="14"></span> Home</button>
+            <button class="header-btn success" onclick="newForm()"><span data-icon="file-plus" data-size="14"></span> New</button>
+            <button class="header-btn" onclick="saveCurrentForm()"><span data-icon="save" data-size="14"></span> Save</button>
+            <button class="header-btn" onclick="previewForm()"><span data-icon="eye" data-size="14"></span> Preview</button>
+            <button class="header-btn sheets" onclick="openSheetsConfig()"><span data-icon="file-spreadsheet" data-size="14"></span> Sheets</button>
+            <button class="header-btn dhis2" onclick="openDhis2Config()"><span data-icon="link" data-size="14"></span> DHIS2</button>
+            <button class="header-btn primary" onclick="shareForm()"><span data-icon="share-2" data-size="14"></span> Share</button>
+            <button class="header-btn danger" onclick="logout()"><span data-icon="log-out" data-size="14"></span> Logout</button>
         </div>
     </header>
 
@@ -350,42 +354,42 @@
     <div class="main-container" id="mainContainer">
         <div class="sidebar">
             <div class="sidebar-section">
-                <h3 class="sidebar-title">🔗 DHIS2 Fields</h3>
-                <div class="field-type special" data-type="period">📅 Period (YYYYMM)</div>
-                <div class="field-type special" data-type="orgunit">🏥 Org Unit</div>
+                <h3 class="sidebar-title"><span data-icon="link" data-size="14"></span> DHIS2 Fields</h3>
+                <div class="field-type special" data-type="period"><span data-icon="calendar-days" data-size="14"></span> Period (YYYYMM)</div>
+                <div class="field-type special" data-type="orgunit"><span data-icon="building-2" data-size="14"></span> Org Unit</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">📝 Basic Fields</h3>
-                <div class="field-type" data-type="text">📄 Text Input</div>
-                <div class="field-type" data-type="number">🔢 Number</div>
-                <div class="field-type" data-type="date">📅 Date</div>
-                <div class="field-type" data-type="time">🕐 Time</div>
-                <div class="field-type" data-type="email">📧 Email</div>
-                <div class="field-type" data-type="phone">📱 Phone</div>
-                <div class="field-type" data-type="textarea">📝 Long Text</div>
+                <h3 class="sidebar-title"><span data-icon="edit-3" data-size="14"></span> Basic Fields</h3>
+                <div class="field-type" data-type="text"><span data-icon="type" data-size="14"></span> Text Input</div>
+                <div class="field-type" data-type="number"><span data-icon="hash" data-size="14"></span> Number</div>
+                <div class="field-type" data-type="date"><span data-icon="calendar" data-size="14"></span> Date</div>
+                <div class="field-type" data-type="time"><span data-icon="clock" data-size="14"></span> Time</div>
+                <div class="field-type" data-type="email"><span data-icon="mail" data-size="14"></span> Email</div>
+                <div class="field-type" data-type="phone"><span data-icon="phone" data-size="14"></span> Phone</div>
+                <div class="field-type" data-type="textarea"><span data-icon="align-left" data-size="14"></span> Long Text</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">☑️ Selection Fields</h3>
-                <div class="field-type" data-type="select">📋 Dropdown</div>
-                <div class="field-type" data-type="radio">🔘 Radio Buttons</div>
-                <div class="field-type" data-type="checkbox">☑️ Checkboxes</div>
-                <div class="field-type" data-type="yesno">✅ Yes / No</div>
+                <h3 class="sidebar-title"><span data-icon="check-square" data-size="14"></span> Selection Fields</h3>
+                <div class="field-type" data-type="select"><span data-icon="chevron-down-square" data-size="14"></span> Dropdown</div>
+                <div class="field-type" data-type="radio"><span data-icon="circle-dot" data-size="14"></span> Radio Buttons</div>
+                <div class="field-type" data-type="checkbox"><span data-icon="check-square" data-size="14"></span> Checkboxes</div>
+                <div class="field-type" data-type="yesno"><span data-icon="toggle-left" data-size="14"></span> Yes / No</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">🎯 Special Fields</h3>
-                <div class="field-type" data-type="gps">📍 GPS Location</div>
-                <div class="field-type" data-type="rating">⭐ Rating</div>
+                <h3 class="sidebar-title"><span data-icon="sparkles" data-size="14"></span> Special Fields</h3>
+                <div class="field-type" data-type="gps"><span data-icon="map-pin" data-size="14"></span> GPS Location</div>
+                <div class="field-type" data-type="rating"><span data-icon="star" data-size="14"></span> Rating</div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title">📑 Structure</h3>
-                <div class="field-type" data-type="section">📁 Section / Page</div>
+                <h3 class="sidebar-title"><span data-icon="layout" data-size="14"></span> Structure</h3>
+                <div class="field-type" data-type="section"><span data-icon="folder" data-size="14"></span> Section / Page</div>
             </div>
         </div>
 
         <div class="canvas-container">
             <div class="canvas-header">
                 <input type="text" class="form-title-input" id="formTitle" value="My Data Collection Form" placeholder="Form Title...">
-                <span style="color:#666;font-size:12px;font-weight:600;" id="fieldCount">📊 0 fields</span>
+                <span style="color:#666;font-size:12px;font-weight:600;" id="fieldCount"><span data-icon="bar-chart-3" data-size="12"></span> 0 fields</span>
             </div>
             <div class="canvas">
                 <div class="form-preview">
@@ -395,7 +399,7 @@
                     </div>
                     <div class="form-preview-body">
                         <div class="drop-zone" id="dropZone">
-                            <p style="font-size:48px;margin-bottom:12px;">📥</p>
+                            <p style="font-size:48px;margin-bottom:12px;"><span data-icon="mouse-pointer-click" data-size="48"></span></p>
                             <p style="font-weight:600;">Click field types to add them</p>
                             <p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period + Org Unit fields for DHIS2 sync</p>
                         </div>
@@ -405,10 +409,10 @@
         </div>
 
         <div class="properties-panel" id="propertiesPanel">
-            <h3 class="properties-title">⚙️ Field Properties</h3>
+            <h3 class="properties-title"><span data-icon="settings" data-size="16"></span> Field Properties</h3>
             <div id="propertiesContent">
                 <div class="no-selection">
-                    <p style="font-size:32px;margin-bottom:12px;">👆</p>
+                    <p style="font-size:32px;margin-bottom:12px;"><span data-icon="mouse-pointer-click" data-size="32"></span></p>
                     <p>Select a field to edit</p>
                 </div>
             </div>
@@ -426,16 +430,16 @@
     <div class="modal-overlay" id="sheetsModal">
         <div class="modal">
             <div class="modal-header sheets">
-                <h3>📊 Google Sheets Configuration</h3>
+                <h3><span data-icon="file-spreadsheet" data-size="18"></span> Google Sheets Configuration</h3>
                 <button class="modal-close" onclick="closeModal('sheetsModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="sheetsStatus" class="status-badge disconnected">
-                    ❌ <span>Not Connected</span>
+                    <span data-icon="x-circle" data-size="14"></span> <span>Not Connected</span>
                 </div>
                 
                 <div class="config-section sheets">
-                    <div class="config-title sheets">📊 Google Apps Script Setup</div>
+                    <div class="config-title sheets"><span data-icon="file-spreadsheet" data-size="14"></span> Google Apps Script Setup</div>
                     <label class="config-label">Script URL (Web App URL)</label>
                     <input type="url" class="config-input" id="sheetsScriptUrl" placeholder="https://script.google.com/macros/s/...">
                     <p class="help-text">Deploy your Google Apps Script as a web app and paste the URL here</p>
@@ -446,14 +450,14 @@
                 </div>
                 
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-                    <button class="modal-btn sheets" onclick="testSheetsConnection()">🔍 Test Connection</button>
-                    <button class="modal-btn primary" onclick="saveSheetsConfig()">💾 Save Config</button>
+                    <button class="modal-btn sheets" onclick="testSheetsConnection()"><span data-icon="search" data-size="14"></span> Test Connection</button>
+                    <button class="modal-btn primary" onclick="saveSheetsConfig()"><span data-icon="save" data-size="14"></span> Save Config</button>
                 </div>
                 
                 <div class="config-section">
-                    <div class="config-title">📋 Google Apps Script Code</div>
+                    <div class="config-title"><span data-icon="code" data-size="14"></span> Google Apps Script Code</div>
                     <p style="font-size:11px;color:#666;margin-bottom:10px;">Copy this code to your Google Apps Script project:</p>
-                    <button class="modal-btn" onclick="copyGASCode()" style="background:#6c757d;color:white;">📋 Copy Script Code</button>
+                    <button class="modal-btn" onclick="copyGASCode()" style="background:#6c757d;color:white;"><span data-icon="copy" data-size="14"></span> Copy Script Code</button>
                 </div>
             </div>
         </div>
@@ -463,16 +467,16 @@
     <div class="modal-overlay" id="dhis2Modal">
         <div class="modal">
             <div class="modal-header">
-                <h3>🔗 DHIS2 Configuration</h3>
+                <h3><span data-icon="link" data-size="18"></span> DHIS2 Configuration</h3>
                 <button class="modal-close" onclick="closeModal('dhis2Modal')">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="dhis2Status" class="status-badge disconnected">
-                    ❌ <span>Not Connected</span>
+                    <span data-icon="x-circle" data-size="14"></span> <span>Not Connected</span>
                 </div>
                 
                 <div class="config-section dhis2">
-                    <div class="config-title dhis2">🌐 Server Connection</div>
+                    <div class="config-title dhis2"><span data-icon="globe" data-size="14"></span> Server Connection</div>
                     <label class="config-label">DHIS2 Server URL</label>
                     <input type="url" class="config-input" id="dhis2Url" placeholder="https://your-dhis2-instance.org">
                     
@@ -489,15 +493,15 @@
                 </div>
                 
                 <div class="config-section">
-                    <div class="config-title">📊 Sync Mode</div>
+                    <div class="config-title"><span data-icon="refresh-cw" data-size="14"></span> Sync Mode</div>
                     <div class="sync-mode-selector">
                         <div class="sync-mode-option selected" data-mode="aggregate" onclick="selectSyncMode('aggregate')">
-                            <h4>📊 Aggregate</h4>
+                            <h4><span data-icon="bar-chart-3" data-size="16"></span> Aggregate</h4>
                             <p>Creates Dataset + Data Elements</p>
                             <p style="font-size:9px;color:#004080;margin-top:4px;">Syncs summarized data by Facility/Period</p>
                         </div>
                         <div class="sync-mode-option" data-mode="tracker" onclick="selectSyncMode('tracker')">
-                            <h4>📋 Event Program</h4>
+                            <h4><span data-icon="clipboard-list" data-size="16"></span> Event Program</h4>
                             <p>Creates Program + Data Elements</p>
                             <p style="font-size:9px;color:#6f42c1;margin-top:4px;">Syncs each record as individual event</p>
                         </div>
@@ -537,19 +541,19 @@
                 </div>
                 
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-                    <button class="modal-btn dhis2" onclick="testDhis2Connection()">🔍 Test Connection</button>
-                    <button class="modal-btn primary" onclick="saveDhis2Config()">💾 Save Config</button>
+                    <button class="modal-btn dhis2" onclick="testDhis2Connection()"><span data-icon="search" data-size="14"></span> Test Connection</button>
+                    <button class="modal-btn primary" onclick="saveDhis2Config()"><span data-icon="save" data-size="14"></span> Save Config</button>
                 </div>
                 
                 <div class="config-section">
-                    <div class="config-title">🚀 Setup & Sync Actions</div>
+                    <div class="config-title"><span data-icon="rocket" data-size="14"></span> Setup & Sync Actions</div>
                     <p style="font-size:11px;color:#666;margin-bottom:15px;">
                         <strong>Setup DHIS2:</strong> Creates Dataset/Program and Data Elements<br>
                         <strong>Sync Data:</strong> Pushes data to DHIS2 based on selected mode
                     </p>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="modal-btn success" onclick="setupDhis2()" style="flex:1;">⚙️ Setup DHIS2</button>
-                        <button class="modal-btn purple" onclick="syncToDhis2()" style="flex:1;">🔄 Sync to DHIS2</button>
+                        <button class="modal-btn success" onclick="setupDhis2()" style="flex:1;"><span data-icon="settings" data-size="14"></span> Setup DHIS2</button>
+                        <button class="modal-btn purple" onclick="syncToDhis2()" style="flex:1;"><span data-icon="refresh-cw" data-size="14"></span> Sync to DHIS2</button>
                     </div>
                 </div>
                 
@@ -564,16 +568,16 @@
     <div class="modal-overlay" id="shareModal">
         <div class="modal">
             <div class="modal-header primary">
-                <h3>📤 Share Form</h3>
+                <h3><span data-icon="share-2" data-size="18"></span> Share Form</h3>
                 <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="qr-container">
                     <div class="qr-box"><div id="qrCode"></div></div>
-                    <div style="margin-top:15px;font-weight:700;color:#004080;">📱 Scan to open form</div>
+                    <div style="margin-top:15px;font-weight:700;color:#004080;"><span data-icon="smartphone" data-size="14"></span> Scan to open form</div>
                     <div class="qr-url" id="shareUrl"></div>
                     <div class="qr-actions">
-                        <button class="modal-btn primary" onclick="copyShareUrl()">📋 Copy URL</button>
+                        <button class="modal-btn primary" onclick="copyShareUrl()"><span data-icon="copy" data-size="14"></span> Copy URL</button>
                     </div>
                 </div>
             </div>
@@ -584,6 +588,95 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // Inline SVG Icons (no external dependency)
+        const icons = {
+            'clipboard-list': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>',
+            'home': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+            'file-plus': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
+            'save': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>',
+            'eye': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+            'link': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+            'share-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>',
+            'log-out': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+            'user': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            'user-plus': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>',
+            'unlock': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+            'calendar': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+            'calendar-days': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>',
+            'type': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>',
+            'hash': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>',
+            'clock': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            'mail': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+            'phone': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+            'align-left': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>',
+            'chevron-down-square': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><polyline points="8 10 12 14 16 10"/></svg>',
+            'circle-dot': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg>',
+            'check-square': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+            'toggle-left': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"/><circle cx="8" cy="12" r="3"/></svg>',
+            'map-pin': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+            'star': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+            'folder': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+            'text-cursor-input': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h1a3 3 0 0 1 3 3 3 3 0 0 1 3-3h1"/><path d="M13 20h-1a3 3 0 0 1-3-3 3 3 0 0 1-3 3H5"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M9 7v10"/></svg>',
+            'sparkles': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
+            'layout': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>',
+            'download': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+            'settings': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+            'mouse-pointer-click': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 5 12 1.8-5.2L21 14Z"/><path d="M7.2 2.2 8 5.1"/><path d="m5.1 8-2.9-.8"/><path d="M14 4.1 12 6"/><path d="m6 12-1.9 2"/></svg>',
+            'chevron-up': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>',
+            'chevron-down': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+            'trash-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
+            'globe': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+            'git-branch': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>',
+            'flask-conical': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>',
+            'rocket': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
+            'refresh-cw': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>',
+            'smartphone': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+            'copy': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+            'check-circle': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            'x-circle': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+            'loader': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>',
+            'database': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+            'building-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>',
+            'bar-chart-3': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+            'inbox': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+            'plus': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+            'pencil': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
+            'file-text': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+            'arrow-left': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
+            'arrow-right': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+            'table': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
+            'bar-chart-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+            'wifi': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+            'wifi-off': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+            'check': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+            'x': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+            'search': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+            'trending-up': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+            'edit-3': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+            'list': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+            'upload': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+            'filter': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
+            'layers': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+            'activity': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+            'file-spreadsheet': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>',
+            'code': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'
+        };
+        
+        function getIcon(name, size = 16) {
+            const svg = icons[name] || icons['file-text'];
+            return svg.replace(/width="24"/g, `width="${size}"`).replace(/height="24"/g, `height="${size}"`);
+        }
+        
+        function initIcons() {
+            document.querySelectorAll('[data-icon]').forEach(el => {
+                const name = el.getAttribute('data-icon');
+                const size = el.getAttribute('data-size') || 16;
+                el.innerHTML = getIcon(name, size);
+            });
+        }
+    </script>
 
     <script>
         // ==================== CONFIGURATION ====================
@@ -630,22 +723,22 @@
         };
 
         const fieldDefs = {
-            period: { label: 'Period', icon: '📅', defaultLabel: 'Reporting Period', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
-            orgunit: { label: 'Org Unit', icon: '🏥', defaultLabel: 'Health Facility', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
-            text: { label: 'Text', icon: '📄', defaultLabel: 'Text Field', valueType: 'TEXT', category: 'text' },
-            number: { label: 'Number', icon: '🔢', defaultLabel: 'Number Field', valueType: 'NUMBER', category: 'numeric' },
-            date: { label: 'Date', icon: '📅', defaultLabel: 'Date Field', valueType: 'DATE', category: 'date' },
-            time: { label: 'Time', icon: '🕐', defaultLabel: 'Time Field', valueType: 'TIME', category: 'time' },
-            email: { label: 'Email', icon: '📧', defaultLabel: 'Email Address', valueType: 'TEXT', category: 'text' },
-            phone: { label: 'Phone', icon: '📱', defaultLabel: 'Phone Number', valueType: 'PHONE_NUMBER', category: 'text' },
-            textarea: { label: 'Long Text', icon: '📝', defaultLabel: 'Long Text', valueType: 'LONG_TEXT', category: 'text' },
-            select: { label: 'Dropdown', icon: '📋', defaultLabel: 'Dropdown', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
-            radio: { label: 'Radio', icon: '🔘', defaultLabel: 'Radio Choice', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
-            checkbox: { label: 'Checkbox', icon: '☑️', defaultLabel: 'Checkbox', valueType: 'TRUE_ONLY', category: 'categorical', options: ['Option 1', 'Option 2'] },
-            yesno: { label: 'Yes/No', icon: '✅', defaultLabel: 'Yes/No Question', valueType: 'BOOLEAN', category: 'categorical' },
-            gps: { label: 'GPS', icon: '📍', defaultLabel: 'GPS Location', valueType: 'COORDINATE', category: 'special' },
-            rating: { label: 'Rating', icon: '⭐', defaultLabel: 'Rating', valueType: 'INTEGER', category: 'categorical', max: 5 },
-            section: { label: 'Section', icon: '📁', defaultLabel: 'New Section', valueType: null, category: 'structure' }
+            period: { label: 'Period', icon: 'calendar-days', defaultLabel: 'Reporting Period', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
+            orgunit: { label: 'Org Unit', icon: 'building-2', defaultLabel: 'Health Facility', valueType: 'TEXT', isDhis2: true, category: 'dhis2' },
+            text: { label: 'Text', icon: 'type', defaultLabel: 'Text Field', valueType: 'TEXT', category: 'text' },
+            number: { label: 'Number', icon: 'hash', defaultLabel: 'Number Field', valueType: 'NUMBER', category: 'numeric' },
+            date: { label: 'Date', icon: 'calendar', defaultLabel: 'Date Field', valueType: 'DATE', category: 'date' },
+            time: { label: 'Time', icon: 'clock', defaultLabel: 'Time Field', valueType: 'TIME', category: 'time' },
+            email: { label: 'Email', icon: 'mail', defaultLabel: 'Email Address', valueType: 'TEXT', category: 'text' },
+            phone: { label: 'Phone', icon: 'phone', defaultLabel: 'Phone Number', valueType: 'PHONE_NUMBER', category: 'text' },
+            textarea: { label: 'Long Text', icon: 'align-left', defaultLabel: 'Long Text', valueType: 'LONG_TEXT', category: 'text' },
+            select: { label: 'Dropdown', icon: 'chevron-down-square', defaultLabel: 'Dropdown', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
+            radio: { label: 'Radio', icon: 'circle-dot', defaultLabel: 'Radio Choice', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
+            checkbox: { label: 'Checkbox', icon: 'check-square', defaultLabel: 'Checkbox', valueType: 'TRUE_ONLY', category: 'categorical', options: ['Option 1', 'Option 2'] },
+            yesno: { label: 'Yes/No', icon: 'toggle-left', defaultLabel: 'Yes/No Question', valueType: 'BOOLEAN', category: 'categorical' },
+            gps: { label: 'GPS', icon: 'map-pin', defaultLabel: 'GPS Location', valueType: 'COORDINATE', category: 'special' },
+            rating: { label: 'Rating', icon: 'star', defaultLabel: 'Rating', valueType: 'INTEGER', category: 'categorical', max: 5 },
+            section: { label: 'Section', icon: 'folder', defaultLabel: 'New Section', valueType: null, category: 'structure' }
         };
 
         // ==================== PERIODS ====================
@@ -737,7 +830,7 @@
         function updateSheetsStatus(type, message) {
             const el = document.getElementById('sheetsStatus');
             el.className = `status-badge ${type}`;
-            const icon = type === 'connected' ? '✅' : type === 'syncing' ? '⏳' : '❌';
+            const icon = type === 'connected' ? '[OK]' : type === 'syncing' ? '[...]' : '[X]';
             el.innerHTML = `${icon} <span>${message}</span>`;
         }
 
@@ -967,7 +1060,7 @@ function jsonResponse(data) {
                 if (result.success && result.data?.systemName) {
                     state.dhis2.connected = true;
                     updateDhis2Status('connected', `Connected to ${result.data.systemName}`);
-                    addLog('success', `✓ Connected: ${result.data.systemName}`);
+                    addLog('success', `[OK] Connected: ${result.data.systemName}`);
                     
                     if (state.dhis2.syncMode === 'aggregate') {
                         await fetchOrgUnits();
@@ -977,13 +1070,13 @@ function jsonResponse(data) {
                 } else {
                     state.dhis2.connected = false;
                     updateDhis2Status('disconnected', 'Connection failed');
-                    addLog('error', '✗ Connection failed');
+                    addLog('error', '[X] Connection failed');
                     notify('Connection failed', 'error');
                 }
             } catch (error) {
                 state.dhis2.connected = false;
                 updateDhis2Status('disconnected', 'Error');
-                addLog('error', '✗ Error: ' + error.message);
+                addLog('error', '[X] Error: ' + error.message);
                 notify('Error: ' + error.message, 'error');
             }
         }
@@ -1010,7 +1103,7 @@ function jsonResponse(data) {
                     });
                 });
                 
-                addLog('success', `✓ Loaded ${state.dhis2.orgUnits.length} org units`);
+                addLog('success', `[OK] Loaded ${state.dhis2.orgUnits.length} org units`);
             }
         }
 
@@ -1049,7 +1142,7 @@ function jsonResponse(data) {
         function updateDhis2Status(type, message) {
             const el = document.getElementById('dhis2Status');
             el.className = `status-badge ${type}`;
-            const icon = type === 'connected' ? '✅' : type === 'syncing' ? '⏳' : '❌';
+            const icon = type === 'connected' ? '[OK]' : type === 'syncing' ? '[...]' : '[X]';
             el.innerHTML = `${icon} <span>${message}</span>`;
         }
 
@@ -1100,7 +1193,7 @@ function jsonResponse(data) {
                         const existing = checkResult.data.dataElements[0];
                         state.dhis2.dataElements[field.id] = existing.id;
                         createdElements.push({ id: existing.id, field: field });
-                        addLog('info', `  ↳ Exists: ${field.label}`);
+                        addLog('info', `  --> Exists: ${field.label}`);
                     } else {
                         const payload = {
                             name: field.label,
@@ -1117,9 +1210,9 @@ function jsonResponse(data) {
                             const newId = createResult.data.response.uid;
                             state.dhis2.dataElements[field.id] = newId;
                             createdElements.push({ id: newId, field: field });
-                            addLog('success', `  ✓ Created: ${field.label}`);
+                            addLog('success', `  [OK] Created: ${field.label}`);
                         } else {
-                            addLog('error', `  ✗ Failed: ${field.label}`);
+                            addLog('error', `  [X] Failed: ${field.label}`);
                         }
                     }
                     await sleep(200);
@@ -1138,7 +1231,7 @@ function jsonResponse(data) {
                 
             } catch (error) {
                 updateDhis2Status('disconnected', 'Setup failed');
-                addLog('error', '✗ Error: ' + error.message);
+                addLog('error', '[X] Error: ' + error.message);
                 notify('Setup failed', 'error');
             }
         }
@@ -1167,9 +1260,9 @@ function jsonResponse(data) {
                     programId = existingProgResult.data.id;
                     programStageId = existingProgResult.data.programStages?.[0]?.id;
                     state.dhis2.programId = programId;
-                    addLog('success', `  ✓ Using existing Program: ${existingProgResult.data.name}`);
+                    addLog('success', `  [OK] Using existing Program: ${existingProgResult.data.name}`);
                 } else {
-                    addLog('error', `  ✗ Program not found: ${userProvidedProgramId}`);
+                    addLog('error', `  [X] Program not found: ${userProvidedProgramId}`);
                     addLog('info', 'Creating new Program instead...');
                 }
             }
@@ -1185,7 +1278,7 @@ function jsonResponse(data) {
                     programId = existingProg.id;
                     programStageId = existingProg.programStages?.[0]?.id;
                     state.dhis2.programId = programId;
-                    addLog('info', `  ↳ Program exists: ${programId}`);
+                    addLog('info', `  --> Program exists: ${programId}`);
                 } else {
                     // Create new Event Program (WITHOUT_REGISTRATION = Event Program)
                     const programPayload = {
@@ -1201,7 +1294,7 @@ function jsonResponse(data) {
                     if (createProgResult.success && createProgResult.data?.response?.uid) {
                         programId = createProgResult.data.response.uid;
                         state.dhis2.programId = programId;
-                        addLog('success', `  ✓ Program created: ${programId}`);
+                        addLog('success', `  [OK] Program created: ${programId}`);
                         
                         // Create Program Stage
                         await sleep(300);
@@ -1215,12 +1308,12 @@ function jsonResponse(data) {
                         
                         if (createStageResult.success && createStageResult.data?.response?.uid) {
                             programStageId = createStageResult.data.response.uid;
-                            addLog('success', `  ✓ Program Stage created: ${programStageId}`);
+                            addLog('success', `  [OK] Program Stage created: ${programStageId}`);
                         } else {
-                            addLog('error', '  ✗ Failed to create Program Stage');
+                            addLog('error', '  [X] Failed to create Program Stage');
                         }
                     } else {
-                        addLog('error', '  ✗ Failed to create Program');
+                        addLog('error', '  [X] Failed to create Program');
                         return;
                     }
                 }
@@ -1248,9 +1341,9 @@ function jsonResponse(data) {
                     const updateResult = await dhis2Request(`programStages/${programStageId}`, 'PUT', stageData);
                     
                     if (updateResult.success) {
-                        addLog('success', `  ✓ Assigned ${createdElements.length} data elements to stage`);
+                        addLog('success', `  [OK] Assigned ${createdElements.length} data elements to stage`);
                     } else {
-                        addLog('warning', '  ⚠ Could not assign all data elements');
+                        addLog('warning', '  [!] Could not assign all data elements');
                     }
                 }
             }
@@ -1274,7 +1367,7 @@ function jsonResponse(data) {
             
             if (dsCheckResult.success && dsCheckResult.data?.dataSets?.length > 0) {
                 state.dhis2.datasetId = dsCheckResult.data.dataSets[0].id;
-                addLog('info', `  ↳ Dataset exists: ${state.dhis2.datasetId}`);
+                addLog('info', `  --> Dataset exists: ${state.dhis2.datasetId}`);
             } else {
                 const createPayload = {
                     name: datasetName,
@@ -1289,9 +1382,9 @@ function jsonResponse(data) {
                 
                 if (createResult.success && createResult.data?.response?.uid) {
                     state.dhis2.datasetId = createResult.data.response.uid;
-                    addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
+                    addLog('success', `  [OK] Dataset created: ${state.dhis2.datasetId}`);
                 } else {
-                    addLog('error', '  ✗ Failed to create dataset');
+                    addLog('error', '  [X] Failed to create dataset');
                 }
             }
         }
@@ -1332,7 +1425,7 @@ function jsonResponse(data) {
                 const orgUnitId = state.dhis2.orgUnitMap[orgUnitName?.toLowerCase().trim()];
                 
                 if (!orgUnitId) {
-                    addLog('error', `  ✗ No org unit match: ${orgUnitName}`);
+                    addLog('error', `  [X] No org unit match: ${orgUnitName}`);
                     failed++;
                     continue;
                 }
@@ -1362,10 +1455,10 @@ function jsonResponse(data) {
                 
                 if (result.success) {
                     success++;
-                    addLog('success', `  ✓ Synced: ${orgUnitName} / ${period}`);
+                    addLog('success', `  [OK] Synced: ${orgUnitName} / ${period}`);
                 } else {
                     failed++;
-                    addLog('error', `  ✗ Failed: ${orgUnitName} / ${period}`);
+                    addLog('error', `  [X] Failed: ${orgUnitName} / ${period}`);
                 }
                 
                 await sleep(300);
@@ -1425,11 +1518,11 @@ function jsonResponse(data) {
                     // Use first org unit as fallback
                     orgUnitId = state.dhis2.orgUnits[0]?.id;
                     if (!orgUnitId) {
-                        addLog('error', `  ✗ No org unit: ${orgUnitName}`);
+                        addLog('error', `  [X] No org unit: ${orgUnitName}`);
                         failed++;
                         continue;
                     }
-                    addLog('warning', `  ⚠ Using default org unit for: ${orgUnitName}`);
+                    addLog('warning', `  [!] Using default org unit for: ${orgUnitName}`);
                 }
                 
                 // Get event date from period or timestamp
@@ -1462,7 +1555,7 @@ function jsonResponse(data) {
                 });
                 
                 if (dataValues.length === 0) {
-                    addLog('warning', '  ⚠ No data values in record');
+                    addLog('warning', '  [!] No data values in record');
                     failed++;
                     continue;
                 }
@@ -1483,11 +1576,11 @@ function jsonResponse(data) {
                     record._syncedAt = new Date().toISOString();
                     delete record._syncError;
                     success++;
-                    addLog('success', `  ✓ Event synced: ${orgUnitName || 'record'}`);
+                    addLog('success', `  [OK] Event synced: ${orgUnitName || 'record'}`);
                 } else {
                     record._syncError = result.error || JSON.stringify(result.data?.message || result.data?.response?.importSummaries?.[0]?.description) || 'Unknown error';
                     failed++;
-                    addLog('error', `  ✗ Event failed: ${record._syncError}`);
+                    addLog('error', `  [X] Event failed: ${record._syncError}`);
                 }
                 
                 await sleep(300);
@@ -1720,8 +1813,9 @@ function jsonResponse(data) {
         function showBuilder() {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainContainer').classList.add('show');
-            document.getElementById('headerUser').textContent = '👤 ' + (state.user?.name || 'User');
+            document.getElementById('headerUser').innerHTML = '<span data-icon="user" data-size="14"></span> ' + (state.user?.name || 'User');
             renderFields();
+            initIcons();
         }
 
         function logout() {
@@ -1802,11 +1896,12 @@ function jsonResponse(data) {
         function renderFields() {
             const dropZone = document.getElementById('dropZone');
             const dataFieldCount = state.fields.filter(f => f.type !== 'section').length;
-            document.getElementById('fieldCount').textContent = `📊 ${dataFieldCount} fields`;
+            document.getElementById('fieldCount').innerHTML = `<span data-icon="bar-chart-3" data-size="12"></span> ${dataFieldCount} fields`;
+            initIcons();
             
             if (state.fields.length === 0) {
                 dropZone.classList.remove('has-fields');
-                dropZone.innerHTML = '<p style="font-size:48px;margin-bottom:12px;">📥</p><p style="font-weight:600;">Click field types to add them</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period + Org Unit fields for DHIS2 sync</p>';
+                dropZone.innerHTML = '<p style="font-size:48px;margin-bottom:12px;"><span class="inline-icon">' + getIcon('inbox', 48) + '</span></p><p style="font-weight:600;">Click field types to add them</p><p style="font-size:11px;color:#868e96;margin-top:10px;">Add Period + Org Unit fields for DHIS2 sync</p>';
                 return;
             }
             
@@ -1815,11 +1910,11 @@ function jsonResponse(data) {
             dropZone.innerHTML = state.fields.map(f => {
                 if (f.type === 'section') {
                     return `<div class="section-divider ${f.id === state.selectedFieldId ? 'selected' : ''}" data-id="${f.id}">
-                        <span>📁 ${f.label.toUpperCase()}</span>
+                        <span><span class="inline-icon">${getIcon('folder', 14)}</span> ${f.label.toUpperCase()}</span>
                         <div style="display:flex;gap:5px;">
-                            <button class="field-action-btn" onclick="moveField('${f.id}','up')">▲</button>
-                            <button class="field-action-btn" onclick="moveField('${f.id}','down')">▼</button>
-                            <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','up')"><span class="inline-icon">${getIcon('chevron-up', 12)}</span></button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','down')"><span class="inline-icon">${getIcon('chevron-down', 12)}</span></button>
+                            <button class="field-action-btn delete" onclick="removeField('${f.id}')"><span data-icon="trash-2" data-size="12"></span></button>
                         </div>
                     </div>`;
                 }
@@ -1830,11 +1925,11 @@ function jsonResponse(data) {
                 
                 return `<div class="form-field ${f.id === state.selectedFieldId ? 'selected' : ''} ${isDhis2Field ? 'dhis2-field' : ''}" data-id="${f.id}">
                     <div class="form-field-header">
-                        <span class="form-field-label">${def?.icon || '📄'} ${f.label}</span>
+                        <span class="form-field-label"><span class="inline-icon">${getIcon(def?.icon || 'file-text', 14)}</span> ${f.label}</span>
                         <div class="form-field-actions">
-                            <button class="field-action-btn" onclick="moveField('${f.id}','up')">▲</button>
-                            <button class="field-action-btn" onclick="moveField('${f.id}','down')">▼</button>
-                            <button class="field-action-btn delete" onclick="removeField('${f.id}')">🗑️</button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','up')"><span class="inline-icon">${getIcon('chevron-up', 12)}</span></button>
+                            <button class="field-action-btn" onclick="moveField('${f.id}','down')"><span class="inline-icon">${getIcon('chevron-down', 12)}</span></button>
+                            <button class="field-action-btn delete" onclick="removeField('${f.id}')"><span data-icon="trash-2" data-size="12"></span></button>
                         </div>
                     </div>
                     <div style="font-size:10px;color:#868e96;">
@@ -1856,7 +1951,7 @@ function jsonResponse(data) {
         function renderProperties() {
             const container = document.getElementById('propertiesContent');
             if (!state.selectedFieldId) {
-                container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;">👆</p><p>Select a field to edit</p></div>';
+                container.innerHTML = '<div class="no-selection"><p style="font-size:32px;margin-bottom:12px;"><span data-icon="chevron-up" data-size="32"></span></p><p>Select a field to edit</p></div>';
                 return;
             }
             
@@ -1865,7 +1960,7 @@ function jsonResponse(data) {
             
             let html = `
                 <div class="prop-section">
-                    <div class="prop-section-title">📝 Field Settings</div>
+                    <div class="prop-section-title"><span data-icon="edit-3" data-size="12"></span> Field Settings</div>
                     <div class="property-group">
                         <label class="property-label">Label</label>
                         <input type="text" class="property-input" id="propLabel" value="${escapeHtml(field.label)}">
@@ -1888,7 +1983,7 @@ function jsonResponse(data) {
             if (['select', 'radio', 'checkbox'].includes(field.type)) {
                 html += `
                     <div class="prop-section">
-                        <div class="prop-section-title">📋 Options (one per line)</div>
+                        <div class="prop-section-title"><span data-icon="list" data-size="12"></span> Options (one per line)</div>
                         <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
                     </div>
                 `;
@@ -1897,7 +1992,7 @@ function jsonResponse(data) {
             if (field.type === 'orgunit') {
                 html += `
                     <div class="prop-section">
-                        <div class="prop-section-title">🏥 Facility Options</div>
+                        <div class="prop-section-title"><span class="inline-icon">${getIcon('building-2', 14)}</span> Facility Options</div>
                         <p style="font-size:10px;color:#666;margin-bottom:10px;">Add facility names (will match with DHIS2 org units)</p>
                         <textarea class="property-textarea" id="propOptions">${(field.options || []).join('\n')}</textarea>
                     </div>
@@ -2070,23 +2165,23 @@ function jsonResponse(data) {
             const forms = JSON.parse(localStorage.getItem('icfCollectForms') || '[]');
             let formsHtml = forms.length === 0 ? `
                 <div style="text-align:center;padding:60px;color:#868e96;">
-                    <p style="font-size:64px;margin-bottom:12px;">📭</p>
+                    <p style="font-size:64px;margin-bottom:12px;"><span data-icon="inbox" data-size="64"></span></p>
                     <h3 style="color:#004080;">No Forms Yet</h3>
-                    <button onclick="closeHome()" style="padding:15px 30px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:20px;font-weight:bold;">➕ Create Form</button>
+                    <button onclick="closeHome()" style="padding:15px 30px;background:#28a745;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:20px;font-weight:bold;"><span data-icon="plus" data-size="14"></span> Create Form</button>
                 </div>
             ` : forms.map((f, i) => `
                 <div style="background:#fff;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);overflow:hidden;">
                     <div style="background:linear-gradient(135deg,#004080,#002855);color:#fff;padding:12px 15px;">
-                        <h3 style="margin:0;font-size:14px;">📋 ${escapeHtml(f.title)}</h3>
+                        <h3 style="margin:0;font-size:14px;"><span data-icon="clipboard-list" data-size="14"></span> ${escapeHtml(f.title)}</h3>
                     </div>
                     <div style="padding:12px 15px;">
                         <div style="font-size:11px;color:#666;margin-bottom:10px;">
-                            📊 ${f.fieldCount} fields | 📝 ${(f.collectedData || []).length} records
-                            ${f.dhis2?.datasetId ? '<span style="color:#17a2b8;margin-left:8px;">🔗 DHIS2</span>' : ''}
+                            <span data-icon="bar-chart-3" data-size="12"></span> ${f.fieldCount} fields | <span data-icon="edit-3" data-size="12"></span> ${(f.collectedData || []).length} records
+                            ${f.dhis2?.datasetId ? '<span style="color:#17a2b8;margin-left:8px;"><span class="inline-icon">' + getIcon('link', 12) + '</span> DHIS2</span>' : ''}
                         </div>
                         <div style="display:flex;gap:6px;">
-                            <button onclick="editForm(${i})" style="flex:1;padding:8px;background:#004080;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;">✏️ Edit</button>
-                            <button onclick="deleteForm(${i})" style="padding:8px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;">🗑️</button>
+                            <button onclick="editForm(${i})" style="flex:1;padding:8px;background:#004080;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;"><span class="inline-icon">${getIcon('pencil', 12)}</span> Edit</button>
+                            <button onclick="deleteForm(${i})" style="padding:8px 12px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;"><span data-icon="trash-2" data-size="12"></span></button>
                         </div>
                     </div>
                 </div>
@@ -2095,8 +2190,8 @@ function jsonResponse(data) {
             document.getElementById('homeContainer').innerHTML = `
                 <div style="max-width:600px;margin:0 auto;padding:20px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                        <h2 style="color:#004080;">🏠 My Forms</h2>
-                        <button onclick="closeHome()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">➕ New</button>
+                        <h2 style="color:#004080;"><span data-icon="home" data-size="20"></span> My Forms</h2>
+                        <button onclick="closeHome()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;"><span data-icon="plus" data-size="14"></span> New</button>
                     </div>
                     ${formsHtml}
                 </div>
@@ -2106,6 +2201,7 @@ function jsonResponse(data) {
             document.getElementById('mainContainer').classList.remove('show');
             document.querySelector('.footer').style.display = 'none';
             document.getElementById('homeContainer').classList.add('show');
+            initIcons();
         }
 
         function closeHome() {
@@ -2226,10 +2322,10 @@ function jsonResponse(data) {
                             input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
                             break;
                         case 'gps':
-                            input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;">📍 Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`;
+                            input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;"><span data-icon="map-pin" data-size="14"></span> Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`;
                             break;
                         case 'rating':
-                            input = `<div>${Array(field.max || 5).fill().map((_, i) => `<span onclick="setRating(this,${i+1})" class="rating-star" style="font-size:24px;cursor:pointer;opacity:0.3;">⭐</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
+                            input = `<div>${Array(field.max || 5).fill().map((_, i) => `<span onclick="setRating(this,${i+1})" class="rating-star" style="font-size:24px;cursor:pointer;opacity:0.3;color:#ffc107;">★</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
                             break;
                         default:
                             input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
@@ -2245,24 +2341,24 @@ function jsonResponse(data) {
                         ${pages.length > 1 ? `<div class="page-header"><span class="page-indicator">Page ${pageIndex + 1}/${pages.length}</span><h3 class="page-title">${escapeHtml(page.title)}</h3></div>` : ''}
                         ${fieldsHtml}
                         <div class="page-navigation">
-                            ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})">⬅️ Back</button>` : '<div></div>'}
-                            ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next ➡️</button>` : ''}
-                            ${isLast ? `<button type="submit" class="nav-btn submit-btn">✅ Submit</button>` : ''}
+                            ${!isFirst ? `<button type="button" class="nav-btn back-btn" onclick="goToPage(${pageIndex - 1})"><span class="inline-icon">${getIcon('arrow-left', 14)}</span> Back</button>` : '<div></div>'}
+                            ${!isLast ? `<button type="button" class="nav-btn next-btn" onclick="goToPage(${pageIndex + 1})">Next <span class="inline-icon">${getIcon('arrow-right', 14)}</span></button>` : ''}
+                            ${isLast ? `<button type="submit" class="nav-btn submit-btn"><span data-icon="check" data-size="14"></span> Submit</button>` : ''}
                         </div>
                     </div>
                 `;
             }).join('');
             
-            const backBtn = state.isSharedMode ? '' : '<button class="viewer-back-btn" onclick="closeViewer()">⬅️ Back</button>';
+            const backBtn = state.isSharedMode ? '' : '<button class="viewer-back-btn" onclick="closeViewer()"><span class="inline-icon">' + getIcon('arrow-left', 14) + '</span> Back</button>';
             
             document.getElementById('viewerContainer').innerHTML = `
                 <div class="viewer-nav">
                     ${backBtn}
-                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)">📝 Form</button>
-                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)">📊 Data</button>
-                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)">📈 Dashboard</button>
+                    <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)"><span data-icon="edit-3" data-size="14"></span> Form</button>
+                    <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)"><span data-icon="table" data-size="14"></span> Data</button>
+                    <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)"><span data-icon="bar-chart-2" data-size="14"></span> Dashboard</button>
                     <div class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
-                        ${navigator.onLine ? '🟢 Online' : '🔴 Offline'}
+                        ${navigator.onLine ? '<span class="inline-icon" style="color:#28a745;">' + getIcon('wifi', 14) + '</span> Online' : '<span class="inline-icon" style="color:#dc3545;">' + getIcon('wifi-off', 14) + '</span> Offline'}
                     </div>
                 </div>
                 
@@ -2283,13 +2379,13 @@ function jsonResponse(data) {
                 
                 <div id="tabData" class="viewer-tab">
                     <div style="max-width:1100px;margin:0 auto;" id="dataContent">
-                        <p style="text-align:center;padding:40px;">⏳ Loading...</p>
+                        <p style="text-align:center;padding:40px;"><span data-icon="loader" data-size="14"></span> Loading...</p>
                     </div>
                 </div>
                 
                 <div id="tabDashboard" class="viewer-tab">
                     <div class="dashboard-container" id="dashboardContent">
-                        <p style="text-align:center;padding:40px;">⏳ Loading...</p>
+                        <p style="text-align:center;padding:40px;"><span data-icon="loader" data-size="14"></span> Loading...</p>
                     </div>
                 </div>
             `;
@@ -2297,6 +2393,7 @@ function jsonResponse(data) {
             window.totalPages = pages.length;
             setupFormSubmit();
             loadViewerData();
+            initIcons();
         }
 
         function setupFormSubmit() {
@@ -2319,7 +2416,7 @@ function jsonResponse(data) {
                 form.reset();
                 goToPage(0);
                 
-                notify(result.offline ? '💾 Saved offline' : '✅ Submitted!');
+                notify(result.offline ? 'Saved offline' : 'Submitted!');
                 loadViewerData();
             };
         }
@@ -2356,11 +2453,11 @@ function jsonResponse(data) {
             // Build filter panel
             let filtersHtml = `
                 <div class="filter-group">
-                    <label class="filter-label">📅 From</label>
+                    <label class="filter-label"><span class="inline-icon">${getIcon('calendar', 12)}</span> From</label>
                     <input type="date" class="filter-input" value="${state.dateFilter.start}" onchange="updateDateFilter('start', this.value)">
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">📅 To</label>
+                    <label class="filter-label"><span class="inline-icon">${getIcon('calendar', 12)}</span> To</label>
                     <input type="date" class="filter-input" value="${state.dateFilter.end}" onchange="updateDateFilter('end', this.value)">
                 </div>
             `;
@@ -2381,24 +2478,25 @@ function jsonResponse(data) {
             container.innerHTML = `
                 <div class="filter-panel">
                     <div class="filter-header">
-                        <div class="filter-title">🔍 Filters ${activeFilterCount > 0 ? `<span class="filter-count">${activeFilterCount} active</span>` : ''}</div>
-                        <button class="filter-btn clear" onclick="clearAllFilters()">🗑️ Clear</button>
+                        <div class="filter-title"><span data-icon="filter" data-size="14"></span> Filters ${activeFilterCount > 0 ? `<span class="filter-count">${activeFilterCount} active</span>` : ''}</div>
+                        <button class="filter-btn clear" onclick="clearAllFilters()"><span data-icon="trash-2" data-size="12"></span> Clear</button>
                     </div>
                     <div class="filter-controls">${filtersHtml}</div>
                 </div>
                 
                 <div class="data-view-tabs">
-                    <div class="data-view-tab ${state.currentDataView === 'case' ? 'active' : ''}" onclick="switchDataView('case')">📋 Case-Based (${filteredData.length})</div>
-                    <div class="data-view-tab ${state.currentDataView === 'aggregate' ? 'active aggregate' : ''}" onclick="switchDataView('aggregate')">📊 Aggregate (${aggregateData.length})</div>
+                    <div class="data-view-tab ${state.currentDataView === 'case' ? 'active' : ''}" onclick="switchDataView('case')"><span data-icon="list" data-size="14"></span> Case-Based (${filteredData.length})</div>
+                    <div class="data-view-tab ${state.currentDataView === 'aggregate' ? 'active aggregate' : ''}" onclick="switchDataView('aggregate')"><span data-icon="bar-chart-3" data-size="14"></span> Aggregate (${aggregateData.length})</div>
                 </div>
                 
                 <div id="dataTableContainer">${state.currentDataView === 'case' ? renderCaseTable(filteredData) : renderAggregateTable(aggregateData)}</div>
                 
                 <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="modal-btn primary" onclick="refreshData()">🔄 Refresh</button>
-                    <button class="modal-btn success" onclick="downloadCSV()">📥 Download CSV</button>
+                    <button class="modal-btn primary" onclick="refreshData()"><span data-icon="refresh-cw" data-size="14"></span> Refresh</button>
+                    <button class="modal-btn success" onclick="downloadCSV()"><span data-icon="download" data-size="14"></span> Download CSV</button>
                 </div>
             `;
+            initIcons();
         }
 
         window.switchDataView = function(view) {
@@ -2408,19 +2506,19 @@ function jsonResponse(data) {
 
         function renderCaseTable(data) {
             if (data.length === 0) {
-                return '<p style="text-align:center;padding:40px;color:#868e96;">📭 No records found</p>';
+                return '<p style="text-align:center;padding:40px;color:#868e96;"><span data-icon="inbox" data-size="20"></span> No records found</p>';
             }
             
             const fields = state.fields.filter(f => f.type !== 'section');
             
-            let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>#</th><th>📅 Timestamp</th>';
+            let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>#</th><th><span data-icon="calendar" data-size="12"></span> Timestamp</th>';
             fields.slice(0, 8).forEach(f => html += `<th>${escapeHtml(f.label)}</th>`);
             html += '<th>Status</th></tr></thead><tbody>';
             
             data.slice().reverse().forEach((row, i) => {
                 const syncStatus = row._synced ? 
-                    '<span class="sync-badge synced">✓ Synced</span>' : 
-                    (row._syncError ? '<span class="sync-badge failed">✗ Failed</span>' : '<span class="sync-badge pending">⏳ Pending</span>');
+                    '<span class="sync-badge synced"><span data-icon="check" data-size="10"></span> Synced</span>' : 
+                    (row._syncError ? '<span class="sync-badge failed"><span data-icon="x" data-size="10"></span> Failed</span>' : '<span class="sync-badge pending"><span data-icon="clock" data-size="10"></span> Pending</span>');
                     
                 html += `<tr><td>${data.length - i}</td><td style="font-size:10px;">${new Date(row._timestamp).toLocaleString()}</td>`;
                 fields.slice(0, 8).forEach(f => html += `<td>${escapeHtml(String(row[f.name] || '-').substring(0, 25))}</td>`);
@@ -2433,14 +2531,14 @@ function jsonResponse(data) {
 
         function renderAggregateTable(data) {
             if (data.length === 0) {
-                return '<p style="text-align:center;padding:40px;color:#868e96;">📭 No aggregate data (need Period + Org Unit fields)</p>';
+                return '<p style="text-align:center;padding:40px;color:#868e96;"><span data-icon="inbox" data-size="20"></span> No aggregate data (need Period + Org Unit fields)</p>';
             }
             
             const dataFields = state.fields.filter(f => 
                 f.type !== 'section' && f.type !== 'period' && f.type !== 'orgunit'
             );
             
-            let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr><th>🏥 Facility</th><th>📅 Period</th><th>📊 Records</th>';
+            let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr><th><span class="inline-icon">' + getIcon('building-2', 14) + '</span> Facility</th><th><span class="inline-icon">' + getIcon('calendar', 14) + '</span> Period</th><th><span class="inline-icon">' + getIcon('bar-chart-3', 14) + '</span> Records</th>';
             dataFields.slice(0, 6).forEach(f => {
                 const def = fieldDefs[f.type];
                 const suffix = f.type === 'number' ? ' (SUM)' : f.type === 'yesno' ? ' (Yes)' : '';
@@ -2462,9 +2560,9 @@ function jsonResponse(data) {
         }
 
         window.refreshData = async function() {
-            notify('🔄 Refreshing...');
+            notify('Refreshing...');
             await loadViewerData();
-            notify('✅ Refreshed!');
+            notify('Refreshed!');
         };
 
         window.downloadCSV = function() {
@@ -2485,7 +2583,7 @@ function jsonResponse(data) {
             a.download = `${state.settings.title}_${state.currentDataView}_data.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            notify('✅ Downloaded!');
+            notify('Downloaded!');
         };
 
         function renderDashboard() {
@@ -2524,7 +2622,7 @@ function jsonResponse(data) {
                 if (Object.keys(valueCounts).length > 0) {
                     chartsHtml += `
                         <div class="chart-container">
-                            <h4>📊 ${escapeHtml(field.label)}</h4>
+                            <h4><span class="inline-icon">${getIcon('bar-chart-3', 16)}</span> ${escapeHtml(field.label)}</h4>
                             <div class="chart-wrapper">
                                 <div class="chart-box"><canvas id="barChart_${idx}"></canvas></div>
                                 <div class="chart-box"><canvas id="pieChart_${idx}"></canvas></div>
@@ -2537,7 +2635,7 @@ function jsonResponse(data) {
             if (numericFields.length > 0 && aggregateData.length > 0) {
                 chartsHtml += `
                     <div class="chart-container">
-                        <h4>🔢 Numeric Summary (Aggregate)</h4>
+                        <h4><span data-icon="hash" data-size="14"></span> Numeric Summary (Aggregate)</h4>
                         <div style="overflow-x:auto;">
                             <table class="data-table">
                                 <thead><tr><th>Field</th><th>Total Sum</th><th>Average per Location</th><th>Min</th><th>Max</th></tr></thead>
@@ -2560,7 +2658,7 @@ function jsonResponse(data) {
             container.innerHTML = `
                 <div class="dashboard-header">
                     <img src="${state.settings.logo}" alt="Logo">
-                    <h2>📈 ${escapeHtml(state.settings.title)} - Dashboard</h2>
+                    <h2><span class="inline-icon">${getIcon('bar-chart-2', 20)}</span> ${escapeHtml(state.settings.title)} - Dashboard</h2>
                     <p>ICF-SL Data Analytics</p>
                 </div>
                 
@@ -2573,7 +2671,7 @@ function jsonResponse(data) {
                     <div class="stat-card"><div class="stat-value">${aggregateData.length}</div><div class="stat-label">Aggregate Rows</div></div>
                 </div>
                 
-                ${chartsHtml || '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;">📊 Add categorical fields for charts</p></div>'}
+                ${chartsHtml || '<div class="chart-container"><p style="text-align:center;color:#868e96;padding:30px;"><span class="inline-icon">' + getIcon('bar-chart-3', 18) + '</span> Add categorical fields for charts</p></div>'}
             `;
             
             // Render charts
@@ -2643,19 +2741,19 @@ function jsonResponse(data) {
             const container = btn.parentElement;
             const status = container.querySelector('.gps-status');
             const input = container.querySelector('input[type="hidden"]');
-            status.innerHTML = '⏳ Getting location...';
+            status.innerHTML = '<span class="inline-icon">' + getIcon('loader', 12) + '</span> Getting location...';
             
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     pos => {
                         const coords = `[${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}]`;
                         input.value = coords;
-                        status.innerHTML = '✅ ' + coords;
+                        status.innerHTML = '<span class="inline-icon" style="color:#28a745;">' + getIcon('check-circle', 12) + '</span> ' + coords;
                     },
-                    err => { status.innerHTML = '❌ ' + err.message; }
+                    err => { status.innerHTML = '<span class="inline-icon" style="color:#dc3545;">' + getIcon('x-circle', 12) + '</span> ' + err.message; }
                 );
             } else {
-                status.innerHTML = '❌ Not supported';
+                status.innerHTML = '<span class="inline-icon" style="color:#dc3545;">' + getIcon('x-circle', 12) + '</span> Not supported';
             }
         };
 
@@ -2667,6 +2765,7 @@ function jsonResponse(data) {
 
         // Initialize
         init();
+        initIcons();
     </script>
 </body>
 </html>
