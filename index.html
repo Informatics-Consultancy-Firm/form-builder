@@ -686,24 +686,26 @@
         // ==================== PROXY CONFIGURATION ====================
         const PROXIES = [
             { 
+                name: 'Direct',
+                url: '',
+                type: 'direct'  // Try direct connection first (works if DHIS2 has CORS enabled)
+            },
+            { 
                 name: 'GAS Proxy',
                 url: 'https://script.google.com/macros/s/AKfycbyRXc68PYSmDSCYPakAS8Gc9R00kRjmsMYoDujPYMItyquXfwMAJUtRqXLiDlNWbSfDQQ/exec',
                 type: 'gas'
             },
             { 
-                name: 'CORS Proxy 1',
+                name: 'CORS Proxy',
                 url: 'https://corsproxy.io/?',
-                type: 'cors'
-            },
-            { 
-                name: 'CORS Proxy 2',
-                url: 'https://api.allorigins.win/raw?url=',
                 type: 'cors'
             }
         ];
 
         function buildProxyUrl(proxy, targetUrl, auth, method) {
-            if (proxy.type === 'gas') {
+            if (proxy.type === 'direct') {
+                return targetUrl; // Direct connection
+            } else if (proxy.type === 'gas') {
                 let proxyUrl = proxy.url + '?url=' + encodeURIComponent(targetUrl);
                 if (auth) {
                     proxyUrl += '&auth=' + encodeURIComponent(auth);
@@ -832,15 +834,19 @@
         async function submitToGoogleSheets(data) {
             const scriptUrl = CONFIG.AUTH_SCRIPT_URL;
             if (!scriptUrl) {
+                console.log('No script URL configured');
                 saveOffline(data);
                 return { success: false, offline: true };
             }
             
             // Check if online
             if (!navigator.onLine) {
+                console.log('Browser reports offline');
                 saveOffline(data);
                 return { success: false, offline: true };
             }
+            
+            console.log('Submitting to Google Sheets...', { formTitle: state.settings.title, sheetId: state.sheets.sheetId });
             
             try {
                 const payload = {
@@ -850,18 +856,35 @@
                     data: data
                 };
                 
+                console.log('Payload:', payload);
+                
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload)
                 });
                 
-                const result = await response.json();
+                console.log('Response status:', response.status);
+                
+                const text = await response.text();
+                console.log('Response text:', text);
+                
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch(e) {
+                    console.error('Failed to parse response:', text);
+                    saveOffline(data);
+                    return { success: false, offline: true, error: 'Invalid response from server' };
+                }
+                
+                console.log('Parsed result:', result);
                 
                 if (result.success) {
                     // Mark as synced
                     data._synced = true;
                     data._syncedAt = new Date().toISOString();
+                    console.log('✓ Submitted successfully');
                     return { success: true, offline: false };
                 } else {
                     console.error('Sheets submission failed:', result.error);
@@ -1026,20 +1049,22 @@
                 const proxy = PROXIES[i];
                 const proxiedUrl = buildProxyUrl(proxy, apiUrl, auth, method);
                 
-                // For GET, use GET. For everything else, use POST (for GAS) or actual method (for CORS)
-                const fetchMethod = proxy.type === 'gas' ? (method === 'GET' ? 'GET' : 'POST') : method;
-                
                 const options = {
-                    method: fetchMethod,
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }
                 };
                 
-                // For CORS proxies, add auth header
-                if (proxy.type === 'cors') {
+                // Add auth header for direct and CORS connections
+                if (proxy.type === 'direct' || proxy.type === 'cors') {
                     options.headers['Authorization'] = 'Basic ' + auth;
+                }
+                
+                // For GAS proxy, use POST for non-GET methods
+                if (proxy.type === 'gas' && method !== 'GET') {
+                    options.method = 'POST';
                 }
                 
                 if (payload && method !== 'GET') {
@@ -1053,9 +1078,23 @@
                     let data;
                     try { data = JSON.parse(text); } catch (e) { data = text; }
                     
-                    // Check for proxy error - try next proxy
-                    if (data && data.error && typeof data.error === 'string' && data.error.includes('Exception')) {
-                        lastError = data.error;
+                    // Check for proxy errors - try next proxy
+                    // GAS proxy error format: {"error": {"status": 502, "message": "..."}}
+                    // or {"error": "Exception: ..."}
+                    if (data && data.error) {
+                        if (typeof data.error === 'object' && (data.error.status === 502 || data.error.status === 500)) {
+                            lastError = `${proxy.name}: ${data.error.message || 'Proxy error'}`;
+                            continue; // Try next proxy
+                        }
+                        if (typeof data.error === 'string' && (data.error.includes('Exception') || data.error.includes('fetch'))) {
+                            lastError = `${proxy.name}: ${data.error}`;
+                            continue; // Try next proxy
+                        }
+                    }
+                    
+                    // Check for CORS error (direct connection blocked)
+                    if (proxy.type === 'direct' && typeof data === 'string' && data === '') {
+                        lastError = 'Direct: CORS blocked';
                         continue;
                     }
                     
@@ -1098,11 +1137,11 @@
                     }
                     
                     // Not successful, try next proxy
-                    lastError = 'Invalid response';
+                    lastError = `${proxy.name}: Invalid response`;
                     
                 } catch (error) {
-                    // Network error - try next proxy silently
-                    lastError = error.message;
+                    // Network error - try next proxy
+                    lastError = `${proxy.name}: ${error.message}`;
                     continue;
                 }
             }
