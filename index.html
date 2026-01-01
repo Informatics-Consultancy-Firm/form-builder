@@ -310,8 +310,8 @@
                 </div>
                 <form class="auth-form active" id="loginForm">
                     <div class="auth-group">
-                        <label class="auth-label">Email</label>
-                        <input type="email" class="auth-input" id="loginEmail" required placeholder="your@email.com">
+                        <label class="auth-label">Email / Username</label>
+                        <input type="text" class="auth-input" id="loginEmail" required placeholder="your@email.com or username">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Password</label>
@@ -328,8 +328,8 @@
                         <input type="text" class="auth-input" id="signupName" required placeholder="John Doe">
                     </div>
                     <div class="auth-group">
-                        <label class="auth-label">Email</label>
-                        <input type="email" class="auth-input" id="signupEmail" required placeholder="your@email.com">
+                        <label class="auth-label">Email / Username</label>
+                        <input type="text" class="auth-input" id="signupEmail" required placeholder="your@email.com or username">
                     </div>
                     <div class="auth-group">
                         <label class="auth-label">Password</label>
@@ -339,8 +339,8 @@
                 </form>
                 <form class="auth-form" id="forgotForm">
                     <div class="auth-group">
-                        <label class="auth-label">Enter your email to receive your password</label>
-                        <input type="email" class="auth-input" id="forgotEmail" required placeholder="your@email.com">
+                        <label class="auth-label">Enter your email/username</label>
+                        <input type="text" class="auth-input" id="forgotEmail" required placeholder="your@email.com or username">
                     </div>
                     <button type="submit" class="auth-btn" style="background:#28a745;"><span data-icon="mail" data-size="14"></span> Send Password</button>
                     <div style="text-align:center;margin-top:12px;">
@@ -2176,8 +2176,13 @@
             try {
                 const response = await fetch(CONFIG.AUTH_SCRIPT_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=signup&name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'signup',
+                        name: name,
+                        email: email,
+                        password: password
+                    })
                 });
                 const result = await response.json();
                 
@@ -2187,7 +2192,7 @@
                     // Also save locally for offline
                     const users = JSON.parse(localStorage.getItem('icfCollectUsers') || '[]');
                     if (!users.find(u => u.email === email)) {
-                        users.push({ id: result.userId || Date.now().toString(), name, email, password });
+                        users.push({ id: result.user?.id || Date.now().toString(), name, email, password });
                         localStorage.setItem('icfCollectUsers', JSON.stringify(users));
                     }
                     
@@ -2196,7 +2201,7 @@
                     setTimeout(() => switchAuthTab('login'), 1500);
                 } else {
                     document.getElementById('authError').style.display = 'block';
-                    document.getElementById('authError').textContent = result.message || 'Registration failed';
+                    document.getElementById('authError').textContent = result.error || 'Registration failed';
                 }
             } catch (error) {
                 showAuthLoading(false);
