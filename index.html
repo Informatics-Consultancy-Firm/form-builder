@@ -2134,7 +2134,15 @@
             showAuthLoading(true);
             
             try {
-                const response = await fetch(CONFIG.AUTH_SCRIPT_URL + '?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password));
+                const response = await fetch(CONFIG.AUTH_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: email,
+                        password: password
+                    })
+                });
                 const result = await response.json();
                 
                 showAuthLoading(false);
@@ -2145,7 +2153,7 @@
                     showBuilder();
                 } else {
                     document.getElementById('authError').style.display = 'block';
-                    document.getElementById('authError').textContent = result.message || 'Invalid credentials';
+                    document.getElementById('authError').textContent = result.error || 'Invalid credentials';
                 }
             } catch (error) {
                 showAuthLoading(false);
