@@ -577,6 +577,21 @@
                         <button class="modal-btn primary" onclick="copyShareUrl()"><span data-icon="copy" data-size="14"></span> Copy URL</button>
                     </div>
                 </div>
+                
+                <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:20px;">
+                    <h4 style="color:#1565c0;margin:0 0 10px 0;"><span data-icon="info" data-size="14"></span> What's included in the shared link</h4>
+                    <ul style="margin:0;padding-left:20px;font-size:12px;color:#333;">
+                        <li>✓ Form fields and configuration</li>
+                        <li>✓ Automatic Google Sheets sync (sheet = form name)</li>
+                        <li>✓ DHIS2 connection & credentials (if configured)</li>
+                        <li>✓ Full sync capability to DHIS2</li>
+                    </ul>
+                </div>
+                
+                <div style="background:#fff3cd;padding:15px;border-radius:8px;margin-top:10px;">
+                    <h4 style="color:#856404;margin:0 0 5px 0;"><span data-icon="alert-triangle" data-size="14"></span> Security Note</h4>
+                    <p style="margin:0;font-size:12px;color:#856404;">DHIS2 credentials are embedded in the link. Only share with trusted users.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -632,6 +647,9 @@
             'smartphone': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
             'copy': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
             'check-circle': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            'cloud': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>',
+            'info': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+            'alert-triangle': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
             'x-circle': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
             'loader': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>',
             'database': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
@@ -684,6 +702,7 @@
         };
 
         // ==================== PROXY CONFIGURATION ====================
+        // For DHIS2 POST/PUT requests, only GAS proxy works (CORS proxies block POST)
         const PROXIES = [
             { 
                 name: 'Direct',
@@ -694,11 +713,6 @@
                 name: 'GAS Proxy',
                 url: 'https://script.google.com/macros/s/AKfycbyRXc68PYSmDSCYPakAS8Gc9R00kRjmsMYoDujPYMItyquXfwMAJUtRqXLiDlNWbSfDQQ/exec',
                 type: 'gas'
-            },
-            { 
-                name: 'CORS Proxy',
-                url: 'https://corsproxy.io/?',
-                type: 'cors'
             }
         ];
 
@@ -829,7 +843,8 @@
         }
 
         // ==================== GOOGLE SHEETS ====================
-        // Configuration is hardcoded in CONFIG.AUTH_SCRIPT_URL
+        // Automatic sheet creation based on form name
+        // Row 1 = Labels, Row 2 = Variable Names, Row 3+ = Data
         
         async function submitToGoogleSheets(data) {
             const scriptUrl = CONFIG.AUTH_SCRIPT_URL;
@@ -846,13 +861,25 @@
                 return { success: false, offline: true };
             }
             
-            console.log('Submitting to Google Sheets...', { formTitle: state.settings.title, sheetId: state.sheets.sheetId });
+            console.log('Submitting to Google Sheets...', { formTitle: state.settings.title });
+            
+            // Build field definitions (labels and names)
+            const fieldDefs = state.fields
+                .filter(f => f.type !== 'section')
+                .map(f => ({ label: f.label, name: f.name }));
+            
+            // Add system fields
+            fieldDefs.unshift(
+                { label: 'Record ID', name: '_id' },
+                { label: 'Timestamp', name: '_timestamp' },
+                { label: 'Synced', name: '_synced' }
+            );
             
             try {
                 const payload = {
                     action: 'submit',
                     formTitle: state.settings.title,
-                    sheetId: state.sheets.sheetId || '',
+                    fields: fieldDefs,
                     data: data
                 };
                 
@@ -900,24 +927,54 @@
 
         async function loadFromGoogleSheets() {
             const scriptUrl = CONFIG.AUTH_SCRIPT_URL;
-            if (!scriptUrl) return [];
+            if (!scriptUrl) {
+                console.log('No script URL configured');
+                return [];
+            }
+            
+            const url = `${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=1000`;
+            console.log('Fetching from:', url);
             
             try {
-                const response = await fetch(`${scriptUrl}?action=getData&formTitle=${encodeURIComponent(state.settings.title)}&limit=1000&sheetId=${encodeURIComponent(state.sheets.sheetId || '')}`);
-                const result = await response.json();
+                const response = await fetch(url);
+                const text = await response.text();
+                console.log('Response:', text.substring(0, 200));
+                
+                const result = JSON.parse(text);
+                
                 if (result.success && result.data) {
+                    console.log('✓ Loaded', result.data.length, 'records from Google Sheets');
                     return result.data;
+                } else {
+                    console.log('No data or error:', result.error || result.message);
+                    return [];
                 }
             } catch (err) {
                 console.error('Load error:', err);
+                return [];
             }
-            return [];
         }
 
         function saveOffline(data) {
             data._offline = true;
+            
+            // Include field definitions for syncing later
+            const fieldDefs = state.fields
+                .filter(f => f.type !== 'section')
+                .map(f => ({ label: f.label, name: f.name }));
+            
+            fieldDefs.unshift(
+                { label: 'Record ID', name: '_id' },
+                { label: 'Timestamp', name: '_timestamp' },
+                { label: 'Synced', name: '_synced' }
+            );
+            
             const offlineData = JSON.parse(localStorage.getItem('icfOfflineData') || '[]');
-            offlineData.push({ formTitle: state.settings.title, data: data });
+            offlineData.push({ 
+                formTitle: state.settings.title, 
+                fields: fieldDefs,
+                data: data 
+            });
             localStorage.setItem('icfOfflineData', JSON.stringify(offlineData));
         }
 
@@ -947,7 +1004,7 @@
                         body: JSON.stringify({
                             action: 'submit',
                             formTitle: item.formTitle,
-                            sheetId: state.sheets.sheetId || '',
+                            fields: item.fields,
                             data: item.data
                         })
                     });
@@ -1261,6 +1318,7 @@
 
         function updateDhis2Status(type, message) {
             const el = document.getElementById('dhis2Status');
+            if (!el) return; // Safe for shared mode where element doesn't exist
             el.className = `status-badge ${type}`;
             const icon = type === 'connected' ? '✓' : type === 'syncing' ? '⋯' : '✗';
             el.innerHTML = `${icon} <span>${message}</span>`;
@@ -1616,10 +1674,13 @@
         }
 
         async function syncToDhis2() {
-            if (!state.dhis2.connected) {
-                notify('Connect to DHIS2 first', 'error');
+            if (!state.dhis2.url || !state.dhis2.username) {
+                notify('DHIS2 not configured', 'error');
                 return;
             }
+            
+            // Ensure connected flag is set
+            state.dhis2.connected = true;
             
             clearLog();
             
@@ -2482,9 +2543,24 @@
             if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
             
             const formData = {
-                s: { t: state.settings.title, l: state.settings.logo, si: state.sheets.sheetId },
+                s: { t: state.settings.title, l: state.settings.logo },
                 f: state.fields.map(f => ({ i: f.id, y: f.type, l: f.label, n: f.name, r: f.required, o: f.options, mx: f.max })),
-                d: state.dhis2.datasetId ? { id: state.dhis2.datasetId, de: state.dhis2.dataElements } : null
+                d: state.dhis2.datasetId || state.dhis2.programId ? { 
+                    id: state.dhis2.datasetId,
+                    pid: state.dhis2.programId,
+                    de: state.dhis2.dataElements 
+                } : null,
+                // Include DHIS2 credentials for sync
+                h: state.dhis2.url ? {
+                    u: state.dhis2.url,
+                    n: state.dhis2.username,
+                    p: btoa(state.dhis2.password), // Encode password
+                    m: state.dhis2.syncMode,
+                    ol: state.dhis2.orgUnitLevel,
+                    pt: state.dhis2.periodType,
+                    pc: state.dhis2.periodColumn,
+                    oc: state.dhis2.orgUnitColumn
+                } : null
             };
             
             try {
@@ -2602,14 +2678,33 @@
             document.querySelector('.footer').style.display = 'none';
             
             state.settings = { title: data.s?.t || 'Form', logo: data.s?.l || state.settings.logo };
-            state.sheets.sheetId = data.s?.si || '';
             state.fields = (data.f || []).map(f => ({
                 id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false, options: f.o || [], max: f.mx || 5
             }));
             
+            // Load DHIS2 dataset/program info
             if (data.d) {
-                state.dhis2.datasetId = data.d.id;
+                state.dhis2.datasetId = data.d.id || '';
+                state.dhis2.programId = data.d.pid || '';
                 state.dhis2.dataElements = data.d.de || {};
+            }
+            
+            // Load DHIS2 credentials from shared link
+            if (data.h) {
+                state.dhis2.url = data.h.u || '';
+                state.dhis2.username = data.h.n || '';
+                state.dhis2.password = data.h.p ? atob(data.h.p) : ''; // Decode password
+                state.dhis2.syncMode = data.h.m || 'aggregate';
+                state.dhis2.orgUnitLevel = data.h.ol || 5;
+                state.dhis2.periodType = data.h.pt || 'Monthly';
+                state.dhis2.periodColumn = data.h.pc || '';
+                state.dhis2.orgUnitColumn = data.h.oc || '';
+                state.dhis2.connected = true; // Mark as configured
+                
+                // Fetch org units in background
+                if (state.dhis2.url) {
+                    fetchOrgUnits().catch(err => console.log('Could not fetch org units:', err));
+                }
             }
             
             document.getElementById('viewerContainer').classList.add('show');
@@ -2700,6 +2795,7 @@
                     <button class="viewer-nav-btn active" style="background:#004080;color:#fff;" onclick="showTab('form',this)"><span data-icon="edit-3" data-size="14"></span> Form</button>
                     <button class="viewer-nav-btn" style="background:#28a745;color:#fff;" onclick="showTab('data',this)"><span data-icon="table" data-size="14"></span> Data</button>
                     <button class="viewer-nav-btn" style="background:#17a2b8;color:#fff;" onclick="showTab('dashboard',this)"><span data-icon="bar-chart-2" data-size="14"></span> Dashboard</button>
+                    ${state.dhis2.url ? `<div class="connection-status" style="background:#17a2b8;"><span class="inline-icon">${getIcon('link', 14)}</span> DHIS2</div>` : ''}
                     <div id="connectionStatus" class="connection-status ${navigator.onLine ? 'online' : 'offline'}">
                         ${navigator.onLine ? '<span class="inline-icon" style="color:#28a745;">' + getIcon('wifi', 14) + '</span> Online' : '<span class="inline-icon" style="color:#dc3545;">' + getIcon('wifi-off', 14) + '</span> Offline'}
                     </div>
@@ -2794,20 +2890,40 @@
         }
 
         async function loadViewerData() {
-            // Try to load from Google Sheets (always available since config is hardcoded)
+            // Show loading state
+            const dataContainer = document.getElementById('dataContent');
+            const dashContainer = document.getElementById('dashboardContent');
+            
+            if (dataContainer) {
+                dataContainer.innerHTML = `<p style="text-align:center;padding:40px;"><span class="spin" style="display:inline-block;">${getIcon('loader', 20)}</span> Loading data from Google Sheets...</p>`;
+            }
+            if (dashContainer) {
+                dashContainer.innerHTML = `<p style="text-align:center;padding:40px;"><span class="spin" style="display:inline-block;">${getIcon('loader', 20)}</span> Loading dashboard...</p>`;
+            }
+            
+            // Try to load from Google Sheets
             try {
+                console.log('Loading data from Google Sheets...');
                 const sheetsData = await loadFromGoogleSheets();
-                if (sheetsData.length > 0) {
-                    // Merge with local data
-                    const localIds = new Set(state.collectedData.map(d => d._id));
-                    sheetsData.forEach(d => {
-                        if (!localIds.has(d._id)) {
-                            state.collectedData.push(d);
-                        }
-                    });
+                console.log('Loaded from Sheets:', sheetsData.length, 'records');
+                
+                if (sheetsData && sheetsData.length > 0) {
+                    // Use Google Sheets as primary data source
+                    // Convert _id to number if it's a string (Sheets may return as string)
+                    state.collectedData = sheetsData.map(d => ({
+                        ...d,
+                        _id: d._id ? (typeof d._id === 'string' ? parseInt(d._id) || d._id : d._id) : Date.now(),
+                        _synced: true
+                    }));
+                    console.log('✓ Data loaded from Google Sheets');
+                } else {
+                    // No data in Sheets, use whatever is in state.collectedData (from local storage)
+                    console.log('No data in Sheets, using local data:', state.collectedData.length, 'records');
                 }
             } catch (err) {
-                console.log('Could not load from Sheets:', err.message);
+                console.error('Could not load from Sheets:', err.message);
+                // Keep using whatever is in state.collectedData
+                console.log('Fallback to local data:', state.collectedData.length, 'records');
             }
             
             renderDataContent();
@@ -2870,6 +2986,7 @@
                     <button class="modal-btn primary" onclick="refreshData()"><span class="inline-icon">${getIcon('refresh-cw', 14)}</span> Refresh</button>
                     <button class="modal-btn success" onclick="downloadCSV()"><span class="inline-icon">${getIcon('download', 14)}</span> Download CSV</button>
                     ${getOfflineCount() > 0 ? `<button class="modal-btn" style="background:#ffc107;color:#000;" onclick="syncOfflineData()"><span class="inline-icon">${getIcon('upload', 14)}</span> Sync Offline (${getOfflineCount()})</button>` : ''}
+                    ${state.dhis2.url && state.dhis2.connected ? `<button class="modal-btn" style="background:#17a2b8;color:#fff;" onclick="syncToDhis2()"><span class="inline-icon">${getIcon('link', 14)}</span> Sync to DHIS2</button>` : ''}
                 </div>
             `;
             initIcons();
