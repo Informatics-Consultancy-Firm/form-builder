@@ -683,6 +683,40 @@
             LOGO_URL: 'https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg'
         };
 
+        // ==================== PROXY CONFIGURATION ====================
+        const PROXIES = [
+            { 
+                name: 'GAS Proxy',
+                url: 'https://script.google.com/macros/s/AKfycbyRXc68PYSmDSCYPakAS8Gc9R00kRjmsMYoDujPYMItyquXfwMAJUtRqXLiDlNWbSfDQQ/exec',
+                type: 'gas'
+            },
+            { 
+                name: 'CORS Proxy 1',
+                url: 'https://corsproxy.io/?',
+                type: 'cors'
+            },
+            { 
+                name: 'CORS Proxy 2',
+                url: 'https://api.allorigins.win/raw?url=',
+                type: 'cors'
+            }
+        ];
+
+        function buildProxyUrl(proxy, targetUrl, auth, method) {
+            if (proxy.type === 'gas') {
+                let proxyUrl = proxy.url + '?url=' + encodeURIComponent(targetUrl);
+                if (auth) {
+                    proxyUrl += '&auth=' + encodeURIComponent(auth);
+                }
+                if (method && method !== 'GET') {
+                    proxyUrl += '&method=' + method;
+                }
+                return proxyUrl;
+            } else {
+                return proxy.url + encodeURIComponent(targetUrl);
+            }
+        }
+
         // ==================== GLOBAL STATE ====================
         const state = {
             user: null,
@@ -857,29 +891,91 @@
             const apiUrl = `${serverUrl}/api/${endpoint}`;
             const auth = btoa(`${username}:${password}`);
             
-            const proxiedUrl = `${CONFIG.PROXY_URL}?url=${encodeURIComponent(apiUrl)}&auth=${encodeURIComponent(auth)}${method !== 'GET' ? '&method=' + method : ''}`;
+            let lastError = null;
             
-            const options = {
-                method: method === 'GET' ? 'GET' : 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            };
-            
-            if (payload && method !== 'GET') {
-                options.body = JSON.stringify(payload);
-            }
-            
-            try {
-                const response = await fetch(proxiedUrl, options);
-                const data = await response.json();
+            // Try each proxy in order
+            for (let i = 0; i < PROXIES.length; i++) {
+                const proxy = PROXIES[i];
+                const proxiedUrl = buildProxyUrl(proxy, apiUrl, auth, method);
                 
-                if (data.httpStatusCode === 401) {
-                    return { success: false, status: 401, error: 'Unauthorized' };
+                // For GET, use GET. For everything else, use POST (for GAS) or actual method (for CORS)
+                const fetchMethod = proxy.type === 'gas' ? (method === 'GET' ? 'GET' : 'POST') : method;
+                
+                const options = {
+                    method: fetchMethod,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+                
+                // For CORS proxies, add auth header
+                if (proxy.type === 'cors') {
+                    options.headers['Authorization'] = 'Basic ' + auth;
                 }
                 
-                return { success: true, status: 200, data: data };
-            } catch (error) {
-                return { success: false, status: 0, error: error.message };
+                if (payload && method !== 'GET') {
+                    options.body = JSON.stringify(payload);
+                }
+                
+                try {
+                    const response = await fetch(proxiedUrl, options);
+                    const text = await response.text();
+                    
+                    let data;
+                    try { data = JSON.parse(text); } catch (e) { data = text; }
+                    
+                    // Check for proxy error - try next proxy
+                    if (data && data.error && typeof data.error === 'string' && data.error.includes('Exception')) {
+                        lastError = data.error;
+                        continue;
+                    }
+                    
+                    // Check for DHIS2 error responses
+                    if (data && (data.httpStatus === 'Unauthorized' || data.httpStatusCode === 401)) {
+                        return { success: false, status: 401, error: 'Unauthorized - check credentials' };
+                    }
+                    if (data && (data.httpStatus === 'Not Found' || data.httpStatusCode === 404)) {
+                        return { success: false, status: 404, error: 'Not found' };
+                    }
+                    if (data && data.httpStatusCode && data.httpStatusCode >= 400) {
+                        return { success: false, status: data.httpStatusCode, error: data.message || 'Request failed' };
+                    }
+                    
+                    // Success check
+                    const isSuccess = data && (
+                        typeof data === 'object' && !data.error ||
+                        data.response?.uid ||
+                        data.status === 'OK' ||
+                        data.status === 'SUCCESS' ||
+                        Array.isArray(data) ||
+                        (data.organisationUnits !== undefined) ||
+                        (data.dataSets !== undefined) ||
+                        (data.dataElements !== undefined) ||
+                        (data.systemName !== undefined)
+                    );
+                    
+                    if (isSuccess) {
+                        return { success: true, status: 200, data: data };
+                    }
+                    
+                    // If we got data but it's not clearly success, still return it
+                    if (data && typeof data === 'object') {
+                        return { success: true, status: 200, data: data };
+                    }
+                    
+                    // Not successful, try next proxy
+                    lastError = 'Invalid response';
+                    
+                } catch (error) {
+                    // Network error - try next proxy silently
+                    lastError = error.message;
+                    continue;
+                }
             }
+            
+            // All proxies failed
+            return { success: false, status: 0, error: 'All proxies failed: ' + lastError };
         }
 
         async function testDhis2Connection() {
@@ -888,7 +984,7 @@
             const password = document.getElementById('dhis2Password').value;
             
             if (!url || !username || !password) {
-                notify('Fill all DHIS2 fields', 'error');
+                notify('Please fill server URL, username and password', 'error');
                 return;
             }
             
@@ -896,7 +992,7 @@
             state.dhis2.username = username;
             state.dhis2.password = password;
             
-            updateDhis2Status('syncing', 'Testing...');
+            updateDhis2Status('syncing', 'Testing connection...');
             addLog('info', 'Connecting to DHIS2...');
             
             try {
@@ -905,24 +1001,25 @@
                 if (result.success && result.data?.systemName) {
                     state.dhis2.connected = true;
                     updateDhis2Status('connected', `Connected to ${result.data.systemName}`);
-                    addLog('success', `[OK] Connected: ${result.data.systemName}`);
+                    addLog('success', `✓ Connected: ${result.data.systemName} v${result.data.version || ''}`);
                     
                     if (state.dhis2.syncMode === 'aggregate') {
                         await fetchOrgUnits();
                     }
                     
+                    saveDhis2Config();
                     notify('Connected to DHIS2!');
                 } else {
                     state.dhis2.connected = false;
                     updateDhis2Status('disconnected', 'Connection failed');
-                    addLog('error', '[X] Connection failed');
-                    notify('Connection failed', 'error');
+                    addLog('error', `✗ Failed: ${result.error || 'Could not connect'}`);
+                    notify('Connection failed. Check URL and credentials.', 'error');
                 }
             } catch (error) {
                 state.dhis2.connected = false;
-                updateDhis2Status('disconnected', 'Error');
-                addLog('error', '[X] Error: ' + error.message);
-                notify('Error: ' + error.message, 'error');
+                updateDhis2Status('disconnected', 'Connection error');
+                addLog('error', `✗ Error: ${error.message}`);
+                notify('Connection error: ' + error.message, 'error');
             }
         }
 
@@ -948,7 +1045,9 @@
                     });
                 });
                 
-                addLog('success', `[OK] Loaded ${state.dhis2.orgUnits.length} org units`);
+                addLog('success', `✓ Loaded ${state.dhis2.orgUnits.length} org units at level ${level}`);
+            } else {
+                addLog('warning', `⚠ Could not load org units: ${result.error || 'Unknown error'}`);
             }
         }
 
@@ -991,7 +1090,7 @@
         function updateDhis2Status(type, message) {
             const el = document.getElementById('dhis2Status');
             el.className = `status-badge ${type}`;
-            const icon = type === 'connected' ? '[OK]' : type === 'syncing' ? '[...]' : '[X]';
+            const icon = type === 'connected' ? '✓' : type === 'syncing' ? '⋯' : '✗';
             el.innerHTML = `${icon} <span>${message}</span>`;
         }
 
@@ -1034,40 +1133,84 @@
                 // Create Data Elements
                 addLog('info', 'Creating Data Elements...');
                 const createdElements = [];
+                const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
                 
                 for (const field of dataFields) {
                     const def = fieldDefs[field.type];
-                    const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
                     
-                    const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
-                    
-                    if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
-                        const existing = checkResult.data.dataElements[0];
-                        state.dhis2.dataElements[field.id] = existing.id;
-                        createdElements.push({ id: existing.id, field: field });
-                        addLog('info', `  --> Exists: ${field.label}`);
-                    } else {
-                        const payload = {
-                            name: field.label,
-                            shortName: field.label.substring(0, 50),
-                            code: code,
-                            domainType: state.dhis2.syncMode === 'tracker' ? 'TRACKER' : 'AGGREGATE',
-                            valueType: def?.valueType || 'TEXT',
-                            aggregationType: field.type === 'number' ? 'SUM' : 'NONE'
-                        };
+                    if (categoricalTypes.includes(field.type)) {
+                        // For categorical fields, create a data element for each option
+                        const options = field.type === 'yesno' ? ['Yes', 'No'] : (field.options || []);
                         
-                        const createResult = await dhis2Request('dataElements', 'POST', payload);
-                        
-                        if (createResult.success && createResult.data?.response?.uid) {
-                            const newId = createResult.data.response.uid;
-                            state.dhis2.dataElements[field.id] = newId;
-                            createdElements.push({ id: newId, field: field });
-                            addLog('success', `  [OK] Created: ${field.label}`);
-                        } else {
-                            addLog('error', `  [X] Failed: ${field.label}`);
+                        for (const opt of options) {
+                            const colName = `${field.name}_${opt}`;
+                            const code = colName.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                            const label = `${field.label} (${opt})`;
+                            
+                            const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
+                            
+                            if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
+                                const existing = checkResult.data.dataElements[0];
+                                state.dhis2.dataElements[colName] = existing.id;
+                                createdElements.push({ id: existing.id, name: label });
+                                addLog('info', `  ↳ Exists: ${label}`);
+                            } else {
+                                const payload = {
+                                    name: label,
+                                    shortName: label.substring(0, 50),
+                                    code: code,
+                                    domainType: state.dhis2.syncMode === 'tracker' ? 'TRACKER' : 'AGGREGATE',
+                                    valueType: 'INTEGER',
+                                    aggregationType: 'SUM'
+                                };
+                                
+                                const createResult = await dhis2Request('dataElements', 'POST', payload);
+                                
+                                if (createResult.success && createResult.data?.response?.uid) {
+                                    const newId = createResult.data.response.uid;
+                                    state.dhis2.dataElements[colName] = newId;
+                                    createdElements.push({ id: newId, name: label });
+                                    addLog('success', `  ✓ Created: ${label}`);
+                                } else {
+                                    addLog('error', `  ✗ Failed: ${label}`);
+                                }
+                            }
+                            await sleep(200);
                         }
+                    } else {
+                        // For numeric and other fields
+                        const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                        
+                        const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
+                        
+                        if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
+                            const existing = checkResult.data.dataElements[0];
+                            state.dhis2.dataElements[field.id] = existing.id;
+                            createdElements.push({ id: existing.id, name: field.label });
+                            addLog('info', `  ↳ Exists: ${field.label}`);
+                        } else {
+                            const payload = {
+                                name: field.label,
+                                shortName: field.label.substring(0, 50),
+                                code: code,
+                                domainType: state.dhis2.syncMode === 'tracker' ? 'TRACKER' : 'AGGREGATE',
+                                valueType: def?.valueType || 'TEXT',
+                                aggregationType: field.type === 'number' ? 'SUM' : 'NONE'
+                            };
+                            
+                            const createResult = await dhis2Request('dataElements', 'POST', payload);
+                            
+                            if (createResult.success && createResult.data?.response?.uid) {
+                                const newId = createResult.data.response.uid;
+                                state.dhis2.dataElements[field.id] = newId;
+                                createdElements.push({ id: newId, name: field.label });
+                                addLog('success', `  ✓ Created: ${field.label}`);
+                            } else {
+                                addLog('error', `  ✗ Failed: ${field.label}`);
+                            }
+                        }
+                        await sleep(200);
                     }
-                    await sleep(200);
                 }
                 
                 if (state.dhis2.syncMode === 'aggregate') {
@@ -1083,7 +1226,7 @@
                 
             } catch (error) {
                 updateDhis2Status('disconnected', 'Setup failed');
-                addLog('error', '[X] Error: ' + error.message);
+                addLog('error', '✗ Error: ' + error.message);
                 notify('Setup failed', 'error');
             }
         }
@@ -1112,9 +1255,9 @@
                     programId = existingProgResult.data.id;
                     programStageId = existingProgResult.data.programStages?.[0]?.id;
                     state.dhis2.programId = programId;
-                    addLog('success', `  [OK] Using existing Program: ${existingProgResult.data.name}`);
+                    addLog('success', `  ✓ Using existing Program: ${existingProgResult.data.name}`);
                 } else {
-                    addLog('error', `  [X] Program not found: ${userProvidedProgramId}`);
+                    addLog('error', `  ✗ Program not found: ${userProvidedProgramId}`);
                     addLog('info', 'Creating new Program instead...');
                 }
             }
@@ -1130,7 +1273,7 @@
                     programId = existingProg.id;
                     programStageId = existingProg.programStages?.[0]?.id;
                     state.dhis2.programId = programId;
-                    addLog('info', `  --> Program exists: ${programId}`);
+                    addLog('info', `  ↳ Program exists: ${programId}`);
                 } else {
                     // Create new Event Program (WITHOUT_REGISTRATION = Event Program)
                     const programPayload = {
@@ -1146,7 +1289,7 @@
                     if (createProgResult.success && createProgResult.data?.response?.uid) {
                         programId = createProgResult.data.response.uid;
                         state.dhis2.programId = programId;
-                        addLog('success', `  [OK] Program created: ${programId}`);
+                        addLog('success', `  ✓ Program created: ${programId}`);
                         
                         // Create Program Stage
                         await sleep(300);
@@ -1160,12 +1303,12 @@
                         
                         if (createStageResult.success && createStageResult.data?.response?.uid) {
                             programStageId = createStageResult.data.response.uid;
-                            addLog('success', `  [OK] Program Stage created: ${programStageId}`);
+                            addLog('success', `  ✓ Program Stage created: ${programStageId}`);
                         } else {
-                            addLog('error', '  [X] Failed to create Program Stage');
+                            addLog('error', '  ✗ Failed to create Program Stage');
                         }
                     } else {
-                        addLog('error', '  [X] Failed to create Program');
+                        addLog('error', '  ✗ Failed to create Program');
                         return;
                     }
                 }
@@ -1193,9 +1336,9 @@
                     const updateResult = await dhis2Request(`programStages/${programStageId}`, 'PUT', stageData);
                     
                     if (updateResult.success) {
-                        addLog('success', `  [OK] Assigned ${createdElements.length} data elements to stage`);
+                        addLog('success', `  ✓ Assigned ${createdElements.length} data elements to stage`);
                     } else {
-                        addLog('warning', '  [!] Could not assign all data elements');
+                        addLog('warning', '  ⚠ Could not assign all data elements');
                     }
                 }
             }
@@ -1219,7 +1362,7 @@
             
             if (dsCheckResult.success && dsCheckResult.data?.dataSets?.length > 0) {
                 state.dhis2.datasetId = dsCheckResult.data.dataSets[0].id;
-                addLog('info', `  --> Dataset exists: ${state.dhis2.datasetId}`);
+                addLog('info', `  ↳ Dataset exists: ${state.dhis2.datasetId}`);
             } else {
                 const createPayload = {
                     name: datasetName,
@@ -1234,9 +1377,9 @@
                 
                 if (createResult.success && createResult.data?.response?.uid) {
                     state.dhis2.datasetId = createResult.data.response.uid;
-                    addLog('success', `  [OK] Dataset created: ${state.dhis2.datasetId}`);
+                    addLog('success', `  ✓ Dataset created: ${state.dhis2.datasetId}`);
                 } else {
-                    addLog('error', '  [X] Failed to create dataset');
+                    addLog('error', '  ✗ Failed to create dataset');
                 }
             }
         }
@@ -1280,27 +1423,51 @@
                 const orgUnitId = state.dhis2.orgUnitMap[orgUnitName?.toLowerCase().trim()];
                 
                 if (!orgUnitId) {
-                    addLog('error', `  [X] No org unit match: ${orgUnitName}`);
+                    addLog('error', `  ✗ No org unit match: ${orgUnitName}`);
                     failed++;
                     continue;
                 }
                 
-                const dataValues = [];
+            const dataValues = [];
                 const dataFields = state.fields.filter(f => 
                     f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
                 );
                 
+                const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
+                
                 dataFields.forEach(field => {
-                    const deId = state.dhis2.dataElements[field.id];
-                    const value = record[field.name];
+                    const def = fieldDefs[field.type];
                     
-                    if (deId && value !== undefined && value !== null && value !== '') {
-                        dataValues.push({
-                            dataElement: deId,
-                            value: String(value),
-                            period: period,
-                            orgUnit: orgUnitId
+                    if (categoricalTypes.includes(field.type)) {
+                        // For categorical fields, send each option as separate value
+                        const options = field.type === 'yesno' ? ['Yes', 'No'] : (field.options || []);
+                        options.forEach(opt => {
+                            const colName = `${field.name}_${opt}`;
+                            const deId = state.dhis2.dataElements[colName];
+                            const value = record[colName];
+                            
+                            if (deId && value !== undefined && value !== null) {
+                                dataValues.push({
+                                    dataElement: deId,
+                                    value: String(value),
+                                    period: period,
+                                    orgUnit: orgUnitId
+                                });
+                            }
                         });
+                    } else {
+                        // For numeric and other fields
+                        const deId = state.dhis2.dataElements[field.id];
+                        const value = record[field.name];
+                        
+                        if (deId && value !== undefined && value !== null && value !== '') {
+                            dataValues.push({
+                                dataElement: deId,
+                                value: String(value),
+                                period: period,
+                                orgUnit: orgUnitId
+                            });
+                        }
                     }
                 });
                 
@@ -1310,10 +1477,10 @@
                 
                 if (result.success) {
                     success++;
-                    addLog('success', `  [OK] Synced: ${orgUnitName} / ${period}`);
+                    addLog('success', `  ✓ Synced: ${orgUnitName} / ${period}`);
                 } else {
                     failed++;
-                    addLog('error', `  [X] Failed: ${orgUnitName} / ${period}`);
+                    addLog('error', `  ✗ Failed: ${orgUnitName} / ${period}`);
                 }
                 
                 await sleep(300);
@@ -1375,11 +1542,11 @@
                     // Use first org unit as fallback
                     orgUnitId = state.dhis2.orgUnits[0]?.id;
                     if (!orgUnitId) {
-                        addLog('error', `  [X] No org unit: ${orgUnitName}`);
+                        addLog('error', `  ✗ No org unit: ${orgUnitName}`);
                         failed++;
                         continue;
                     }
-                    addLog('warning', `  [!] Using default org unit for: ${orgUnitName}`);
+                    addLog('warning', `  ⚠ Using default org unit for: ${orgUnitName}`);
                 }
                 
                 // Get event date from period or timestamp
@@ -1411,7 +1578,7 @@
                 });
                 
                 if (dataValues.length === 0) {
-                    addLog('warning', '  [!] No data values in record');
+                    addLog('warning', '  ⚠ No data values in record');
                     failed++;
                     continue;
                 }
@@ -1432,11 +1599,11 @@
                     record._syncedAt = new Date().toISOString();
                     delete record._syncError;
                     success++;
-                    addLog('success', `  [OK] Event synced: ${orgUnitName || 'record'}`);
+                    addLog('success', `  ✓ Event synced: ${orgUnitName || 'record'}`);
                 } else {
                     record._syncError = result.error || JSON.stringify(result.data?.message || result.data?.response?.importSummaries?.[0]?.description) || 'Unknown error';
                     failed++;
-                    addLog('error', `  [X] Event failed: ${record._syncError}`);
+                    addLog('error', `  ✗ Event failed: ${record._syncError}`);
                 }
                 
                 await sleep(300);
@@ -1496,31 +1663,21 @@
                         const numVal = parseFloat(value) || 0;
                         grouped[key][field.name] = (grouped[key][field.name] || 0) + numVal;
                     } else if (def?.category === 'categorical' || field.type === 'yesno') {
-                        // Count "Yes" or first option
-                        if (!grouped[key][field.name + '_counts']) {
-                            grouped[key][field.name + '_counts'] = {};
-                        }
-                        if (value) {
-                            grouped[key][field.name + '_counts'][value] = (grouped[key][field.name + '_counts'][value] || 0) + 1;
-                        }
+                        // Get options for this field
+                        const options = field.type === 'yesno' ? ['Yes', 'No'] : (field.options || []);
                         
-                        // For Yes/No, count Yes
-                        if (field.type === 'yesno') {
-                            if (value === 'Yes') {
-                                grouped[key][field.name] = (grouped[key][field.name] || 0) + 1;
+                        // Initialize all option columns to 0 if not exists
+                        options.forEach(opt => {
+                            const colName = `${field.name}_${opt}`;
+                            if (grouped[key][colName] === undefined) {
+                                grouped[key][colName] = 0;
                             }
-                        } else {
-                            // For other categorical, take most common
-                            const counts = grouped[key][field.name + '_counts'];
-                            let maxCount = 0;
-                            let maxValue = '';
-                            Object.entries(counts).forEach(([k, v]) => {
-                                if (v > maxCount) {
-                                    maxCount = v;
-                                    maxValue = k;
-                                }
-                            });
-                            grouped[key][field.name] = `${maxValue} (${maxCount})`;
+                        });
+                        
+                        // Increment the matching option column
+                        if (value && options.includes(value)) {
+                            const colName = `${field.name}_${value}`;
+                            grouped[key][colName] = (grouped[key][colName] || 0) + 1;
                         }
                     }
                 });
@@ -2498,19 +2655,59 @@
                 f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
             );
             
-            let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr><th><span class="inline-icon">' + getIcon('building-2', 14) + '</span> Facility</th><th><span class="inline-icon">' + getIcon('calendar', 14) + '</span> Period</th><th><span class="inline-icon">' + getIcon('bar-chart-3', 14) + '</span> Records</th>';
-            dataFields.slice(0, 6).forEach(f => {
+            // Build column definitions - expand categorical fields into multiple columns
+            const columns = [];
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
+            
+            dataFields.forEach(f => {
                 const def = fieldDefs[f.type];
-                const suffix = f.type === 'number' ? ' (SUM)' : f.type === 'yesno' ? ' (Yes)' : '';
-                html += `<th>${escapeHtml(f.label)}${suffix}</th>`;
+                if (categoricalTypes.includes(f.type)) {
+                    // Expand categorical field into option columns
+                    const options = f.type === 'yesno' ? ['Yes', 'No'] : (f.options || []);
+                    options.forEach(opt => {
+                        columns.push({
+                            key: `${f.name}_${opt}`,
+                            label: `${f.label} (${opt})`,
+                            type: 'categorical'
+                        });
+                    });
+                } else if (def?.category === 'numeric' || f.type === 'number') {
+                    columns.push({
+                        key: f.name,
+                        label: `${f.label} (SUM)`,
+                        type: 'numeric'
+                    });
+                } else {
+                    columns.push({
+                        key: f.name,
+                        label: f.label,
+                        type: 'other'
+                    });
+                }
+            });
+            
+            // Build table
+            let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr>';
+            html += '<th style="position:sticky;left:0;background:#004080;z-index:2;"><span class="inline-icon">' + getIcon('building-2', 14) + '</span> Facility</th>';
+            html += '<th><span class="inline-icon">' + getIcon('calendar', 14) + '</span> Period</th>';
+            html += '<th><span class="inline-icon">' + getIcon('bar-chart-3', 14) + '</span> N</th>';
+            
+            columns.forEach(col => {
+                const bgColor = col.type === 'categorical' ? '#0066cc' : '#004080';
+                html += `<th style="background:${bgColor};white-space:nowrap;font-size:11px;">${escapeHtml(col.label)}</th>`;
             });
             html += '</tr></thead><tbody>';
             
             data.forEach(row => {
-                html += `<tr><td><strong>${escapeHtml(row._orgUnit)}</strong></td><td>${escapeHtml(row._period)}</td><td class="aggregate-value">${row._count}</td>`;
-                dataFields.slice(0, 6).forEach(f => {
-                    const value = row[f.name];
-                    html += `<td class="aggregate-value">${value !== undefined ? escapeHtml(String(value)) : '-'}</td>`;
+                html += `<tr>`;
+                html += `<td style="position:sticky;left:0;background:#fff;z-index:1;font-weight:600;">${escapeHtml(row._orgUnit)}</td>`;
+                html += `<td>${escapeHtml(row._period)}</td>`;
+                html += `<td class="aggregate-value" style="font-weight:600;">${row._count}</td>`;
+                
+                columns.forEach(col => {
+                    const value = row[col.key];
+                    const displayVal = value !== undefined && value !== null ? value : 0;
+                    html += `<td class="aggregate-value">${displayVal}</td>`;
                 });
                 html += '</tr>';
             });
@@ -2526,10 +2723,18 @@
         };
 
         window.downloadCSV = function() {
-            const data = state.currentDataView === 'case' ? getFilteredData() : calculateAggregateData();
+            const isAggregate = state.currentDataView === 'aggregate';
+            const data = isAggregate ? calculateAggregateData() : getFilteredData();
             if (data.length === 0) { notify('No data', 'error'); return; }
             
-            const headers = Object.keys(data[0]).filter(k => !k.startsWith('_') || k === '_timestamp');
+            // For aggregate data, include _orgUnit, _period, _count; for case data, include _timestamp
+            const headers = Object.keys(data[0]).filter(k => {
+                if (isAggregate) {
+                    return k === '_orgUnit' || k === '_period' || k === '_count' || !k.startsWith('_');
+                }
+                return !k.startsWith('_') || k === '_timestamp';
+            });
+            
             let csv = headers.join(',') + '\n';
             
             data.forEach(row => {
