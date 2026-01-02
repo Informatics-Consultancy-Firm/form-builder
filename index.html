@@ -1397,83 +1397,46 @@
                 for (const field of dataFields) {
                     const def = fieldDefs[field.type];
                     
-                    if (categoricalTypes.includes(field.type)) {
-                        // For categorical fields, create a data element for each option
-                        const options = field.type === 'yesno' ? ['Yes', 'No'] : (field.options || []);
-                        
-                        for (const opt of options) {
-                            const colName = `${field.name}_${opt}`;
-                            const code = colName.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
-                            const label = `${field.label} (${opt})`;
-                            
-                            const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
-                            
-                            if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
-                                const existing = checkResult.data.dataElements[0];
-                                state.dhis2.dataElements[colName] = existing.id;
-                                createdElements.push({ id: existing.id, name: label });
-                                addLog('info', `  ↳ Exists: ${label}`);
-                            } else {
-                                const payload = {
-                                    name: label,
-                                    shortName: label.substring(0, 50),
-                                    code: code,
-                                    domainType: state.dhis2.syncMode === 'tracker' ? 'TRACKER' : 'AGGREGATE',
-                                    valueType: 'INTEGER',
-                                    aggregationType: 'SUM'
-                                };
-                                
-                                const createResult = await dhis2Request('dataElements', 'POST', payload);
-                                
-                                // Check various success response formats
-                                const newId = createResult.data?.response?.uid || 
-                                             createResult.data?.uid ||
-                                             (createResult.data?.status === 'OK' && createResult.data?.response?.uid);
-                                
-                                if (createResult.success && newId) {
-                                    state.dhis2.dataElements[colName] = newId;
-                                    createdElements.push({ id: newId, name: label });
-                                    addLog('success', `  ✓ Created: ${label}`);
-                                } else {
-                                    const errorMsg = createResult.data?.message || 
-                                                    createResult.data?.response?.errorReports?.[0]?.message ||
-                                                    createResult.error || 
-                                                    JSON.stringify(createResult.data);
-                                    addLog('error', `  ✗ Failed: ${label} - ${errorMsg}`);
-                                }
-                            }
-                            await sleep(200);
-                        }
-                    } else {
-                        // For numeric and other fields
+                    // For TRACKER mode: Create ONE data element per field (no splitting)
+                    // For AGGREGATE mode: Split categorical fields into separate columns
+                    
+                    if (state.dhis2.syncMode === 'tracker') {
+                        // TRACKER MODE: One data element per field, stores actual value
                         const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
                         
                         const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
                         
                         if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
                             const existing = checkResult.data.dataElements[0];
-                            state.dhis2.dataElements[field.id] = existing.id;
+                            state.dhis2.dataElements[field.name] = existing.id;
                             createdElements.push({ id: existing.id, name: field.label });
                             addLog('info', `  ↳ Exists: ${field.label}`);
                         } else {
+                            // Determine valueType for tracker
+                            let valueType = 'TEXT';
+                            if (field.type === 'number') valueType = 'NUMBER';
+                            else if (field.type === 'date') valueType = 'DATE';
+                            else if (field.type === 'time') valueType = 'TIME';
+                            else if (field.type === 'yesno') valueType = 'TEXT'; // Store as Yes/No text
+                            else if (def?.valueType) valueType = def.valueType;
+                            
                             const payload = {
                                 name: field.label,
                                 shortName: field.label.substring(0, 50),
                                 code: code,
-                                domainType: state.dhis2.syncMode === 'tracker' ? 'TRACKER' : 'AGGREGATE',
-                                valueType: def?.valueType || 'TEXT',
-                                aggregationType: field.type === 'number' ? 'SUM' : 'NONE'
+                                domainType: 'TRACKER',
+                                valueType: valueType,
+                                aggregationType: 'NONE'
                             };
                             
                             const createResult = await dhis2Request('dataElements', 'POST', payload);
                             
-                            // Check various success response formats
                             const newId = createResult.data?.response?.uid || 
                                          createResult.data?.uid ||
                                          (createResult.data?.status === 'OK' && createResult.data?.response?.uid);
                             
                             if (createResult.success && newId) {
-                                state.dhis2.dataElements[field.id] = newId;
+                                state.dhis2.dataElements[field.name] = newId;
                                 createdElements.push({ id: newId, name: field.label });
                                 addLog('success', `  ✓ Created: ${field.label}`);
                             } else {
@@ -1485,6 +1448,96 @@
                             }
                         }
                         await sleep(200);
+                        
+                    } else {
+                        // AGGREGATE MODE: Split categorical fields into separate columns
+                        if (categoricalTypes.includes(field.type)) {
+                            // For categorical fields, create a data element for each option
+                            const options = field.type === 'yesno' ? ['Yes', 'No'] : (field.options || []);
+                            
+                            for (const opt of options) {
+                                const colName = `${field.name}_${opt}`;
+                                const code = colName.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                                const label = `${field.label} (${opt})`;
+                                
+                                const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
+                                
+                                if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
+                                    const existing = checkResult.data.dataElements[0];
+                                    state.dhis2.dataElements[colName] = existing.id;
+                                    createdElements.push({ id: existing.id, name: label });
+                                    addLog('info', `  ↳ Exists: ${label}`);
+                                } else {
+                                    const payload = {
+                                        name: label,
+                                        shortName: label.substring(0, 50),
+                                        code: code,
+                                        domainType: 'AGGREGATE',
+                                        valueType: 'INTEGER',
+                                        aggregationType: 'SUM'
+                                    };
+                                    
+                                    const createResult = await dhis2Request('dataElements', 'POST', payload);
+                                    
+                                    const newId = createResult.data?.response?.uid || 
+                                                 createResult.data?.uid ||
+                                                 (createResult.data?.status === 'OK' && createResult.data?.response?.uid);
+                                    
+                                    if (createResult.success && newId) {
+                                        state.dhis2.dataElements[colName] = newId;
+                                        createdElements.push({ id: newId, name: label });
+                                        addLog('success', `  ✓ Created: ${label}`);
+                                    } else {
+                                        const errorMsg = createResult.data?.message || 
+                                                        createResult.data?.response?.errorReports?.[0]?.message ||
+                                                        createResult.error || 
+                                                        JSON.stringify(createResult.data);
+                                        addLog('error', `  ✗ Failed: ${label} - ${errorMsg}`);
+                                    }
+                                }
+                                await sleep(200);
+                            }
+                        } else {
+                            // For numeric and other fields (AGGREGATE mode)
+                            const code = field.name.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                            
+                            const checkResult = await dhis2Request(`dataElements.json?filter=code:eq:${code}&fields=id,name`);
+                            
+                            if (checkResult.success && checkResult.data?.dataElements?.length > 0) {
+                                const existing = checkResult.data.dataElements[0];
+                                state.dhis2.dataElements[field.id] = existing.id;
+                                createdElements.push({ id: existing.id, name: field.label });
+                                addLog('info', `  ↳ Exists: ${field.label}`);
+                            } else {
+                                const payload = {
+                                    name: field.label,
+                                    shortName: field.label.substring(0, 50),
+                                    code: code,
+                                    domainType: 'AGGREGATE',
+                                    valueType: def?.valueType || 'TEXT',
+                                    aggregationType: field.type === 'number' ? 'SUM' : 'NONE'
+                                };
+                                
+                                const createResult = await dhis2Request('dataElements', 'POST', payload);
+                                
+                                const newId = createResult.data?.response?.uid || 
+                                             createResult.data?.uid ||
+                                             (createResult.data?.status === 'OK' && createResult.data?.response?.uid);
+                                
+                                if (createResult.success && newId) {
+                                    state.dhis2.dataElements[field.id] = newId;
+                                    createdElements.push({ id: newId, name: field.label });
+                                    addLog('success', `  ✓ Created: ${field.label}`);
+                                } else {
+                                    const errorMsg = createResult.data?.message || 
+                                                    createResult.data?.response?.errorReports?.[0]?.message ||
+                                                    createResult.error || 
+                                                    JSON.stringify(createResult.data);
+                                    addLog('error', `  ✗ Failed: ${field.label} - ${errorMsg}`);
+                                }
+                            }
+                            await sleep(200);
+                        }
                     }
                 }
                 
