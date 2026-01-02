@@ -1,4 +1,4 @@
-<!DOCTYPE html>    
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -184,7 +184,7 @@
         .viewer-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; color: #333; }
         .viewer-input { width: 100%; padding: 12px; border: 2px solid #004080; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 13px; }
         .viewer-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,64,128,0.2); }
-        .viewer-radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .viewer-radio-group { display: flex; flex-direction: column; gap: 8px; }
         .viewer-radio-option { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .viewer-radio-option:hover { border-color: #004080; background: #e8f4fc; }
         
@@ -216,7 +216,12 @@
         .filter-title { color: white; font-size: 14px; font-weight: 700; }
         .filter-toggle { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: 11px; }
         .filter-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
-        .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 140px; position: relative; }
+        .filter-group.with-arrows { padding-left: 18px; padding-right: 18px; }
+        .filter-arrow-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; border-radius: 3px; cursor: pointer; padding: 4px 3px; color: white; font-size: 10px; line-height: 1; }
+        .filter-arrow-btn:hover { background: rgba(255,255,255,0.4); }
+        .filter-arrow-btn.left { left: 0; }
+        .filter-arrow-btn.right { right: 0; }
         .filter-label { color: rgba(255,255,255,0.9); font-size: 9px; font-weight: 700; text-transform: uppercase; }
         .filter-select, .filter-input { padding: 8px 10px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; }
         .filter-btn { padding: 8px 16px; border: none; border-radius: 6px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; }
@@ -782,6 +787,7 @@
             },
             collectedData: [],
             filters: {},
+            filterOrder: [], // Custom order for filter fields
             dateFilter: { start: '', end: '' },
             currentDataView: 'case', // 'case' or 'aggregate'
             chartInstances: {}
@@ -1634,6 +1640,7 @@
                 updateDhis2Status('connected', 'Setup complete!');
                 addLog('success', 'DHIS2 SETUP COMPLETE!');
                 saveToStorage();
+                saveDhis2Config(); // Also save DHIS2 config with programId
                 notify('DHIS2 setup complete!');
                 
             } catch (error) {
@@ -1684,7 +1691,7 @@
                     programId = existingProg.id;
                     programStageId = existingProg.programStages?.[0]?.id;
                     state.dhis2.programId = programId;
-                    addLog('info', `  ↳ Program already exists: ${existingProg.name}`);
+                    addLog('info', `  ↳ Program already exists: ${existingProg.name} (will add data elements to it)`);
                 } else {
                     // Check by name if not found by code
                     const nameCheck = await dhis2Request(`programs.json?filter=name:eq:${encodeURIComponent(programName)}&fields=id,name,programStages[id]`);
@@ -1693,7 +1700,7 @@
                         programId = existingProg.id;
                         programStageId = existingProg.programStages?.[0]?.id;
                         state.dhis2.programId = programId;
-                        addLog('info', `  ↳ Program already exists: ${existingProg.name}`);
+                        addLog('info', `  ↳ Program already exists: ${existingProg.name} (will add data elements to it)`);
                     } else {
                         // Create new Event Program (WITHOUT_REGISTRATION = Event Program)
                         const programPayload = {
@@ -1735,7 +1742,7 @@
                                 programId = existingProg.id;
                                 programStageId = existingProg.programStages?.[0]?.id;
                                 state.dhis2.programId = programId;
-                                addLog('info', `  ↳ Program already exists: ${existingProg.name}`);
+                                addLog('info', `  ↳ Program already exists: ${existingProg.name} (will add data elements to it)`);
                             } else {
                                 // Try broader search
                                 const likeCheck = await dhis2Request(`programs.json?filter=name:ilike:${encodeURIComponent(programName)}&fields=id,name,programStages[id]`);
@@ -1744,10 +1751,29 @@
                                     programId = existingProg.id;
                                     programStageId = existingProg.programStages?.[0]?.id;
                                     state.dhis2.programId = programId;
-                                    addLog('info', `  ↳ Program already exists: ${existingProg.name}`);
+                                    addLog('info', `  ↳ Program already exists: ${existingProg.name} (will add data elements to it)`);
                                 } else {
-                                    addLog('info', `  ⊘ Program setup skipped (may need manual creation)`);
-                                    return;
+                                    // Last resort - get all programs and look for partial match
+                                    const allProgsCheck = await dhis2Request(`programs.json?fields=id,name,programStages[id]&pageSize=100`);
+                                    if (allProgsCheck.success && allProgsCheck.data?.programs?.length > 0) {
+                                        const searchName = programName.toLowerCase();
+                                        const matchedProg = allProgsCheck.data.programs.find(p => 
+                                            p.name.toLowerCase().includes(searchName) || 
+                                            searchName.includes(p.name.toLowerCase())
+                                        );
+                                        if (matchedProg) {
+                                            programId = matchedProg.id;
+                                            programStageId = matchedProg.programStages?.[0]?.id;
+                                            state.dhis2.programId = programId;
+                                            addLog('info', `  ↳ Program found: ${matchedProg.name} (will add data elements to it)`);
+                                        } else {
+                                            addLog('info', `  ⊘ Program could not be created (may need manual creation in DHIS2)`);
+                                            return;
+                                        }
+                                    } else {
+                                        addLog('info', `  ⊘ Program could not be created (may need manual creation in DHIS2)`);
+                                        return;
+                                    }
                                 }
                             }
                         }
@@ -1755,9 +1781,35 @@
                 }
             }
             
+            // If program exists but has no stage, create one
+            if (programId && !programStageId) {
+                addLog('info', '  Creating Program Stage for existing program...');
+                const stagePayload = {
+                    name: programName + ' - Data Entry',
+                    program: { id: programId },
+                    sortOrder: 1
+                };
+                
+                const createStageResult = await dhis2Request('programStages', 'POST', stagePayload);
+                
+                if (createStageResult.success && createStageResult.data?.response?.uid) {
+                    programStageId = createStageResult.data.response.uid;
+                    addLog('success', `  ✓ Program Stage created`);
+                } else {
+                    // Stage creation failed - try to find existing stage
+                    const stageCheck = await dhis2Request(`programStages.json?filter=program.id:eq:${programId}&fields=id,name`);
+                    if (stageCheck.success && stageCheck.data?.programStages?.length > 0) {
+                        programStageId = stageCheck.data.programStages[0].id;
+                        addLog('info', `  ↳ Program Stage already exists`);
+                    } else {
+                        addLog('warning', '  ⚠ Could not create or find Program Stage');
+                    }
+                }
+            }
+            
             // Assign Data Elements to Program Stage (merge with existing)
             if (programStageId && createdElements.length > 0) {
-                addLog('info', 'Merging Data Elements into Program Stage...');
+                addLog('info', `Adding ${createdElements.length} data elements to Program Stage...`);
                 
                 // Get current program stage to update it
                 const stageResult = await dhis2Request(`programStages/${programStageId}.json?fields=:owner`);
@@ -1770,12 +1822,15 @@
                         (stageData.programStageDataElements || []).map(psde => psde.dataElement?.id).filter(Boolean)
                     );
                     
-                    // Merge: keep existing + add new
+                    // Use form field order from createdElements, then add any existing that are not in new list
                     const newElementIds = createdElements.map(el => el.id);
-                    const allElementIds = [...new Set([...existingElementIds, ...newElementIds])];
+                    const extraExistingIds = [...existingElementIds].filter(id => !newElementIds.includes(id));
                     
-                    // Build programStageDataElements array
-                    const programStageDataElements = allElementIds.map((id, idx) => ({
+                    // Form order first, then any extras that existed before
+                    const orderedElementIds = [...newElementIds, ...extraExistingIds];
+                    
+                    // Build programStageDataElements array with correct sortOrder
+                    const programStageDataElements = orderedElementIds.map((id, idx) => ({
                         dataElement: { id: id },
                         compulsory: false,
                         sortOrder: idx + 1
@@ -1787,11 +1842,17 @@
                     
                     if (updateResult.success) {
                         const newCount = newElementIds.filter(id => !existingElementIds.has(id)).length;
-                        addLog('success', `  ✓ Program Stage updated: ${newCount} new elements added, ${allElementIds.length} total`);
+                        addLog('success', `  ✓ Program Stage updated: ${newCount} new elements added, ${orderedElementIds.length} total`);
                     } else {
                         addLog('warning', '  ⚠ Could not update Program Stage');
                     }
+                } else {
+                    addLog('warning', '  ⚠ Could not load Program Stage data');
                 }
+            } else if (!programStageId) {
+                addLog('warning', '  ⚠ No Program Stage available - data elements not assigned');
+            } else if (createdElements.length === 0) {
+                addLog('info', '  ⊘ No data elements to add to Program Stage');
             }
             
             // Update Program ID in the UI
@@ -2048,10 +2109,60 @@
             addLog('info', 'Syncing TRACKER/EVENT data to DHIS2...');
             updateDhis2Status('syncing', 'Syncing...');
             
-            const programId = state.dhis2.programId;
+            let programId = state.dhis2.programId;
+            
+            // If no programId, try to find the program by name
+            if (!programId) {
+                addLog('info', 'No Program ID saved, searching for existing program...');
+                const programName = state.settings.title;
+                const programCode = programName.toUpperCase().replace(/[^A-Z0-9]/g, '_').substring(0, 30);
+                
+                // Check by code first
+                const codeCheck = await dhis2Request(`programs.json?filter=code:eq:${programCode}&fields=id,name,programStages[id]`);
+                if (codeCheck.success && codeCheck.data?.programs?.length > 0) {
+                    const prog = codeCheck.data.programs[0];
+                    programId = prog.id;
+                    state.dhis2.programId = programId;
+                    addLog('info', `  ↳ Found program: ${prog.name}`);
+                    if (document.getElementById('dhis2ProgramId')) {
+                        document.getElementById('dhis2ProgramId').value = programId;
+                    }
+                    saveToStorage();
+                    saveDhis2Config();
+                } else {
+                    // Check by name
+                    const nameCheck = await dhis2Request(`programs.json?filter=name:eq:${encodeURIComponent(programName)}&fields=id,name,programStages[id]`);
+                    if (nameCheck.success && nameCheck.data?.programs?.length > 0) {
+                        const prog = nameCheck.data.programs[0];
+                        programId = prog.id;
+                        state.dhis2.programId = programId;
+                        addLog('info', `  ↳ Found program: ${prog.name}`);
+                        if (document.getElementById('dhis2ProgramId')) {
+                            document.getElementById('dhis2ProgramId').value = programId;
+                        }
+                        saveToStorage();
+                        saveDhis2Config();
+                    } else {
+                        // Try ilike search
+                        const likeCheck = await dhis2Request(`programs.json?filter=name:ilike:${encodeURIComponent(programName)}&fields=id,name,programStages[id]`);
+                        if (likeCheck.success && likeCheck.data?.programs?.length > 0) {
+                            const prog = likeCheck.data.programs[0];
+                            programId = prog.id;
+                            state.dhis2.programId = programId;
+                            addLog('info', `  ↳ Found program: ${prog.name}`);
+                            if (document.getElementById('dhis2ProgramId')) {
+                                document.getElementById('dhis2ProgramId').value = programId;
+                            }
+                            saveToStorage();
+                            saveDhis2Config();
+                        }
+                    }
+                }
+            }
+            
             if (!programId) {
                 notify('Run Setup DHIS2 first to create the Program', 'error');
-                addLog('error', 'No Program ID - run Setup first');
+                addLog('info', '⊘ No Program found - run Setup first to create it');
                 return;
             }
             
@@ -2312,6 +2423,64 @@
             applyFilters();
             notify('Filters cleared');
         };
+
+        window.moveFilter = function(fieldName, direction) {
+            const filterableFields = getFilterableFields();
+            const fieldNames = filterableFields.map(f => f.name);
+            
+            // Initialize filterOrder if empty
+            if (state.filterOrder.length === 0) {
+                state.filterOrder = [...fieldNames];
+            }
+            
+            // Add any new fields not in filterOrder
+            fieldNames.forEach(name => {
+                if (!state.filterOrder.includes(name)) {
+                    state.filterOrder.push(name);
+                }
+            });
+            
+            // Remove any fields no longer in filterableFields
+            state.filterOrder = state.filterOrder.filter(name => fieldNames.includes(name));
+            
+            const idx = state.filterOrder.indexOf(fieldName);
+            if (idx === -1) return;
+            
+            if (direction === 'up' && idx > 0) {
+                [state.filterOrder[idx], state.filterOrder[idx - 1]] = [state.filterOrder[idx - 1], state.filterOrder[idx]];
+            } else if (direction === 'down' && idx < state.filterOrder.length - 1) {
+                [state.filterOrder[idx], state.filterOrder[idx + 1]] = [state.filterOrder[idx + 1], state.filterOrder[idx]];
+            }
+            
+            saveToStorage();
+            renderDataContent();
+            renderDashboard();
+        };
+
+        function getOrderedFilterFields() {
+            const filterableFields = getFilterableFields();
+            
+            // Initialize filterOrder if empty
+            if (state.filterOrder.length === 0) {
+                return filterableFields;
+            }
+            
+            // Sort fields by filterOrder
+            const ordered = [];
+            state.filterOrder.forEach(name => {
+                const field = filterableFields.find(f => f.name === name);
+                if (field) ordered.push(field);
+            });
+            
+            // Add any new fields not in filterOrder
+            filterableFields.forEach(field => {
+                if (!ordered.find(f => f.name === field.name)) {
+                    ordered.push(field);
+                }
+            });
+            
+            return ordered;
+        }
 
         function applyFilters() {
             renderDataContent();
@@ -2711,8 +2880,10 @@
                 settings: state.settings,
                 fieldCounter: state.fieldCounter,
                 collectedData: state.collectedData,
+                filterOrder: state.filterOrder,
                 dhis2: {
                     datasetId: state.dhis2.datasetId,
+                    programId: state.dhis2.programId,
                     dataElements: state.dhis2.dataElements
                 }
             }));
@@ -2727,8 +2898,10 @@
                     state.settings = { ...state.settings, ...data.settings };
                     state.fieldCounter = data.fieldCounter || 0;
                     state.collectedData = data.collectedData || [];
+                    state.filterOrder = data.filterOrder || [];
                     if (data.dhis2) {
                         state.dhis2.datasetId = data.dhis2.datasetId;
+                        state.dhis2.programId = data.dhis2.programId;
                         state.dhis2.dataElements = data.dhis2.dataElements || {};
                     }
                     
@@ -3046,7 +3219,8 @@
                             input = `<div class="viewer-radio-group">${(field.options||[]).map(o => `<label class="viewer-radio-option"><input type="checkbox" name="${field.name}" value="${escapeHtml(o)}"><span>${escapeHtml(o)}</span></label>`).join('')}</div>`;
                             break;
                         case 'gps':
-                            input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;"><span data-icon="map-pin" data-size="14"></span> Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div></div>`;
+                            input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;"><span data-icon="map-pin" data-size="14"></span> Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div>
+                `;
                             break;
                         case 'rating':
                             input = `<div>${Array(field.max || 5).fill().map((_, i) => `<span onclick="setRating(this,${i+1})" class="rating-star" style="font-size:24px;cursor:pointer;opacity:0.3;color:#ffc107;">★</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
@@ -3249,7 +3423,7 @@
             const container = document.getElementById('dataContent');
             if (!container) return;
             
-            const filterableFields = getFilterableFields();
+            const orderedFilterFields = getOrderedFilterFields();
             const filteredData = getFilteredData();
             const aggregateData = calculateAggregateData();
             const activeFilterCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
@@ -3267,15 +3441,17 @@
                 </div>
             `;
             
-            filterableFields.forEach(field => {
+            orderedFilterFields.forEach((field, idx) => {
                 const uniqueValues = [...new Set(state.collectedData.map(d => d[field.name]).filter(Boolean))];
                 filtersHtml += `
-                    <div class="filter-group">
+                    <div class="filter-group with-arrows">
+                        <button class="filter-arrow-btn left" onclick="moveFilter('${field.name}','up')" title="Move Left">◀</button>
                         <label class="filter-label">${escapeHtml(field.label)}</label>
                         <select class="filter-select" onchange="updateFilter('${field.name}', this.value)">
                             <option value="">All</option>
                             ${uniqueValues.map(v => `<option value="${escapeHtml(v)}" ${state.filters[field.name] === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
                         </select>
+                        <button class="filter-arrow-btn right" onclick="moveFilter('${field.name}','down')" title="Move Right">▶</button>
                     </div>
                 `;
             });
@@ -3451,8 +3627,11 @@
             const container = document.getElementById('dashboardContent');
             if (!container) return;
             
+            const orderedFilterFields = getOrderedFilterFields();
             const filteredData = getFilteredData();
             const aggregateData = calculateAggregateData();
+            const activeFilterCount = Object.keys(state.filters).filter(k => state.filters[k]).length + 
+                                     (state.dateFilter.start || state.dateFilter.end ? 1 : 0);
             
             // Destroy old charts
             Object.values(state.chartInstances).forEach(chart => { if (chart) chart.destroy(); });
@@ -3466,9 +3645,40 @@
             const orgUnitColumn = state.dhis2.orgUnitColumn;
             const uniqueOrgUnits = orgUnitColumn ? [...new Set(filteredData.map(d => d[orgUnitColumn]).filter(Boolean))].length : 0;
             
-            // Build charts
+            // Build filter panel HTML (same as Data tab)
+            let filtersHtml = `
+                <div class="filter-group">
+                    <label class="filter-label"><span class="inline-icon">${getIcon('calendar', 12)}</span> From</label>
+                    <input type="date" class="filter-input" value="${state.dateFilter.start}" onchange="updateDateFilter('start', this.value)">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label"><span class="inline-icon">${getIcon('calendar', 12)}</span> To</label>
+                    <input type="date" class="filter-input" value="${state.dateFilter.end}" onchange="updateDateFilter('end', this.value)">
+                </div>
+            `;
+            
+            orderedFilterFields.forEach((field, idx) => {
+                const uniqueValues = [...new Set(state.collectedData.map(d => d[field.name]).filter(Boolean))];
+                filtersHtml += `
+                    <div class="filter-group with-arrows">
+                        <button class="filter-arrow-btn left" onclick="moveFilter('${field.name}','up')" title="Move Left">◀</button>
+                        <label class="filter-label">${escapeHtml(field.label)}</label>
+                        <select class="filter-select" onchange="updateFilter('${field.name}', this.value)">
+                            <option value="">All</option>
+                            ${uniqueValues.map(v => `<option value="${escapeHtml(v)}" ${state.filters[field.name] === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+                        </select>
+                        <button class="filter-arrow-btn right" onclick="moveFilter('${field.name}','down')" title="Move Right">▶</button>
+                    </div>
+                `;
+            });
+            
+            // Build charts - EXCLUDE org unit column from charts
             const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
-            const categoricalFields = state.fields.filter(f => categoricalTypes.includes(f.type));
+            const categoricalFields = state.fields.filter(f => 
+                categoricalTypes.includes(f.type) && 
+                f.name !== orgUnitColumn && 
+                f.name !== periodColumn
+            );
             const numericFields = state.fields.filter(f => f.type === 'number');
             
             let chartsHtml = '';
@@ -3517,6 +3727,14 @@
             }
             
             container.innerHTML = `
+                <div class="filter-panel">
+                    <div class="filter-header">
+                        <div class="filter-title"><span class="inline-icon">${getIcon('filter', 14)}</span> Filters ${activeFilterCount > 0 ? `<span class="filter-count">${activeFilterCount} active</span>` : ''}</div>
+                        <button class="filter-btn clear" onclick="clearAllFilters()"><span class="inline-icon">${getIcon('trash-2', 12)}</span> Clear</button>
+                    </div>
+                    <div class="filter-controls">${filtersHtml}</div>
+                </div>
+                
                 <div class="dashboard-header">
                     <img src="${state.settings.logo}" alt="Logo">
                     <h2><span class="inline-icon">${getIcon('bar-chart-2', 20)}</span> ${escapeHtml(state.settings.title)} - Dashboard</h2>
