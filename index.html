@@ -101,6 +101,30 @@
         .prop-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 12px; margin-bottom: 15px; }
         .prop-section-title { font-size: 11px; font-weight: 700; color: #004080; margin-bottom: 10px; }
         
+        /* Logic Builder */
+        .logic-rule { background: #fff; border: 2px solid #dee2e6; border-radius: 6px; padding: 10px; margin-bottom: 8px; position: relative; }
+        .logic-rule.show { border-color: #28a745; background: #f0fff4; }
+        .logic-rule.hide { border-color: #dc3545; background: #fff5f5; }
+        .logic-rule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .logic-rule-type { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+        .logic-rule-type.show { background: #28a745; color: white; }
+        .logic-rule-type.hide { background: #dc3545; color: white; }
+        .logic-rule-delete { background: none; border: none; color: #dc3545; cursor: pointer; font-size: 14px; padding: 2px 6px; }
+        .logic-rule-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+        .logic-select { padding: 6px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 11px; font-family: 'Oswald', sans-serif; }
+        .logic-input { padding: 6px 8px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 11px; width: 70px; font-family: 'Oswald', sans-serif; }
+        .logic-add-btn { background: #004080; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 10px; cursor: pointer; font-family: 'Oswald', sans-serif; font-weight: 700; }
+        .logic-add-btn:hover { background: #003366; }
+        .logic-add-condition { background: #6c757d; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 9px; cursor: pointer; margin-top: 5px; }
+        .logic-connector { font-size: 10px; font-weight: 700; color: #6c757d; padding: 2px 6px; background: #e9ecef; border-radius: 3px; }
+        
+        /* Validation */
+        .validation-rule { background: #fff3cd; border: 2px solid #ffc107; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+        .validation-msg { font-size: 10px; color: #856404; margin-top: 5px; }
+        .field-hidden { display: none !important; }
+        .field-error input, .field-error select, .field-error textarea { border-color: #dc3545 !important; }
+        .field-error-msg { color: #dc3545; font-size: 10px; margin-top: 4px; }
+        
         /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; overflow-y: auto; }
         .modal-overlay.show { display: flex; }
@@ -197,6 +221,29 @@
         .back-btn { background: #6c757d; color: white; }
         .next-btn { background: #004080; color: white; }
         .submit-btn { background: #28a745; color: white; }
+        
+        /* Draft Panel Styles */
+        .draft-actions-bar { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 2px dashed #dee2e6; flex-wrap: wrap; }
+        .draft-save-btn, .draft-toggle-btn { padding: 10px 16px; border: 2px solid #6f42c1; border-radius: 6px; font-family: 'Oswald', sans-serif; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .draft-save-btn { background: #6f42c1; color: white; }
+        .draft-save-btn:hover { background: #5a32a3; }
+        .draft-toggle-btn { background: white; color: #6f42c1; }
+        .draft-toggle-btn:hover { background: #f3f0ff; }
+        .drafts-panel-wrapper { margin-top: 15px; border: 2px solid #6f42c1; border-radius: 8px; background: #f8f9fa; }
+        .drafts-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white; font-size: 12px; font-weight: 700; border-radius: 6px 6px 0 0; }
+        .drafts-list { max-height: 250px; overflow-y: auto; }
+        .draft-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #dee2e6; gap: 10px; }
+        .draft-item:last-child { border-bottom: none; }
+        .draft-item:hover { background: #e9ecef; }
+        .draft-info { flex: 1; min-width: 0; }
+        .draft-preview { font-size: 11px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .draft-date { font-size: 9px; color: #868e96; margin-top: 2px; }
+        .draft-actions { display: flex; gap: 6px; }
+        .draft-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .draft-btn.load { background: #17a2b8; color: white; }
+        .draft-btn.load:hover { background: #138496; }
+        .draft-btn.delete { background: #dc3545; color: white; }
+        .draft-btn.delete:hover { background: #c82333; }
         
         /* Data Table */
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 15px; }
@@ -401,6 +448,7 @@
             <div class="sidebar-section">
                 <h3 class="sidebar-title"><span data-icon="sparkles" data-size="14"></span> Special Fields</h3>
                 <div class="field-type" data-type="gps"><span data-icon="map-pin" data-size="14"></span> GPS Location</div>
+                <div class="field-type" data-type="qrcode"><span data-icon="qr-code" data-size="14"></span> QR/Barcode Scanner</div>
                 <div class="field-type" data-type="rating"><span data-icon="star" data-size="14"></span> Rating</div>
             </div>
             <div class="sidebar-section">
@@ -551,11 +599,15 @@
                     <div class="config-title"><span data-icon="rocket" data-size="14"></span> Setup & Sync Actions</div>
                     <p style="font-size:11px;color:#666;margin-bottom:15px;">
                         <strong>Setup DHIS2:</strong> Creates Dataset/Program and Data Elements<br>
-                        <strong>Sync Data:</strong> Pushes data to DHIS2 based on selected mode
+                        <strong>Sync Case-Based:</strong> Pushes individual records as Events (Tracker)<br>
+                        <strong>Sync Aggregate:</strong> Pushes aggregated data values (DataSets)
                     </p>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                         <button class="modal-btn success" onclick="setupDhis2()" style="flex:1;"><span data-icon="settings" data-size="14"></span> Setup DHIS2</button>
-                        <button class="modal-btn purple" onclick="syncToDhis2()" style="flex:1;"><span data-icon="refresh-cw" data-size="14"></span> Sync to DHIS2</button>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                        <button class="modal-btn purple" onclick="syncCaseBased()" style="flex:1;"><span data-icon="list" data-size="14"></span> Sync Case-Based</button>
+                        <button class="modal-btn" onclick="syncAggregate()" style="flex:1;background:#17a2b8;color:#fff;"><span data-icon="bar-chart-3" data-size="14"></span> Sync Aggregate</button>
                     </div>
                 </div>
                 
@@ -681,7 +733,11 @@
             'layers': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
             'activity': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
             'file-spreadsheet': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>',
-            'code': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'
+            'code': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+            'qr-code': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>',
+            'scan': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>',
+            'file-edit': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"/><polyline points="14 2 14 8 20 8"/><path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l1-3.95 5.42-5.44Z"/></svg>',
+            'copy-check': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 15 2 2 4-4"/><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>'
         };
         
         function getIcon(name, size = 16) {
@@ -762,7 +818,8 @@
             isSharedMode: false,
             settings: {
                 title: 'My Data Collection Form',
-                logo: CONFIG.LOGO_URL
+                logo: CONFIG.LOGO_URL,
+                aggregateColumn: '' // Column used for grouping in aggregate view
             },
             sheets: {
                 scriptUrl: CONFIG.AUTH_SCRIPT_URL,
@@ -807,6 +864,7 @@
             checkbox: { label: 'Checkbox', icon: 'check-square', defaultLabel: 'Checkbox', valueType: 'TRUE_ONLY', category: 'categorical', options: ['Option 1', 'Option 2'] },
             yesno: { label: 'Yes/No', icon: 'toggle-left', defaultLabel: 'Yes/No Question', valueType: 'BOOLEAN', category: 'categorical' },
             gps: { label: 'GPS', icon: 'map-pin', defaultLabel: 'GPS Location', valueType: 'TEXT', category: 'text' },
+            qrcode: { label: 'QR Code', icon: 'qr-code', defaultLabel: 'QR/Barcode Scanner', valueType: 'TEXT', category: 'text' },
             rating: { label: 'Rating', icon: 'star', defaultLabel: 'Rating', valueType: 'INTEGER', category: 'categorical', max: 5 },
             section: { label: 'Section', icon: 'folder', defaultLabel: 'New Section', valueType: null, category: 'structure' }
         };
@@ -2008,9 +2066,39 @@
             }
         }
 
+        // Separate sync function for Case-Based (Tracker)
+        window.syncCaseBased = async function() {
+            if (!state.dhis2.url || !state.dhis2.username) {
+                notify('DHIS2 not configured', 'error');
+                return;
+            }
+            state.dhis2.connected = true;
+            clearLog();
+            await syncTrackerData();
+        };
+
+        // Separate sync function for Aggregate
+        window.syncAggregate = async function() {
+            if (!state.dhis2.url || !state.dhis2.username) {
+                notify('DHIS2 not configured', 'error');
+                return;
+            }
+            state.dhis2.connected = true;
+            clearLog();
+            await syncAggregateData();
+        };
+
         async function syncAggregateData() {
             addLog('info', 'Syncing AGGREGATE data to DHIS2...');
             updateDhis2Status('syncing', 'Syncing...');
+            
+            // Check if DHIS2 columns are configured
+            if (!state.dhis2.periodColumn || !state.dhis2.orgUnitColumn) {
+                addLog('error', 'Period Column and Org Unit Column must be set in DHIS2 settings');
+                notify('Set Period Column and Org Unit Column in DHIS2 settings first', 'error');
+                updateDhis2Status('disconnected', 'Config needed');
+                return;
+            }
             
             // Get aggregate data
             const aggregateData = calculateAggregateData();
@@ -2023,16 +2111,17 @@
             
             const periodColumn = state.dhis2.periodColumn;
             const orgUnitColumn = state.dhis2.orgUnitColumn;
+            const aggregateColumn = state.settings.aggregateColumn || orgUnitColumn;
             
             let success = 0, failed = 0;
             
             for (const record of aggregateData) {
                 const period = record._period;
-                const orgUnitName = record._orgUnit;
-                const orgUnitId = state.dhis2.orgUnitMap[orgUnitName?.toLowerCase().trim()];
+                const groupValue = record._group;
+                const orgUnitId = state.dhis2.orgUnitMap[groupValue?.toLowerCase().trim()];
                 
                 if (!orgUnitId) {
-                    addLog('error', `  ✗ No org unit match: ${orgUnitName}`);
+                    addLog('error', `  ✗ No org unit match: ${groupValue}`);
                     failed++;
                     continue;
                 }
@@ -2043,7 +2132,7 @@
                 const dataFields = state.fields.filter(f => 
                     f.type !== 'section' && 
                     f.name !== periodColumn && 
-                    f.name !== orgUnitColumn &&
+                    f.name !== aggregateColumn &&
                     !skipTypes.includes(f.type)
                 );
                 
@@ -2291,27 +2380,48 @@
             const periodColumn = state.dhis2.periodColumn;
             const orgUnitColumn = state.dhis2.orgUnitColumn;
             
-            if (!periodColumn || !orgUnitColumn) {
-                notify('Select Period Column and Org Unit Column in DHIS2 settings', 'error');
-                return [];
-            }
+            // Use aggregateColumn from settings, or fall back to orgUnitColumn for DHIS2
+            const aggregateColumn = state.settings.aggregateColumn || orgUnitColumn;
+            
+            // If no aggregation column set, use default grouping by month
+            const useDefaultGrouping = !aggregateColumn && !periodColumn;
             
             const grouped = {};
             const data = getFilteredData();
             
-            // Get field names to skip (period and org unit)
-            const skipFields = [periodColumn, orgUnitColumn];
+            if (data.length === 0) return [];
+            
+            // Get field names to skip (period and aggregate column)
+            const skipFields = [periodColumn, aggregateColumn].filter(Boolean);
             // Field types that cannot be aggregated
             const skipTypes = ['phone', 'gps', 'email', 'text', 'textarea', 'date', 'time'];
             
             data.forEach(record => {
-                const period = record[periodColumn] || 'Unknown';
-                const orgUnit = record[orgUnitColumn] || 'Unknown';
-                const key = `${orgUnit}|||${period}`;
+                let period, groupValue, key;
+                
+                if (useDefaultGrouping) {
+                    // Use timestamp month as period, "All" as group
+                    const ts = record._timestamp ? new Date(record._timestamp) : new Date();
+                    period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
+                    groupValue = 'All';
+                    key = `${groupValue}|||${period}`;
+                } else {
+                    // Use period column or timestamp month
+                    if (periodColumn && record[periodColumn]) {
+                        period = record[periodColumn];
+                    } else {
+                        const ts = record._timestamp ? new Date(record._timestamp) : new Date();
+                        period = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}`;
+                    }
+                    
+                    // Use aggregate column value
+                    groupValue = aggregateColumn ? (record[aggregateColumn] || 'Unknown') : 'All';
+                    key = `${groupValue}|||${period}`;
+                }
                 
                 if (!grouped[key]) {
                     grouped[key] = {
-                        _orgUnit: orgUnit,
+                        _group: groupValue,
                         _period: period,
                         _count: 0
                     };
@@ -2319,11 +2429,11 @@
                 
                 grouped[key]._count++;
                 
-                // Aggregate other fields (excluding period, orgunit columns, section, and text types)
+                // Aggregate other fields (excluding period, aggregate columns, section, and text types)
                 state.fields.forEach(field => {
                     if (field.type === 'section') return;
                     
-                    // Skip period and org unit columns - they are used for grouping, not aggregation
+                    // Skip period and aggregate columns - they are used for grouping, not aggregation
                     if (skipFields.includes(field.name)) return;
                     
                     // Skip non-aggregatable field types
@@ -2834,6 +2944,10 @@
             const field = state.fields.find(f => f.id === state.selectedFieldId);
             if (!field) return;
             
+            // Initialize logic arrays if not exist
+            if (!field.showLogic) field.showLogic = [];
+            if (!field.validation) field.validation = [];
+            
             let html = `
                 <div class="prop-section">
                     <div class="prop-section-title"><span data-icon="edit-3" data-size="12"></span> Field Settings</div>
@@ -2852,6 +2966,13 @@
                                 <span>Required Field</span>
                             </label>
                         </div>
+                        <div class="property-group">
+                            <label class="property-checkbox">
+                                <input type="checkbox" id="propCheckDuplicate" ${field.checkDuplicate ? 'checked' : ''}>
+                                <span>Check for Duplicates</span>
+                            </label>
+                            <p style="font-size:9px;color:#868e96;margin-top:4px;">Block submission if this value already exists in Google Sheets</p>
+                        </div>
                     ` : ''}
                 </div>
             `;
@@ -2865,12 +2986,725 @@
                 `;
             }
             
+            // Get other fields that can be used for conditions (exclude current field and sections)
+            const otherFields = state.fields.filter(f => f.id !== field.id && f.type !== 'section');
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
+            const numericTypes = ['number'];
+            
+            // Show/Hide Logic Section
+            html += `
+                <div class="prop-section">
+                    <div class="prop-section-title"><span data-icon="eye" data-size="12"></span> Show/Hide Logic</div>
+                    <p style="font-size:10px;color:#666;margin-bottom:10px;">Show or hide this field based on other field values</p>
+                    
+                    <div id="logicRulesContainer">
+                        ${renderLogicRules(field.showLogic, otherFields)}
+                    </div>
+                    
+                    <div style="display:flex;gap:8px;margin-top:10px;">
+                        <button class="logic-add-btn" onclick="addLogicRule('show')"><span data-icon="eye" data-size="10"></span> Add SHOW Rule</button>
+                        <button class="logic-add-btn" style="background:#dc3545;" onclick="addLogicRule('hide')"><span data-icon="eye-off" data-size="10"></span> Add HIDE Rule</button>
+                    </div>
+                </div>
+            `;
+            
+            // Validation Section - different for each field type
+            const validatableTypes = ['number', 'text', 'textarea', 'email', 'phone', 'date', 'time'];
+            
+            if (validatableTypes.includes(field.type)) {
+                let validationHtml = '';
+                
+                if (field.type === 'number') {
+                    validationHtml = `
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Set numeric constraints</p>
+                        <div id="validationRulesContainer">
+                            ${renderNumericValidation(field.validation)}
+                        </div>
+                        <button class="logic-add-btn" style="background:#ffc107;color:#000;" onclick="addValidationRule('number')"><span data-icon="plus" data-size="10"></span> Add Rule</button>
+                    `;
+                } else if (field.type === 'text' || field.type === 'textarea') {
+                    validationHtml = `
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Set character limits</p>
+                        <div class="validation-rule">
+                            <div class="logic-rule-row">
+                                <span style="font-size:10px;font-weight:700;">Min characters:</span>
+                                <input type="number" class="logic-input" min="0" value="${field.minLength || ''}" onchange="updateFieldValidation('minLength', this.value)">
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <span style="font-size:10px;font-weight:700;">Max characters:</span>
+                                <input type="number" class="logic-input" min="0" value="${field.maxLength || ''}" onchange="updateFieldValidation('maxLength', this.value)">
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <span style="font-size:10px;font-weight:700;">Exact length:</span>
+                                <input type="number" class="logic-input" min="0" value="${field.exactLength || ''}" onchange="updateFieldValidation('exactLength', this.value)" placeholder="e.g. 10">
+                            </div>
+                        </div>
+                    `;
+                } else if (field.type === 'email') {
+                    validationHtml = `
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Email validation is automatic (must contain @)</p>
+                        <div class="validation-rule" style="background:#d4edda;border-color:#28a745;">
+                            <div style="font-size:11px;color:#155724;">✓ Email format validation enabled (requires @)</div>
+                        </div>
+                    `;
+                } else if (field.type === 'phone') {
+                    validationHtml = `
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Set phone number format</p>
+                        <div class="validation-rule">
+                            <div class="logic-rule-row">
+                                <span style="font-size:10px;font-weight:700;">Exact digits:</span>
+                                <input type="number" class="logic-input" min="1" max="20" value="${field.exactDigits || ''}" onchange="updateFieldValidation('exactDigits', this.value)" placeholder="e.g. 8">
+                                <span style="font-size:9px;color:#666;">digits only</span>
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <span style="font-size:10px;font-weight:700;">Min digits:</span>
+                                <input type="number" class="logic-input" min="1" value="${field.minDigits || ''}" onchange="updateFieldValidation('minDigits', this.value)">
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <span style="font-size:10px;font-weight:700;">Max digits:</span>
+                                <input type="number" class="logic-input" min="1" value="${field.maxDigits || ''}" onchange="updateFieldValidation('maxDigits', this.value)">
+                            </div>
+                        </div>
+                    `;
+                } else if (field.type === 'date') {
+                    validationHtml = `
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Set date restrictions</p>
+                        <div class="validation-rule">
+                            <div class="logic-rule-row">
+                                <label class="property-checkbox" style="padding:0;">
+                                    <input type="checkbox" ${field.noFutureDates ? 'checked' : ''} onchange="updateFieldValidation('noFutureDates', this.checked)">
+                                    <span style="font-size:10px;">No future dates (today or before)</span>
+                                </label>
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <label class="property-checkbox" style="padding:0;">
+                                    <input type="checkbox" ${field.noPastDates ? 'checked' : ''} onchange="updateFieldValidation('noPastDates', this.checked)">
+                                    <span style="font-size:10px;">No past dates (today or after)</span>
+                                </label>
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <span style="font-size:10px;font-weight:700;">Not before:</span>
+                                <input type="date" class="logic-input" style="width:auto;" value="${field.minDate || ''}" onchange="updateFieldValidation('minDate', this.value)">
+                            </div>
+                            <div class="logic-rule-row" style="margin-top:8px;">
+                                <span style="font-size:10px;font-weight:700;">Not after:</span>
+                                <input type="date" class="logic-input" style="width:auto;" value="${field.maxDate || ''}" onchange="updateFieldValidation('maxDate', this.value)">
+                            </div>
+                        </div>
+                    `;
+                } else if (field.type === 'time') {
+                    validationHtml = `
+                        <p style="font-size:10px;color:#666;margin-bottom:10px;">Time field settings</p>
+                        <div class="validation-rule" style="background:#e8f4fc;border-color:#17a2b8;">
+                            <div class="logic-rule-row">
+                                <label class="property-checkbox" style="padding:0;">
+                                    <input type="checkbox" ${field.autoTime !== false ? 'checked' : ''} onchange="updateFieldValidation('autoTime', this.checked)">
+                                    <span style="font-size:10px;">Auto-fill with current time</span>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="prop-section">
+                        <div class="prop-section-title"><span data-icon="check-circle" data-size="12"></span> Validation Rules</div>
+                        ${validationHtml}
+                    </div>
+                `;
+            }
+            
             container.innerHTML = html;
+            initIcons();
             
             document.getElementById('propLabel')?.addEventListener('change', (e) => updateField('label', e.target.value));
             document.getElementById('propName')?.addEventListener('change', (e) => updateField('name', e.target.value));
             document.getElementById('propRequired')?.addEventListener('change', (e) => updateField('required', e.target.checked));
+            document.getElementById('propCheckDuplicate')?.addEventListener('change', (e) => updateField('checkDuplicate', e.target.checked));
             document.getElementById('propOptions')?.addEventListener('change', (e) => updateField('options', e.target.value.split('\n').filter(o => o.trim())));
+        }
+        
+        function renderLogicRules(rules, otherFields) {
+            if (!rules || rules.length === 0) {
+                return '<p style="font-size:10px;color:#868e96;text-align:center;padding:10px;">No logic rules. Field always visible.</p>';
+            }
+            
+            const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
+            
+            return rules.map((rule, ruleIdx) => {
+                const conditions = rule.conditions || [];
+                
+                return `
+                    <div class="logic-rule ${rule.action}">
+                        <div class="logic-rule-header">
+                            <span class="logic-rule-type ${rule.action}">${rule.action.toUpperCase()} this field when:</span>
+                            <button class="logic-rule-delete" onclick="deleteLogicRule(${ruleIdx})" title="Delete rule">✕</button>
+                        </div>
+                        
+                        ${conditions.map((cond, condIdx) => {
+                            const sourceField = otherFields.find(f => f.name === cond.field);
+                            const isCategorical = sourceField && categoricalTypes.includes(sourceField.type);
+                            const isNumeric = sourceField && sourceField.type === 'number';
+                            const options = sourceField?.type === 'yesno' ? ['Yes', 'No'] : (sourceField?.options || []);
+                            
+                            return `
+                                ${condIdx > 0 ? `<div style="text-align:center;margin:5px 0;"><span class="logic-connector">${rule.connector || 'AND'}</span></div>` : ''}
+                                <div class="logic-rule-row">
+                                    <select class="logic-select" style="flex:1;" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'field', this.value)">
+                                        <option value="">-- Select Field --</option>
+                                        ${otherFields.map(f => `<option value="${f.name}" ${cond.field === f.name ? 'selected' : ''}>${f.label}</option>`).join('')}
+                                    </select>
+                                    
+                                    ${isCategorical ? `
+                                        <select class="logic-select" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'operator', this.value)">
+                                            <option value="=" ${cond.operator === '=' ? 'selected' : ''}>equals</option>
+                                            <option value="!=" ${cond.operator === '!=' ? 'selected' : ''}>not equals</option>
+                                        </select>
+                                        <select class="logic-select" style="flex:1;" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'value', this.value)">
+                                            <option value="">-- Select Value --</option>
+                                            ${options.map(o => `<option value="${o}" ${cond.value === o ? 'selected' : ''}>${o}</option>`).join('')}
+                                        </select>
+                                    ` : isNumeric ? `
+                                        <select class="logic-select" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'operator', this.value)">
+                                            <option value="=" ${cond.operator === '=' ? 'selected' : ''}>=</option>
+                                            <option value="!=" ${cond.operator === '!=' ? 'selected' : ''}>≠</option>
+                                            <option value=">" ${cond.operator === '>' ? 'selected' : ''}>&gt;</option>
+                                            <option value=">=" ${cond.operator === '>=' ? 'selected' : ''}>≥</option>
+                                            <option value="<" ${cond.operator === '<' ? 'selected' : ''}>&lt;</option>
+                                            <option value="<=" ${cond.operator === '<=' ? 'selected' : ''}>≤</option>
+                                            <option value="between" ${cond.operator === 'between' ? 'selected' : ''}>between</option>
+                                        </select>
+                                        ${cond.operator === 'between' ? `
+                                            <input type="number" class="logic-input" placeholder="min" value="${cond.min || ''}" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'min', this.value)">
+                                            <span style="font-size:10px;">and</span>
+                                            <input type="number" class="logic-input" placeholder="max" value="${cond.max || ''}" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'max', this.value)">
+                                        ` : `
+                                            <input type="number" class="logic-input" placeholder="value" value="${cond.value || ''}" onchange="updateLogicCondition(${ruleIdx}, ${condIdx}, 'value', this.value)">
+                                        `}
+                                    ` : `
+                                        <span style="font-size:10px;color:#868e96;">Select a field first</span>
+                                    `}
+                                    
+                                    <button class="logic-rule-delete" onclick="deleteLogicCondition(${ruleIdx}, ${condIdx})" title="Remove condition">✕</button>
+                                </div>
+                            `;
+                        }).join('')}
+                        
+                        <div style="display:flex;gap:8px;margin-top:8px;">
+                            <button class="logic-add-condition" onclick="addLogicCondition(${ruleIdx}, 'AND')">+ AND</button>
+                            <button class="logic-add-condition" onclick="addLogicCondition(${ruleIdx}, 'OR')">+ OR</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderNumericValidation(rules) {
+            if (!rules || rules.length === 0) {
+                return '<p style="font-size:10px;color:#868e96;text-align:center;padding:10px;">No validation rules.</p>';
+            }
+            
+            return rules.map((rule, idx) => `
+                <div class="validation-rule">
+                    <div class="logic-rule-row">
+                        <span style="font-size:10px;font-weight:700;">Value must be</span>
+                        <select class="logic-select" onchange="updateValidationRule(${idx}, 'operator', this.value)">
+                            <option value=">" ${rule.operator === '>' ? 'selected' : ''}>&gt;</option>
+                            <option value=">=" ${rule.operator === '>=' ? 'selected' : ''}>≥</option>
+                            <option value="<" ${rule.operator === '<' ? 'selected' : ''}>&lt;</option>
+                            <option value="<=" ${rule.operator === '<=' ? 'selected' : ''}>≤</option>
+                            <option value="=" ${rule.operator === '=' ? 'selected' : ''}>=</option>
+                            <option value="!=" ${rule.operator === '!=' ? 'selected' : ''}>≠</option>
+                            <option value="between" ${rule.operator === 'between' ? 'selected' : ''}>between</option>
+                        </select>
+                        ${rule.operator === 'between' ? `
+                            <input type="number" class="logic-input" placeholder="min" value="${rule.min || ''}" onchange="updateValidationRule(${idx}, 'min', this.value)">
+                            <span style="font-size:10px;">and</span>
+                            <input type="number" class="logic-input" placeholder="max" value="${rule.max || ''}" onchange="updateValidationRule(${idx}, 'max', this.value)">
+                        ` : `
+                            <input type="number" class="logic-input" placeholder="value" value="${rule.value || ''}" onchange="updateValidationRule(${idx}, 'value', this.value)">
+                        `}
+                        <button class="logic-rule-delete" onclick="deleteValidationRule(${idx})">✕</button>
+                    </div>
+                    <div class="validation-msg">
+                        <input type="text" class="property-input" style="font-size:10px;padding:5px;" placeholder="Error message (optional)" value="${rule.message || ''}" onchange="updateValidationRule(${idx}, 'message', this.value)">
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Update field validation property directly
+        window.updateFieldValidation = function(prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field) return;
+            
+            // Convert to number for numeric props, boolean for boolean props
+            if (['minLength', 'maxLength', 'exactLength', 'exactDigits', 'minDigits', 'maxDigits'].includes(prop)) {
+                field[prop] = value === '' ? null : parseInt(value);
+            } else if (['noFutureDates', 'noPastDates', 'autoTime'].includes(prop)) {
+                field[prop] = value;
+            } else {
+                field[prop] = value || null;
+            }
+            
+            saveToStorage();
+        };
+        
+        // Logic Management Functions
+        window.addLogicRule = function(action) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field) return;
+            if (!field.showLogic) field.showLogic = [];
+            
+            field.showLogic.push({
+                action: action, // 'show' or 'hide'
+                connector: 'AND',
+                conditions: [{ field: '', operator: '=', value: '' }]
+            });
+            
+            saveToStorage();
+            renderProperties();
+        };
+        
+        window.deleteLogicRule = function(ruleIdx) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field || !field.showLogic) return;
+            
+            field.showLogic.splice(ruleIdx, 1);
+            saveToStorage();
+            renderProperties();
+        };
+        
+        window.addLogicCondition = function(ruleIdx, connector) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field || !field.showLogic || !field.showLogic[ruleIdx]) return;
+            
+            field.showLogic[ruleIdx].connector = connector;
+            field.showLogic[ruleIdx].conditions.push({ field: '', operator: '=', value: '' });
+            
+            saveToStorage();
+            renderProperties();
+        };
+        
+        window.deleteLogicCondition = function(ruleIdx, condIdx) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field || !field.showLogic || !field.showLogic[ruleIdx]) return;
+            
+            if (field.showLogic[ruleIdx].conditions.length <= 1) {
+                // If only one condition, delete the whole rule
+                field.showLogic.splice(ruleIdx, 1);
+            } else {
+                field.showLogic[ruleIdx].conditions.splice(condIdx, 1);
+            }
+            
+            saveToStorage();
+            renderProperties();
+        };
+        
+        window.updateLogicCondition = function(ruleIdx, condIdx, prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field || !field.showLogic || !field.showLogic[ruleIdx]) return;
+            
+            const condition = field.showLogic[ruleIdx].conditions[condIdx];
+            if (!condition) return;
+            
+            condition[prop] = value;
+            
+            // If field changed, reset other values
+            if (prop === 'field') {
+                condition.operator = '=';
+                condition.value = '';
+                condition.min = '';
+                condition.max = '';
+            }
+            
+            // If operator changed to between, reset value
+            if (prop === 'operator' && value === 'between') {
+                condition.value = '';
+            }
+            
+            saveToStorage();
+            renderProperties();
+        };
+        
+        // Validation Management Functions
+        window.addValidationRule = function(type) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field) return;
+            if (!field.validation) field.validation = [];
+            
+            field.validation.push({
+                operator: '>=',
+                value: '',
+                min: '',
+                max: '',
+                message: ''
+            });
+            
+            saveToStorage();
+            renderProperties();
+        };
+        
+        window.deleteValidationRule = function(idx) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field || !field.validation) return;
+            
+            field.validation.splice(idx, 1);
+            saveToStorage();
+            renderProperties();
+        };
+        
+        window.updateValidationRule = function(idx, prop, value) {
+            const field = state.fields.find(f => f.id === state.selectedFieldId);
+            if (!field || !field.validation || !field.validation[idx]) return;
+            
+            field.validation[idx][prop] = value;
+            
+            if (prop === 'operator' && value === 'between') {
+                field.validation[idx].value = '';
+            }
+            
+            saveToStorage();
+            renderProperties();
+        };
+        
+        // Evaluate Logic for a field given current form data
+        function evaluateFieldLogic(field, formData) {
+            if (!field.showLogic || field.showLogic.length === 0) {
+                return { visible: true, valid: true, errorMessage: '' };
+            }
+            
+            let shouldShow = null; // null means no show rules
+            let shouldHide = false;
+            
+            for (const rule of field.showLogic) {
+                const result = evaluateRule(rule, formData);
+                
+                if (rule.action === 'show') {
+                    if (shouldShow === null) shouldShow = false;
+                    if (result) shouldShow = true;
+                } else if (rule.action === 'hide') {
+                    if (result) shouldHide = true;
+                }
+            }
+            
+            // Hide takes precedence
+            if (shouldHide) return { visible: false, valid: true, errorMessage: '' };
+            
+            // If there are show rules, field is only visible if at least one matches
+            if (shouldShow !== null) return { visible: shouldShow, valid: true, errorMessage: '' };
+            
+            return { visible: true, valid: true, errorMessage: '' };
+        }
+        
+        function evaluateRule(rule, formData) {
+            const conditions = rule.conditions || [];
+            if (conditions.length === 0) return false;
+            
+            const results = conditions.map(cond => evaluateCondition(cond, formData));
+            
+            if (rule.connector === 'OR') {
+                return results.some(r => r);
+            } else {
+                return results.every(r => r);
+            }
+        }
+        
+        function evaluateCondition(condition, formData) {
+            const fieldValue = formData[condition.field];
+            const operator = condition.operator;
+            
+            if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
+                return false;
+            }
+            
+            if (operator === 'between') {
+                const num = parseFloat(fieldValue);
+                const min = parseFloat(condition.min);
+                const max = parseFloat(condition.max);
+                return !isNaN(num) && !isNaN(min) && !isNaN(max) && num >= min && num <= max;
+            }
+            
+            const compareValue = condition.value;
+            
+            // For numeric comparisons
+            if (['>', '>=', '<', '<='].includes(operator)) {
+                const num = parseFloat(fieldValue);
+                const comp = parseFloat(compareValue);
+                if (isNaN(num) || isNaN(comp)) return false;
+                
+                switch (operator) {
+                    case '>': return num > comp;
+                    case '>=': return num >= comp;
+                    case '<': return num < comp;
+                    case '<=': return num <= comp;
+                }
+            }
+            
+            // For equality
+            if (operator === '=') {
+                return String(fieldValue) === String(compareValue);
+            }
+            if (operator === '!=') {
+                return String(fieldValue) !== String(compareValue);
+            }
+            
+            return false;
+        }
+        
+        function validateField(field, value) {
+            if (value === '' || value === null || value === undefined) {
+                return { valid: true, message: '' }; // Don't validate empty (use required for that)
+            }
+            
+            // Numeric validation
+            if (field.type === 'number') {
+                const num = parseFloat(value);
+                if (isNaN(num)) {
+                    return { valid: false, message: 'Please enter a valid number' };
+                }
+                
+                if (field.validation && field.validation.length > 0) {
+                    for (const rule of field.validation) {
+                        let valid = true;
+                        
+                        if (rule.operator === 'between') {
+                            const min = parseFloat(rule.min);
+                            const max = parseFloat(rule.max);
+                            valid = !isNaN(min) && !isNaN(max) && num >= min && num <= max;
+                        } else {
+                            const comp = parseFloat(rule.value);
+                            if (!isNaN(comp)) {
+                                switch (rule.operator) {
+                                    case '>': valid = num > comp; break;
+                                    case '>=': valid = num >= comp; break;
+                                    case '<': valid = num < comp; break;
+                                    case '<=': valid = num <= comp; break;
+                                    case '=': valid = num === comp; break;
+                                    case '!=': valid = num !== comp; break;
+                                }
+                            }
+                        }
+                        
+                        if (!valid) {
+                            const defaultMsg = rule.operator === 'between' 
+                                ? `Value must be between ${rule.min} and ${rule.max}`
+                                : `Value must be ${rule.operator} ${rule.value}`;
+                            return { valid: false, message: rule.message || defaultMsg };
+                        }
+                    }
+                }
+            }
+            
+            // Text/Textarea validation
+            if (field.type === 'text' || field.type === 'textarea') {
+                const len = value.length;
+                
+                if (field.exactLength && len !== parseInt(field.exactLength)) {
+                    return { valid: false, message: `Must be exactly ${field.exactLength} characters` };
+                }
+                if (field.minLength && len < parseInt(field.minLength)) {
+                    return { valid: false, message: `Minimum ${field.minLength} characters required` };
+                }
+                if (field.maxLength && len > parseInt(field.maxLength)) {
+                    return { valid: false, message: `Maximum ${field.maxLength} characters allowed` };
+                }
+            }
+            
+            // Email validation
+            if (field.type === 'email') {
+                if (!value.includes('@') || !value.includes('.')) {
+                    return { valid: false, message: 'Please enter a valid email address' };
+                }
+                // Basic email pattern
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(value)) {
+                    return { valid: false, message: 'Please enter a valid email address' };
+                }
+            }
+            
+            // Phone validation
+            if (field.type === 'phone') {
+                // Extract only digits
+                const digits = value.replace(/\D/g, '');
+                
+                if (field.exactDigits && digits.length !== parseInt(field.exactDigits)) {
+                    return { valid: false, message: `Phone number must be exactly ${field.exactDigits} digits` };
+                }
+                if (field.minDigits && digits.length < parseInt(field.minDigits)) {
+                    return { valid: false, message: `Phone number must have at least ${field.minDigits} digits` };
+                }
+                if (field.maxDigits && digits.length > parseInt(field.maxDigits)) {
+                    return { valid: false, message: `Phone number must have at most ${field.maxDigits} digits` };
+                }
+            }
+            
+            // Date validation
+            if (field.type === 'date') {
+                const dateValue = new Date(value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (field.noFutureDates && dateValue > today) {
+                    return { valid: false, message: 'Future dates are not allowed' };
+                }
+                if (field.noPastDates && dateValue < today) {
+                    return { valid: false, message: 'Past dates are not allowed' };
+                }
+                if (field.minDate) {
+                    const minDate = new Date(field.minDate);
+                    if (dateValue < minDate) {
+                        return { valid: false, message: `Date must be on or after ${field.minDate}` };
+                    }
+                }
+                if (field.maxDate) {
+                    const maxDate = new Date(field.maxDate);
+                    if (dateValue > maxDate) {
+                        return { valid: false, message: `Date must be on or before ${field.maxDate}` };
+                    }
+                }
+            }
+            
+            return { valid: true, message: '' };
+        }
+        
+        // Apply logic to all fields in the form
+        function applyFormLogic() {
+            const form = document.getElementById('viewerForm');
+            if (!form) return;
+            
+            // Get current form data
+            const formData = {};
+            new FormData(form).forEach((v, k) => {
+                // Handle multiple values (checkboxes)
+                if (formData[k]) {
+                    formData[k] = Array.isArray(formData[k]) ? [...formData[k], v] : [formData[k], v];
+                } else {
+                    formData[k] = v;
+                }
+            });
+            
+            // Also get values from inputs that might not be in FormData yet
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                const name = el.name;
+                if (!name) return;
+                
+                if (el.type === 'radio') {
+                    if (el.checked) formData[name] = el.value;
+                } else if (el.type === 'checkbox') {
+                    if (el.checked && !formData[name]) {
+                        formData[name] = el.value;
+                    }
+                } else {
+                    if (!formData[name]) formData[name] = el.value;
+                }
+            });
+            
+            // Apply logic to each field
+            state.fields.forEach(field => {
+                if (field.type === 'section') return;
+                
+                const fieldEl = document.querySelector(`[data-field-name="${field.name}"]`);
+                if (!fieldEl) return;
+                
+                const logicResult = evaluateFieldLogic(field, formData);
+                
+                // Show/Hide field
+                if (logicResult.visible) {
+                    fieldEl.classList.remove('field-hidden');
+                } else {
+                    fieldEl.classList.add('field-hidden');
+                    // Clear hidden field values
+                    const inputs = fieldEl.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        if (input.type === 'radio' || input.type === 'checkbox') {
+                            input.checked = false;
+                        } else if (input.type !== 'time') { // Don't clear auto-time
+                            input.value = '';
+                        }
+                    });
+                }
+                
+                // Apply validation styling for validatable fields
+                const validatableTypes = ['number', 'text', 'textarea', 'email', 'phone', 'date'];
+                if (validatableTypes.includes(field.type)) {
+                    const input = fieldEl.querySelector('input, textarea');
+                    const errorDiv = fieldEl.querySelector('.field-error-msg');
+                    
+                    if (input && input.value) {
+                        const validResult = validateField(field, input.value);
+                        if (!validResult.valid) {
+                            fieldEl.classList.add('field-error');
+                            if (errorDiv) errorDiv.textContent = validResult.message;
+                        } else {
+                            fieldEl.classList.remove('field-error');
+                            if (errorDiv) errorDiv.textContent = '';
+                        }
+                    } else {
+                        fieldEl.classList.remove('field-error');
+                        if (errorDiv) errorDiv.textContent = '';
+                    }
+                }
+            });
+            
+            // Also handle sections (hide section if all its fields are hidden)
+            let currentSection = null;
+            let allFieldsHidden = true;
+            
+            state.fields.forEach((field, idx) => {
+                if (field.type === 'section') {
+                    // Check if previous section should be hidden
+                    if (currentSection && allFieldsHidden) {
+                        const sectionEl = document.querySelector(`[data-field-name="${currentSection.name}"]`);
+                        if (sectionEl) sectionEl.classList.add('field-hidden');
+                    }
+                    currentSection = field;
+                    allFieldsHidden = true;
+                } else if (currentSection) {
+                    const fieldEl = document.querySelector(`[data-field-name="${field.name}"]`);
+                    if (fieldEl && !fieldEl.classList.contains('field-hidden')) {
+                        allFieldsHidden = false;
+                    }
+                }
+            });
+        }
+        
+        // Validate all visible fields before submit
+        function validateAllFields() {
+            const form = document.getElementById('viewerForm');
+            if (!form) return { valid: true };
+            
+            const formData = {};
+            new FormData(form).forEach((v, k) => formData[k] = v);
+            
+            for (const field of state.fields) {
+                if (field.type === 'section') continue;
+                
+                const fieldEl = document.querySelector(`[data-field-name="${field.name}"]`);
+                if (!fieldEl || fieldEl.classList.contains('field-hidden')) continue;
+                
+                // Check required
+                if (field.required) {
+                    const value = formData[field.name];
+                    if (!value || value === '') {
+                        return { valid: false, message: `${field.label} is required` };
+                    }
+                }
+                
+                // Check validation rules for all validatable field types
+                const validatableTypes = ['number', 'text', 'textarea', 'email', 'phone', 'date'];
+                if (validatableTypes.includes(field.type)) {
+                    const value = formData[field.name];
+                    if (value) {
+                        const result = validateField(field, value);
+                        if (!result.valid) {
+                            return { valid: false, message: `${field.label}: ${result.message}` };
+                        }
+                    }
+                }
+            }
+            
+            return { valid: true };
         }
 
         // ==================== STORAGE ====================
@@ -3002,8 +3836,18 @@
             if (state.fields.length === 0) { notify('Add fields!', 'error'); return; }
             
             const formData = {
-                s: { t: state.settings.title, l: state.settings.logo },
-                f: state.fields.map(f => ({ i: f.id, y: f.type, l: f.label, n: f.name, r: f.required, o: f.options, mx: f.max })),
+                s: { t: state.settings.title, l: state.settings.logo, ac: state.settings.aggregateColumn },
+                f: state.fields.map(f => ({ 
+                    i: f.id, y: f.type, l: f.label, n: f.name, r: f.required, o: f.options, mx: f.max,
+                    // Validation fields
+                    sl: f.showLogic || [],
+                    v: f.validation || [],
+                    mnl: f.minLength, mxl: f.maxLength, el: f.exactLength,
+                    ed: f.exactDigits, mnd: f.minDigits, mxd: f.maxDigits,
+                    nfd: f.noFutureDates, npd: f.noPastDates, mid: f.minDate, mxd2: f.maxDate,
+                    at: f.autoTime,
+                    cd: f.checkDuplicate // Check for duplicates
+                })),
                 d: state.dhis2.datasetId || state.dhis2.programId ? { 
                     id: state.dhis2.datasetId,
                     pid: state.dhis2.programId,
@@ -3136,9 +3980,17 @@
             document.querySelector('.header').style.display = 'none';
             document.querySelector('.footer').style.display = 'none';
             
-            state.settings = { title: data.s?.t || 'Form', logo: data.s?.l || state.settings.logo };
+            state.settings = { title: data.s?.t || 'Form', logo: data.s?.l || state.settings.logo, aggregateColumn: data.s?.ac || '' };
             state.fields = (data.f || []).map(f => ({
-                id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false, options: f.o || [], max: f.mx || 5
+                id: f.i, type: f.y, label: f.l, name: f.n, required: f.r || false, options: f.o || [], max: f.mx || 5,
+                // Validation fields
+                showLogic: f.sl || [],
+                validation: f.v || [],
+                minLength: f.mnl, maxLength: f.mxl, exactLength: f.el,
+                exactDigits: f.ed, minDigits: f.mnd, maxDigits: f.mxd,
+                noFutureDates: f.nfd, noPastDates: f.npd, minDate: f.mid, maxDate: f.mxd2,
+                autoTime: f.at !== false,
+                checkDuplicate: f.cd || false
             }));
             
             // Load DHIS2 dataset/program info
@@ -3191,6 +4043,31 @@
                     const reqAttr = field.required ? 'required' : '';
                     let input = '';
                     
+                    // Build validation attributes
+                    let textAttrs = '';
+                    if (field.minLength) textAttrs += ` minlength="${field.minLength}"`;
+                    if (field.maxLength) textAttrs += ` maxlength="${field.maxLength}"`;
+                    if (field.exactLength) textAttrs += ` minlength="${field.exactLength}" maxlength="${field.exactLength}"`;
+                    
+                    let phoneAttrs = '';
+                    if (field.exactDigits) {
+                        phoneAttrs = ` pattern="[0-9]{${field.exactDigits}}" title="Must be exactly ${field.exactDigits} digits"`;
+                    } else if (field.minDigits || field.maxDigits) {
+                        const min = field.minDigits || 1;
+                        const max = field.maxDigits || 20;
+                        phoneAttrs = ` pattern="[0-9]{${min},${max}}" title="Must be ${min}-${max} digits"`;
+                    }
+                    
+                    let dateAttrs = '';
+                    const today = new Date().toISOString().split('T')[0];
+                    if (field.noFutureDates) dateAttrs += ` max="${today}"`;
+                    if (field.noPastDates) dateAttrs += ` min="${today}"`;
+                    if (field.minDate) dateAttrs += ` min="${field.minDate}"`;
+                    if (field.maxDate) dateAttrs += ` max="${field.maxDate}"`;
+                    
+                    const currentTime = new Date().toTimeString().slice(0, 5);
+                    const autoTimeValue = (field.autoTime !== false) ? ` value="${currentTime}"` : '';
+                    
                     switch (field.type) {
                         case 'period':
                             input = `<select name="${field.name}" class="viewer-input" ${reqAttr}>
@@ -3198,15 +4075,26 @@
                                 ${PERIODS.map(p => `<option value="${p}">${p.substring(0,4)}-${p.substring(4)}</option>`).join('')}
                             </select>`;
                             break;
-                        case 'text': case 'email': case 'phone': case 'date': case 'time':
-                            const type = field.type === 'phone' ? 'tel' : field.type;
-                            input = `<input type="${type}" name="${field.name}" class="viewer-input" ${reqAttr}>`;
+                        case 'text':
+                            input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}${textAttrs}>`;
+                            break;
+                        case 'email':
+                            input = `<input type="email" name="${field.name}" class="viewer-input" ${reqAttr} pattern="[^\\s@]+@[^\\s@]+\\.[^\\s@]+" title="Please enter a valid email (e.g., name@example.com)">`;
+                            break;
+                        case 'phone':
+                            input = `<input type="tel" name="${field.name}" class="viewer-input" ${reqAttr}${phoneAttrs}>`;
+                            break;
+                        case 'date':
+                            input = `<input type="date" name="${field.name}" class="viewer-input" ${reqAttr}${dateAttrs}>`;
+                            break;
+                        case 'time':
+                            input = `<input type="time" name="${field.name}" class="viewer-input" ${reqAttr}${autoTimeValue} readonly style="background:#f0f0f0;">`;
                             break;
                         case 'number':
                             input = `<input type="number" name="${field.name}" class="viewer-input" ${reqAttr}>`;
                             break;
                         case 'textarea':
-                            input = `<textarea name="${field.name}" class="viewer-input" rows="3" ${reqAttr}></textarea>`;
+                            input = `<textarea name="${field.name}" class="viewer-input" rows="3" ${reqAttr}${textAttrs}></textarea>`;
                             break;
                         case 'select':
                             input = `<select name="${field.name}" class="viewer-input" ${reqAttr}><option value="">-- Select --</option>${(field.options||[]).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`;
@@ -3222,6 +4110,19 @@
                             input = `<div><button type="button" onclick="captureGPS(this)" style="padding:10px 20px;background:#004080;color:white;border:none;border-radius:6px;cursor:pointer;"><span data-icon="map-pin" data-size="14"></span> Get Location</button><input type="hidden" name="${field.name}"><div class="gps-status" style="margin-top:6px;font-size:11px;"></div>
                 `;
                             break;
+                        case 'qrcode':
+                            input = `<div class="qr-scanner-container">
+                                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                                    <button type="button" onclick="startQRScanner(this)" style="padding:10px 20px;background:#6f42c1;color:white;border:none;border-radius:6px;cursor:pointer;"><span data-icon="scan" data-size="14"></span> Scan QR/Barcode</button>
+                                    <input type="text" name="${field.name}" class="viewer-input" style="flex:1;min-width:150px;" placeholder="Or enter manually" ${reqAttr}>
+                                </div>
+                                <div class="qr-preview" style="margin-top:10px;display:none;">
+                                    <video class="qr-video" style="width:100%;max-width:300px;border-radius:8px;"></video>
+                                    <button type="button" onclick="stopQRScanner(this)" style="margin-top:8px;padding:6px 12px;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;">Stop Scanner</button>
+                                </div>
+                                <div class="qr-status" style="margin-top:6px;font-size:11px;"></div>
+                            </div>`;
+                            break;
                         case 'rating':
                             input = `<div>${Array(field.max || 5).fill().map((_, i) => `<span onclick="setRating(this,${i+1})" class="rating-star" style="font-size:24px;cursor:pointer;opacity:0.3;color:#ffc107;">★</span>`).join('')}<input type="hidden" name="${field.name}"></div>`;
                             break;
@@ -3229,7 +4130,7 @@
                             input = `<input type="text" name="${field.name}" class="viewer-input" ${reqAttr}>`;
                     }
                     
-                    return `<div class="viewer-field"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}</div>`;
+                    return `<div class="viewer-field" data-field-name="${field.name}" data-field-id="${field.id}"><label class="viewer-field-label">${escapeHtml(field.label)} ${req}</label>${input}<div class="field-error-msg"></div></div>`;
                 }).join('');
                 
                 const isFirst = pageIndex === 0, isLast = pageIndex === pages.length - 1;
@@ -3271,6 +4172,25 @@
                             </div>
                             <div class="viewer-body">
                                 <form id="viewerForm">${pagesHtml}</form>
+                                
+                                <!-- Draft Actions -->
+                                <div class="draft-actions-bar">
+                                    <button type="button" class="draft-save-btn" onclick="saveDraft()">
+                                        <span data-icon="file-edit" data-size="14"></span> Save as Draft
+                                    </button>
+                                    <button type="button" class="draft-toggle-btn" onclick="toggleDraftsPanel()">
+                                        <span data-icon="folder" data-size="14"></span> <span id="draftsCount">Drafts (0)</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- Drafts Panel -->
+                                <div id="draftsPanelWrapper" class="drafts-panel-wrapper" style="display:none;">
+                                    <div class="drafts-panel-header">
+                                        <span><span data-icon="file-edit" data-size="14"></span> Saved Drafts</span>
+                                        <button onclick="toggleDraftsPanel()" style="background:none;border:none;cursor:pointer;color:#666;">✕</button>
+                                    </div>
+                                    <div id="draftsPanel"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3293,14 +4213,34 @@
             setupFormSubmit();
             loadViewerData();
             initIcons();
+            
+            // Initialize drafts panel
+            setTimeout(() => {
+                renderDraftsPanel();
+                updateDraftsCount();
+            }, 100);
+            
+            // Apply initial logic after form renders
+            setTimeout(() => applyFormLogic(), 100);
         }
 
         function setupFormSubmit() {
             const form = document.getElementById('viewerForm');
             if (!form) return;
             
+            // Add change listener to apply logic when form values change
+            form.addEventListener('input', applyFormLogic);
+            form.addEventListener('change', applyFormLogic);
+            
             form.onsubmit = async function(e) {
                 e.preventDefault();
+                
+                // Validate all visible fields
+                const validationResult = validateAllFields();
+                if (!validationResult.valid) {
+                    notify(validationResult.message, 'error');
+                    return;
+                }
                 
                 const data = { _id: Date.now(), _timestamp: new Date().toISOString(), _synced: false };
                 new FormData(form).forEach((v, k) => data[k] = v);
@@ -3309,8 +4249,26 @@
                 const submitBtn = form.querySelector('.submit-btn');
                 const originalText = submitBtn ? submitBtn.innerHTML : '';
                 if (submitBtn) {
-                    submitBtn.innerHTML = '<span class="spin" style="display:inline-block;">' + getIcon('loader', 14) + '</span> Submitting...';
+                    submitBtn.innerHTML = '<span class="spin" style="display:inline-block;">' + getIcon('loader', 14) + '</span> Checking...';
                     submitBtn.disabled = true;
+                }
+                
+                // Check for duplicates
+                const duplicateFields = state.fields.filter(f => f.checkDuplicate && data[f.name]);
+                if (duplicateFields.length > 0) {
+                    const duplicateResult = await checkDuplicates(data, duplicateFields);
+                    if (duplicateResult.hasDuplicate) {
+                        if (submitBtn) {
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                        notify(`Duplicate found: ${duplicateResult.field} = "${duplicateResult.value}" already exists`, 'error');
+                        return;
+                    }
+                }
+                
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<span class="spin" style="display:inline-block;">' + getIcon('loader', 14) + '</span> Submitting...';
                 }
                 
                 // Submit to Google Sheets first (if online)
@@ -3326,9 +4284,20 @@
                 saveToStorage();
                 saveFormToList();
                 
+                // Remove from drafts if it was a draft being submitted
+                const draftId = form.dataset.draftId ? parseInt(form.dataset.draftId) : null;
+                if (draftId) {
+                    removeDraft(draftId);
+                    delete form.dataset.draftId;
+                    updateDraftsCount();
+                }
+                
                 // Reset form
                 form.reset();
                 goToPage(0);
+                
+                // Re-apply logic after reset
+                setTimeout(() => applyFormLogic(), 100);
                 
                 // Restore button
                 if (submitBtn) {
@@ -3348,6 +4317,194 @@
                 loadViewerData();
             };
         }
+        
+        // Check for duplicate entries in Google Sheets
+        async function checkDuplicates(data, duplicateFields) {
+            try {
+                // First check local data
+                for (const field of duplicateFields) {
+                    const value = data[field.name];
+                    const localDuplicate = state.collectedData.find(d => d[field.name] === value);
+                    if (localDuplicate) {
+                        return { hasDuplicate: true, field: field.label, value: value };
+                    }
+                }
+                
+                // Then check Google Sheets
+                const existingData = await loadFromGoogleSheets();
+                for (const field of duplicateFields) {
+                    const value = data[field.name];
+                    const sheetDuplicate = existingData.find(d => d[field.name] === value);
+                    if (sheetDuplicate) {
+                        return { hasDuplicate: true, field: field.label, value: value };
+                    }
+                }
+                
+                return { hasDuplicate: false };
+            } catch (err) {
+                console.error('Duplicate check error:', err);
+                return { hasDuplicate: false }; // Allow submission if check fails
+            }
+        }
+        
+        // ==================== DRAFT FUNCTIONALITY ====================
+        function getDraftStorageKey() {
+            return `icf_drafts_${state.settings.title.replace(/\s+/g, '_')}`;
+        }
+        
+        function loadDrafts() {
+            try {
+                return JSON.parse(localStorage.getItem(getDraftStorageKey()) || '[]');
+            } catch (err) {
+                return [];
+            }
+        }
+        
+        function saveDrafts(drafts) {
+            localStorage.setItem(getDraftStorageKey(), JSON.stringify(drafts));
+        }
+        
+        window.saveDraft = function() {
+            const form = document.getElementById('viewerForm');
+            if (!form) return;
+            
+            const data = { 
+                _draftId: Date.now(), 
+                _savedAt: new Date().toISOString()
+            };
+            new FormData(form).forEach((v, k) => data[k] = v);
+            
+            // Check if any field has data
+            const hasData = state.fields.some(f => f.type !== 'section' && data[f.name]);
+            if (!hasData) {
+                notify('No data to save as draft', 'info');
+                return;
+            }
+            
+            const drafts = loadDrafts();
+            drafts.push(data);
+            saveDrafts(drafts);
+            
+            notify('Draft saved!', 'success');
+            renderDraftsPanel();
+            updateDraftsCount();
+        };
+        
+        window.loadDraft = function(draftId) {
+            const drafts = loadDrafts();
+            const draft = drafts.find(d => d._draftId === draftId);
+            if (!draft) return;
+            
+            const form = document.getElementById('viewerForm');
+            if (!form) return;
+            
+            // Populate form with draft data
+            state.fields.forEach(field => {
+                if (field.type === 'section') return;
+                const value = draft[field.name];
+                if (value === undefined) return;
+                
+                const input = form.querySelector(`[name="${field.name}"]`);
+                if (!input) return;
+                
+                if (input.type === 'radio') {
+                    // Find the radio with matching value
+                    const radio = form.querySelector(`input[name="${field.name}"][value="${value}"]`);
+                    if (radio) radio.checked = true;
+                } else if (input.type === 'checkbox') {
+                    const values = Array.isArray(value) ? value : [value];
+                    form.querySelectorAll(`input[name="${field.name}"]`).forEach(cb => {
+                        cb.checked = values.includes(cb.value);
+                    });
+                } else {
+                    input.value = value;
+                }
+            });
+            
+            // Store draft ID for removal after submit
+            form.dataset.draftId = draftId;
+            
+            notify('Draft loaded!', 'info');
+            goToPage(0);
+            setTimeout(() => applyFormLogic(), 100);
+        };
+        
+        window.deleteDraft = function(draftId) {
+            if (!confirm('Delete this draft?')) return;
+            removeDraft(draftId);
+            notify('Draft deleted');
+            renderDraftsPanel();
+            updateDraftsCount();
+        };
+        
+        function removeDraft(draftId) {
+            if (!draftId) return;
+            const drafts = loadDrafts();
+            const filtered = drafts.filter(d => d._draftId !== draftId);
+            saveDrafts(filtered);
+        }
+        
+        function renderDraftsPanel() {
+            const container = document.getElementById('draftsPanel');
+            if (!container) return;
+            
+            const drafts = loadDrafts();
+            
+            if (drafts.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#868e96;font-size:11px;padding:10px;">No saved drafts</p>';
+                return;
+            }
+            
+            let html = '<div class="drafts-list">';
+            drafts.forEach(draft => {
+                const savedDate = new Date(draft._savedAt).toLocaleString();
+                // Get first few non-empty field values for preview
+                const preview = state.fields
+                    .filter(f => f.type !== 'section' && draft[f.name])
+                    .slice(0, 2)
+                    .map(f => `${f.label}: ${String(draft[f.name]).substring(0, 20)}`)
+                    .join(', ') || 'Empty draft';
+                
+                html += `
+                    <div class="draft-item">
+                        <div class="draft-info">
+                            <div class="draft-preview">${escapeHtml(preview)}</div>
+                            <div class="draft-date">${savedDate}</div>
+                        </div>
+                        <div class="draft-actions">
+                            <button class="draft-btn load" onclick="loadDraft(${draft._draftId})" title="Load Draft">
+                                <span data-icon="file-edit" data-size="12"></span>
+                            </button>
+                            <button class="draft-btn delete" onclick="deleteDraft(${draft._draftId})" title="Delete Draft">
+                                <span data-icon="trash-2" data-size="12"></span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+            initIcons();
+        }
+        
+        window.toggleDraftsPanel = function() {
+            const wrapper = document.getElementById('draftsPanelWrapper');
+            if (wrapper) {
+                wrapper.style.display = wrapper.style.display === 'none' ? 'block' : 'none';
+                if (wrapper.style.display === 'block') {
+                    renderDraftsPanel();
+                }
+            }
+        };
+        
+        function updateDraftsCount() {
+            const countEl = document.getElementById('draftsCount');
+            if (countEl) {
+                const drafts = loadDrafts();
+                countEl.textContent = `Drafts (${drafts.length})`;
+            }
+        }
 
         async function loadViewerData() {
             // Show loading state
@@ -3363,9 +4520,7 @@
             
             // Try to load from Google Sheets
             try {
-                console.log('Loading data from Google Sheets...');
                 const sheetsData = await loadFromGoogleSheets();
-                console.log('Loaded from Sheets:', sheetsData.length, 'records');
                 
                 if (sheetsData && sheetsData.length > 0) {
                     // Use Google Sheets as primary data source
@@ -3456,6 +4611,26 @@
                 `;
             });
             
+            // Build aggregate column options (categorical fields that can be used for grouping)
+            const aggregatableFields = state.fields.filter(f => 
+                ['select', 'radio', 'yesno', 'text'].includes(f.type) && f.type !== 'section'
+            );
+            const aggregateColumnHtml = `
+                <div class="config-section" style="margin-bottom:15px;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span class="inline-icon">${getIcon('layers', 14)}</span>
+                            <strong style="font-size:11px;">Aggregate By:</strong>
+                            <select class="filter-select" style="min-width:150px;" onchange="setAggregateColumn(this.value)">
+                                <option value="">-- Select Column --</option>
+                                ${aggregatableFields.map(f => `<option value="${f.name}" ${state.settings.aggregateColumn === f.name ? 'selected' : ''}>${escapeHtml(f.label)}</option>`).join('')}
+                            </select>
+                        </div>
+                        ${state.settings.aggregateColumn ? `<span style="font-size:10px;color:#28a745;"><span class="inline-icon">${getIcon('check-circle', 12)}</span> Grouping by: ${escapeHtml(aggregatableFields.find(f => f.name === state.settings.aggregateColumn)?.label || state.settings.aggregateColumn)}</span>` : '<span style="font-size:10px;color:#868e96;">Select a column to enable aggregate view</span>'}
+                    </div>
+                </div>
+            `;
+            
             container.innerHTML = `
                 <div class="filter-panel">
                     <div class="filter-header">
@@ -3464,6 +4639,8 @@
                     </div>
                     <div class="filter-controls">${filtersHtml}</div>
                 </div>
+                
+                ${aggregateColumnHtml}
                 
                 <div class="data-view-tabs">
                     <div class="data-view-tab ${state.currentDataView === 'case' ? 'active' : ''}" onclick="switchDataView('case')"><span class="inline-icon">${getIcon('list', 14)}</span> Case-Based (${filteredData.length})</div>
@@ -3476,7 +4653,8 @@
                     <button class="modal-btn primary" onclick="refreshData()"><span class="inline-icon">${getIcon('refresh-cw', 14)}</span> Refresh</button>
                     <button class="modal-btn success" onclick="downloadCSV()"><span class="inline-icon">${getIcon('download', 14)}</span> Download CSV</button>
                     ${getOfflineCount() > 0 ? `<button class="modal-btn" style="background:#ffc107;color:#000;" onclick="syncOfflineData()"><span class="inline-icon">${getIcon('upload', 14)}</span> Sync Offline (${getOfflineCount()})</button>` : ''}
-                    ${state.dhis2.url && state.dhis2.connected ? `<button class="modal-btn" style="background:#17a2b8;color:#fff;" onclick="syncToDhis2()"><span class="inline-icon">${getIcon('link', 14)}</span> Sync to DHIS2</button>` : ''}
+                    ${state.dhis2.url ? `<button class="modal-btn" style="background:#6f42c1;color:#fff;" onclick="syncCaseBased()"><span class="inline-icon">${getIcon('list', 14)}</span> Sync Case-Based</button>` : ''}
+                    ${state.dhis2.url ? `<button class="modal-btn" style="background:#17a2b8;color:#fff;" onclick="syncAggregate()"><span class="inline-icon">${getIcon('bar-chart-3', 14)}</span> Sync Aggregate</button>` : ''}
                 </div>
             `;
             initIcons();
@@ -3485,6 +4663,13 @@
         window.switchDataView = function(view) {
             state.currentDataView = view;
             renderDataContent();
+        };
+        
+        window.setAggregateColumn = function(columnName) {
+            state.settings.aggregateColumn = columnName;
+            saveToStorage();
+            renderDataContent();
+            renderDashboard();
         };
 
         function renderCaseTable(data) {
@@ -3514,17 +4699,17 @@
 
         function renderAggregateTable(data) {
             if (data.length === 0) {
-                return '<p style="text-align:center;padding:40px;color:#868e96;"><span data-icon="inbox" data-size="20"></span> No aggregate data (select Period Column and Org Unit Column in DHIS2 settings)</p>';
+                return '<p style="text-align:center;padding:40px;color:#868e96;"><span data-icon="inbox" data-size="20"></span> No aggregate data available</p>';
             }
             
             const periodColumn = state.dhis2.periodColumn;
-            const orgUnitColumn = state.dhis2.orgUnitColumn;
+            const aggregateColumn = state.settings.aggregateColumn || state.dhis2.orgUnitColumn;
             
-            // Fields to skip (period, org unit, and non-aggregatable types)
-            const skipFields = [periodColumn, orgUnitColumn];
+            // Fields to skip (period, aggregate column, and non-aggregatable types)
+            const skipFields = [periodColumn, aggregateColumn].filter(Boolean);
             const skipTypes = ['phone', 'gps', 'email', 'text', 'textarea', 'date', 'time'];
             
-            // Exclude period, org unit, and text-based fields
+            // Exclude period, aggregate column, and text-based fields
             const dataFields = state.fields.filter(f => 
                 f.type !== 'section' && 
                 !skipFields.includes(f.name) &&
@@ -3558,9 +4743,13 @@
                 // Skip text fields and other non-aggregatable types
             });
             
+            // Get the aggregate column label (aggregateColumn already defined above)
+            const aggregateField = state.fields.find(f => f.name === aggregateColumn);
+            const aggregateLabel = aggregateField?.label || 'Group';
+            
             // Build table
             let html = '<div style="overflow-x:auto;"><table class="aggregate-table"><thead><tr>';
-            html += '<th style="position:sticky;left:0;background:#004080;z-index:2;"><span class="inline-icon">' + getIcon('building-2', 14) + '</span> Facility</th>';
+            html += '<th style="position:sticky;left:0;background:#004080;z-index:2;"><span class="inline-icon">' + getIcon('layers', 14) + '</span> ' + escapeHtml(aggregateLabel) + '</th>';
             html += '<th><span class="inline-icon">' + getIcon('calendar', 14) + '</span> Period</th>';
             html += '<th><span class="inline-icon">' + getIcon('bar-chart-3', 14) + '</span> N</th>';
             
@@ -3572,7 +4761,7 @@
             
             data.forEach(row => {
                 html += `<tr>`;
-                html += `<td style="position:sticky;left:0;background:#fff;z-index:1;font-weight:600;">${escapeHtml(row._orgUnit)}</td>`;
+                html += `<td style="position:sticky;left:0;background:#fff;z-index:1;font-weight:600;">${escapeHtml(row._group)}</td>`;
                 html += `<td>${escapeHtml(row._period)}</td>`;
                 html += `<td class="aggregate-value" style="font-weight:600;">${row._count}</td>`;
                 
@@ -3599,10 +4788,10 @@
             const data = isAggregate ? calculateAggregateData() : getFilteredData();
             if (data.length === 0) { notify('No data', 'error'); return; }
             
-            // For aggregate data, include _orgUnit, _period, _count; for case data, include _timestamp
+            // For aggregate data, include _group, _period, _count; for case data, include _timestamp
             const headers = Object.keys(data[0]).filter(k => {
                 if (isAggregate) {
-                    return k === '_orgUnit' || k === '_period' || k === '_count' || !k.startsWith('_');
+                    return k === '_group' || k === '_period' || k === '_count' || !k.startsWith('_');
                 }
                 return !k.startsWith('_') || k === '_timestamp';
             });
@@ -3642,8 +4831,11 @@
             const pending = state.collectedData.filter(d => !d._synced && !d._syncError).length;
             const periodColumn = state.dhis2.periodColumn;
             const uniquePeriods = periodColumn ? [...new Set(filteredData.map(d => d[periodColumn]).filter(Boolean))].length : 0;
-            const orgUnitColumn = state.dhis2.orgUnitColumn;
-            const uniqueOrgUnits = orgUnitColumn ? [...new Set(filteredData.map(d => d[orgUnitColumn]).filter(Boolean))].length : 0;
+            
+            // Use aggregateColumn from settings, or fall back to orgUnitColumn for DHIS2
+            const aggregateColumn = state.settings.aggregateColumn || state.dhis2.orgUnitColumn;
+            const aggregateField = state.fields.find(f => f.name === aggregateColumn);
+            const uniqueGroups = aggregateColumn ? [...new Set(filteredData.map(d => d[aggregateColumn]).filter(Boolean))].length : 0;
             
             // Build filter panel HTML (same as Data tab)
             let filtersHtml = `
@@ -3672,11 +4864,11 @@
                 `;
             });
             
-            // Build charts - EXCLUDE org unit column from charts
+            // Build charts - EXCLUDE aggregate column from charts
             const categoricalTypes = ['select', 'radio', 'yesno', 'checkbox'];
             const categoricalFields = state.fields.filter(f => 
                 categoricalTypes.includes(f.type) && 
-                f.name !== orgUnitColumn && 
+                f.name !== aggregateColumn && 
                 f.name !== periodColumn
             );
             const numericFields = state.fields.filter(f => f.type === 'number');
@@ -3745,8 +4937,8 @@
                     <div class="stat-card"><div class="stat-value">${filteredData.length}</div><div class="stat-label">Total Records</div></div>
                     <div class="stat-card success"><div class="stat-value">${synced}</div><div class="stat-label">Synced</div></div>
                     <div class="stat-card warning"><div class="stat-value">${pending}</div><div class="stat-label">Pending</div></div>
-                    <div class="stat-card info"><div class="stat-value">${uniquePeriods}</div><div class="stat-label">Periods</div></div>
-                    <div class="stat-card purple"><div class="stat-value">${uniqueOrgUnits}</div><div class="stat-label">Facilities</div></div>
+                    ${periodColumn ? `<div class="stat-card info"><div class="stat-value">${uniquePeriods}</div><div class="stat-label">Periods</div></div>` : ''}
+                    ${aggregateColumn ? `<div class="stat-card purple"><div class="stat-value">${uniqueGroups}</div><div class="stat-label">${escapeHtml(aggregateField?.label || 'Groups')}</div></div>` : ''}
                     <div class="stat-card"><div class="stat-value">${aggregateData.length}</div><div class="stat-label">Aggregate Rows</div></div>
                 </div>
                 
@@ -3802,13 +4994,23 @@
         }
 
         function showTab(tab, btn) {
+            console.log('=== showTab called ===', tab);
             document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.viewer-nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
+            const tabEl = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+            console.log('Tab element ID:', 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+            console.log('Tab element found:', !!tabEl);
+            if (tabEl) tabEl.classList.add('active');
             if (btn) btn.classList.add('active');
             
-            if (tab === 'data') renderDataContent();
-            if (tab === 'dashboard') renderDashboard();
+            if (tab === 'data') {
+                console.log('Rendering data tab...');
+                renderDataContent();
+            }
+            if (tab === 'dashboard') {
+                console.log('Rendering dashboard tab...');
+                renderDashboard();
+            }
         }
 
         function goToPage(pageIndex) {
@@ -3840,6 +5042,78 @@
             const container = star.parentElement;
             container.querySelectorAll('span').forEach((s, i) => s.style.opacity = i < val ? '1' : '0.3');
             container.querySelector('input').value = val;
+        };
+
+        // QR/Barcode Scanner
+        window.activeQRStream = null;
+        
+        window.startQRScanner = async function(btn) {
+            const container = btn.closest('.qr-scanner-container');
+            const preview = container.querySelector('.qr-preview');
+            const video = container.querySelector('.qr-video');
+            const status = container.querySelector('.qr-status');
+            const input = container.querySelector('input[type="text"]');
+            
+            status.innerHTML = '<span class="inline-icon">' + getIcon('loader', 12) + '</span> Starting camera...';
+            preview.style.display = 'block';
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = stream;
+                video.play();
+                window.activeQRStream = stream;
+                
+                status.innerHTML = '<span class="inline-icon" style="color:#17a2b8;">' + getIcon('scan', 12) + '</span> Point camera at QR code or barcode...';
+                
+                // Check for BarcodeDetector API
+                if ('BarcodeDetector' in window) {
+                    const detector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'code_93', 'upc_a', 'upc_e', 'itf', 'codabar'] });
+                    
+                    const scanLoop = async () => {
+                        if (!window.activeQRStream) return;
+                        
+                        try {
+                            const barcodes = await detector.detect(video);
+                            if (barcodes.length > 0) {
+                                const value = barcodes[0].rawValue;
+                                input.value = value;
+                                status.innerHTML = '<span class="inline-icon" style="color:#28a745;">' + getIcon('check-circle', 12) + '</span> Scanned: ' + value;
+                                stopQRScanner(btn);
+                                return;
+                            }
+                        } catch (err) {
+                            console.log('Scan error:', err);
+                        }
+                        
+                        if (window.activeQRStream) {
+                            requestAnimationFrame(scanLoop);
+                        }
+                    };
+                    
+                    scanLoop();
+                } else {
+                    status.innerHTML = '<span class="inline-icon" style="color:#ffc107;">' + getIcon('alert-triangle', 12) + '</span> Scanner not supported - enter value manually';
+                }
+            } catch (err) {
+                status.innerHTML = '<span class="inline-icon" style="color:#dc3545;">' + getIcon('x-circle', 12) + '</span> Camera error: ' + err.message;
+                preview.style.display = 'none';
+            }
+        };
+        
+        window.stopQRScanner = function(btn) {
+            const container = btn.closest('.qr-scanner-container');
+            const preview = container.querySelector('.qr-preview');
+            const video = container.querySelector('.qr-video');
+            
+            if (window.activeQRStream) {
+                window.activeQRStream.getTracks().forEach(track => track.stop());
+                window.activeQRStream = null;
+            }
+            
+            video.srcObject = null;
+            preview.style.display = 'none';
         };
 
         // Initialize
