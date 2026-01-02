@@ -794,13 +794,13 @@
             date: { label: 'Date', icon: 'calendar', defaultLabel: 'Date Field', valueType: 'DATE', category: 'date' },
             time: { label: 'Time', icon: 'clock', defaultLabel: 'Time Field', valueType: 'TIME', category: 'time' },
             email: { label: 'Email', icon: 'mail', defaultLabel: 'Email Address', valueType: 'TEXT', category: 'text' },
-            phone: { label: 'Phone', icon: 'phone', defaultLabel: 'Phone Number', valueType: 'PHONE_NUMBER', category: 'text' },
+            phone: { label: 'Phone', icon: 'phone', defaultLabel: 'Phone Number', valueType: 'TEXT', category: 'text' },
             textarea: { label: 'Long Text', icon: 'align-left', defaultLabel: 'Long Text', valueType: 'LONG_TEXT', category: 'text' },
             select: { label: 'Dropdown', icon: 'chevron-down-square', defaultLabel: 'Dropdown', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
             radio: { label: 'Radio', icon: 'circle-dot', defaultLabel: 'Radio Choice', valueType: 'TEXT', category: 'categorical', options: ['Option 1', 'Option 2', 'Option 3'] },
             checkbox: { label: 'Checkbox', icon: 'check-square', defaultLabel: 'Checkbox', valueType: 'TRUE_ONLY', category: 'categorical', options: ['Option 1', 'Option 2'] },
             yesno: { label: 'Yes/No', icon: 'toggle-left', defaultLabel: 'Yes/No Question', valueType: 'BOOLEAN', category: 'categorical' },
-            gps: { label: 'GPS', icon: 'map-pin', defaultLabel: 'GPS Location', valueType: 'COORDINATE', category: 'special' },
+            gps: { label: 'GPS', icon: 'map-pin', defaultLabel: 'GPS Location', valueType: 'TEXT', category: 'text' },
             rating: { label: 'Rating', icon: 'star', defaultLabel: 'Rating', valueType: 'INTEGER', category: 'categorical', max: 5 },
             section: { label: 'Section', icon: 'folder', defaultLabel: 'New Section', valueType: null, category: 'structure' }
         };
@@ -1363,16 +1363,25 @@
             
             clearLog();
             addLog('info', `Setting up DHIS2 (${state.dhis2.syncMode} mode)...`);
+            addLog('info', `Period column: ${periodColumn || 'Not set'}`);
+            addLog('info', `Org Unit column: ${orgUnitColumn || 'Not set'} (will be used for assignment, not as data element)`);
             updateDhis2Status('syncing', 'Setting up...');
             
-            const dataFields = state.fields.filter(f => 
-                f.type !== 'section' && f.name !== periodColumn && f.name !== orgUnitColumn
-            );
+            // Skip fields: sections, period column, org unit column
+            const skipFieldNames = [periodColumn, orgUnitColumn].filter(Boolean);
+            
+            const dataFields = state.fields.filter(f => {
+                if (f.type === 'section') return false;
+                if (skipFieldNames.includes(f.name)) return false;
+                return true;
+            });
             
             if (dataFields.length === 0) {
                 notify('Add data fields first', 'error');
                 return;
             }
+            
+            addLog('info', `Data fields to create: ${dataFields.map(f => f.label).join(', ')}`);
             
             // Ensure org units are loaded
             if (state.dhis2.orgUnits.length === 0) {
